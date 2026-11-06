@@ -11,6 +11,7 @@
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="icon" href="icon-192.png">
 <meta name="robots" content="noindex">
+<title>ERMANO e-Sign</title>
 
 <style>
 /* ERMANO e-Sign v2 — shared styles: UI primitives, document pages (8.5 x 13 in long bond), signature boxes, signature pad. */
@@ -2065,7 +2066,7 @@ var Forms = (function(){
   function executedHtml(){
     var css=''; document.querySelectorAll('style').forEach(function(st){ css+=st.textContent+'\n'; });
     Forms.S.docSet=null; Forms.render($('pages'));
-    return '<!DOCTYPE html><html><head><meta charset="utf-8"><title>EXECUTED '+Forms.esc(A.id)+' '+Forms.esc(Forms.S.f.loanId||'')+'</title><style>'+css+'</style></head><body class="archive"><div class="pages" style="zoom:1">'+$('pages').innerHTML+'</div>'+
+    return '<!DOCTYPE html><html><head><meta charset="utf-8"><style>'+css+'</style></head><body class="archive"><div class="pages" style="zoom:1">'+$('pages').innerHTML+'</div>'+
       '<div class="no-print" style="font:11px monospace;padding:12px">Package '+Forms.esc(A.id)+' · docHash '+Forms.esc(Forms.S.docHash)+' · archived by '+Forms.esc(A.operator)+' · '+new Date().toISOString()+'</div></body></html>';
   }
   $('bArchive').onclick=function(){
