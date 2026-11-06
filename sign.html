@@ -1,0 +1,1505 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0F4C81">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="e-Sign">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" href="icon-192.png">
+<meta name="robots" content="noindex">
+
+<style>
+/* ERMANO e-Sign v2 — shared styles: UI primitives, document pages (8.5 x 13 in long bond), signature boxes, signature pad. */
+:root{
+  --royal:#1d3f8f; --royal-ink:#14295c; --gold:#c49a2c; --gold-soft:#f6ecd2;
+  --bg:#eef1f7; --panel:#ffffff; --line:#d5dbe8; --fg:#1b2233; --muted:#5d6782;
+  --ok:#1f7a4d; --warn:#b4471b; --crit:#8d1d1d;
+  --ui:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+  --doc-sans:Arial,Helvetica,"Liberation Sans",sans-serif;
+  --doc-serif:Cambria,Georgia,"Times New Roman",serif;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{margin:0}
+body{background:var(--bg);color:var(--fg);font:14px/1.45 var(--ui)}
+button{font:inherit;cursor:pointer}
+button:disabled{opacity:.55;cursor:not-allowed}
+button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px solid var(--gold);outline-offset:1px}
+.btn{border:1px solid var(--line);background:#fff;color:var(--fg);border-radius:6px;padding:7px 12px}
+.btn.primary{background:var(--gold);border-color:var(--gold);color:#1b1404;font-weight:600}
+.btn.royal{background:var(--royal);border-color:var(--royal);color:#fff;font-weight:600}
+.btn.ghost{background:transparent;color:#fff;border-color:#4a5f96}
+.btn.sm{padding:4px 9px;font-size:12.5px}
+.btn.danger{color:var(--warn);border-color:#f0c9b8}
+.pill{font-size:11px;border-radius:99px;padding:2px 8px;font-weight:600;white-space:nowrap;display:inline-block}
+.pill.ok{background:#e1f3e9;color:var(--ok)}
+.pill.no{background:#fbe9e1;color:var(--warn)}
+.pill.crit{background:#f9e3e3;color:var(--crit)}
+.pill.info{background:#e4eafa;color:var(--royal)}
+.pill.mute{background:#eceef3;color:var(--muted)}
+.toast{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);background:var(--royal-ink);color:#fff;padding:10px 16px;border-radius:8px;z-index:80;max-width:90vw;font-size:13px;white-space:pre-line}
+
+.pages{display:flex;flex-direction:column;align-items:center;gap:18px}
+
+/* signature pad */
+.modal{position:fixed;inset:0;background:rgba(10,18,40,.55);z-index:60;display:flex;align-items:center;justify-content:center;padding:16px}
+.pad{background:#fff;border-radius:12px;width:min(680px,100%);padding:16px;display:flex;flex-direction:column;gap:10px}
+.pad h3{margin:0;color:var(--royal-ink);font-size:16px}
+.pad p{margin:0;font-size:13px;color:var(--muted)}
+.pad canvas{width:100%;height:240px;border:1.5px dashed var(--royal);border-radius:8px;touch-action:none;background:#fff;background-image:linear-gradient(to top,transparent 56px,#c8cfdf 56px,#c8cfdf 57px,transparent 57px)}
+.pad.fig canvas{height:170px;background-image:linear-gradient(to top,transparent 40px,#c8cfdf 40px,#c8cfdf 41px,transparent 41px)}
+.pad .row{display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap}
+
+/* ---------- pages ---------- */
+.page{width:8.5in;min-height:13in;background:#fff;color:#000;box-shadow:0 2px 14px rgba(20,40,90,.18);padding:.45in .6in .6in;position:relative;font-family:var(--doc-sans);font-size:10pt;line-height:1.3}
+.page.serif{font-family:var(--doc-serif);font-size:11pt;line-height:1.45}
+.pfoot{position:absolute;left:.6in;right:.6in;bottom:.22in;font-size:6.3pt;line-height:1.25;color:#555;display:flex;justify-content:space-between;gap:10px;border-top:.5pt solid #bbb;padding-top:3px}
+.co{margin:0;color:#000;font:700 15pt var(--doc-sans);letter-spacing:.02em}
+.hdr{display:grid;grid-template-columns:1.25in 1fr 1.25in;align-items:center}
+.hdr img{width:1.15in}
+.hdr .t{text-align:center}
+.hdr .t div{font-size:10pt}
+.hdr .t .addr{font-size:9pt}
+.hdr .t .dt{font-weight:700;font-size:11pt;margin-top:3px}
+.hdr .t .ds{font-size:8.5pt;color:#222}
+.hdr2{display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:6px}
+.hdr2 img{width:1.1in}
+.hdr2 .addr{font:10pt var(--doc-sans)}
+.doc-title{text-align:center;color:#2f5597;font-weight:700;font-size:12.5pt;margin:12px 0 18px}
+.u{display:inline-block;border-bottom:1px solid #000;min-width:1in;padding:0 4px;text-align:center;font-weight:700}
+.u.l{text-align:left}
+.cbx{font-family:"Segoe UI Symbol","DejaVu Sans",var(--doc-sans);font-size:9.5pt}
+.draftline{font:700 8pt var(--doc-sans);color:#8d1d1d;border:1px solid #8d1d1d;background:#fff2f2;padding:2px 6px;margin-bottom:6px;text-align:center;letter-spacing:.03em}
+.fine{font-size:7.6pt;color:#222;line-height:1.25}
+
+/* v2 document pages */
+.doc{font-size:8.8pt;line-height:1.28}
+.doc h2{font:700 9pt var(--doc-sans);margin:7px 0 3px;letter-spacing:.02em}
+.doc p{margin:0 0 4px;text-align:justify}
+.doc ul,.doc ol{margin:0 0 4px 0;padding-left:.25in}
+.archive .sig .hint{display:none}
+.archive .no-print{display:block}
+.doc li{margin:0 0 2px}
+.doc table.kvt{width:100%;border-collapse:collapse;margin:3px 0 4px;font-size:8.6pt}
+.doc table.kvt th{width:2.1in;text-align:left;font-weight:700;border:1px solid #000;padding:2px 5px;vertical-align:top;background:#f3f3f3}
+.doc table.kvt td{border:1px solid #000;padding:2px 5px;vertical-align:top}
+.doc table.kvt .u{font-weight:700;min-width:1in}
+.doc table.chg{width:100%;border-collapse:collapse;font-size:8.4pt;margin:2px 0 3px}
+.doc table.chg th{border:1px solid #000;padding:2px 5px;text-align:left;background:#f3f3f3}
+.doc table.chg td{border:1px solid #000;padding:2px 5px;vertical-align:top}
+.doc table.chg .a,.doc table.sched .a{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+.doc table.chg .c,.doc table.sched .c{text-align:center;white-space:nowrap}
+.doc table.chg tr.tot td{background:#fafafa}
+.doc table.sched{width:100%;border-collapse:collapse;font-size:8.6pt;margin:6px 0}
+.doc table.sched th{border:1px solid #000;padding:2px 5px;text-align:left;background:#f3f3f3}
+.doc table.sched td{border:1px solid #000;padding:1.5px 5px}
+.doc table.sched tr.tot td{border-top:2px solid #000}
+.doc table.sa{margin:0 0 6px;font-size:8pt}
+.doc table.sa th{width:1.45in}
+.sg3.narrow{grid-template-columns:1.6fr 1.6fr 1fr}
+.doc table.sa th.sah{background:#e8e8e8;text-align:center;width:auto}
+.pn2{font-size:8pt;line-height:1.22}
+.pn2 table.kvt th,.pn2 table.kvt td{padding:1px 4px}
+.pn2 h2{margin:6px 0 2px}
+.figrow{display:inline-flex;align-items:center;gap:6px;flex-wrap:wrap}
+.figcell{display:inline-block;min-width:1.5in;background:#fffbe8;border:1px solid #000;vertical-align:middle}
+.figcell.done{background:#fff}
+.figcell .sig{height:.4in;align-items:center}
+.figcell .sig img{max-height:.38in}
+.figcell .sig .hint{font-size:7.5pt;padding:2px 6px;margin-bottom:1px}
+
+/* signature primitives */
+.sig{position:relative;height:.52in;display:flex;align-items:flex-end;justify-content:center}
+.sig img{max-height:.5in;max-width:100%;display:block}
+.sig .hint{font:600 9pt var(--ui);color:var(--royal);border:1.5px dashed var(--royal);border-radius:6px;padding:4px 10px;background:#f2f5fd;margin-bottom:4px;white-space:nowrap}
+.sig.clickable{cursor:pointer}
+.sig.clickable:hover .hint{background:#e4eafa}
+.sig .stamp{position:absolute;right:0;top:0;font:6pt var(--doc-sans);color:#1d3f8f}
+.sigline{border-top:1px solid #000;text-align:center;font-size:8.8pt;padding-top:2px}
+.sigline b{display:block;font-size:9.5pt;text-transform:uppercase}
+.sg3{display:grid;grid-template-columns:2.2fr 1.7fr 1.1fr;gap:.18in;align-items:end;margin:6px 0 2px}
+.sg3 .cell{min-width:0}
+.sg3 .cell .v{border-bottom:1px solid #000;min-height:.52in;display:flex;align-items:flex-end;padding:0 3px 1px;font-weight:700;text-transform:uppercase;font-size:8.6pt;word-break:break-word}
+.sg3 .cell .sig{border-bottom:1px solid #000}
+.sg3 .cell .c{font-size:7.4pt;color:#222;padding-top:1px}
+.sigsec{margin-top:6px}
+.sigsec .sh{font-weight:700;font-size:8.6pt;margin-top:4px}
+.line2{margin:3px 0 0;font-size:8.4pt}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:.5in;margin-top:8px}
+.wit2{display:grid;grid-template-columns:1fr 1fr;gap:.5in;margin-top:4px}
+
+/* legacy v1 DS / PN + PDC / BP22 */
+.dshead{display:grid;grid-template-columns:1fr 2.6in;gap:2px 16px;margin-top:10px;font-size:9.3pt}
+.dshead>div{display:flex;gap:6px;align-items:flex-end}
+.dshead .u{flex:1;min-width:0}
+.ds{width:100%;border-collapse:collapse;font-size:9.3pt;line-height:1.2}
+.ds td{padding:1px 2px;vertical-align:bottom}
+.ds .m{width:1.8in;border-bottom:1px solid #000;text-align:right;font-variant-numeric:tabular-nums}
+.ds .p{width:.2in;text-align:right}
+.ds .gap{width:.25in}
+.ind1{padding-left:.22in!important}
+.ind2{padding-left:.45in!important}
+.ck{display:inline-block;min-width:.27in;text-align:center}
+.small{font-size:7.5pt}
+.addl{width:5.6in;margin:4px auto 0;border-collapse:collapse;font-size:9.5pt}
+.addl td{padding:1px 4px}
+.addl td+td{border-bottom:1px solid #000;text-align:center}
+.pn{font-size:8pt;line-height:1.22}
+.pnh{display:grid;grid-template-columns:1.3in 1fr 1.3in;align-items:center;text-align:center}
+.pnh img{width:1.1in}
+.pnh .s{font-weight:700;font-size:10.5pt}
+.pntab{width:100%;border-collapse:collapse;margin-top:10px;font-size:9pt}
+.pntab td{border:1px solid #000;padding:2px 4px;font-weight:700}
+.pntab td.v{text-align:center}
+.pntab .figcell{display:table-cell;min-width:0;border:1px solid #000;padding:0!important}
+.pnfigsig .sig{height:.42in}
+.pnfigsig .sig img{max-height:.4in}
+.pnfigsig .sig .hint{font-size:7.5pt;padding:2px 6px;margin-bottom:1px}
+.pnfigsig .sig .stamp{display:none}
+.pn p{text-align:justify;margin:0 0 4.5px;text-indent:.45in;font-weight:700}
+.pn .c{text-align:center;font-weight:700}
+.pnsig{display:grid;grid-template-columns:1fr 1fr;gap:.45in;margin-top:6px;font-size:8pt}
+.pnsig .ln{display:grid;grid-template-columns:.7in 1fr;border-bottom:1px solid #000;padding:2px 0;font-weight:700}
+.pnwit{display:grid;grid-template-columns:1fr 1fr;gap:.45in;margin-top:4px}
+.serif p{margin:0 0 10px}
+.bp p{margin:0 0 6px}
+.bp .doc-title{margin:6px 0 10px}
+.ctable{width:100%;border-collapse:collapse;margin:6px 0 16px;font-variant-numeric:tabular-nums}
+.ctable th{text-align:left;font-weight:400;padding:4px 6px;border-bottom:1px solid #000}
+.ctable td{padding:5px 6px;border-bottom:.5pt solid #bbb}
+.ctable .a{text-align:right}
+.ctable tfoot td{font-weight:700;border-bottom:0;border-top:1px solid #000}
+.fieldl{display:grid;grid-template-columns:auto 1fr;gap:6px;align-items:end;margin:3px 0}
+.fieldl span:last-child{border-bottom:1px solid #000;min-height:1.2em;padding:0 4px}
+.serif ul{margin:4px 0 8px .3in;padding-left:.2in}
+.serif ol{padding-left:0;list-style:none;margin:0}
+
+@media print{
+  @page{size:8.5in 13in;margin:0}
+  body{background:#fff}
+  .no-print,.modal,.toast{display:none!important}
+  .wrap{display:block!important;padding:0!important;max-width:none!important;margin:0!important}
+  .pages{gap:0;zoom:1!important}
+  .page{box-shadow:none;break-after:page;height:13in;overflow:hidden}
+  .page:last-child{break-after:auto}
+  .sig .hint{display:none}
+  .figcell{background:#fff!important}
+}
+</style>
+
+<style>
+/* Signer view: only the documents this link's signers must sign, with a checklist bar on top */
+.bar{position:sticky;top:0;z-index:20;background:var(--royal-ink);color:#fff;padding:10px 16px;display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between}
+.bar b{font-size:15px;letter-spacing:.02em}
+.bar small{display:block;color:#c9d3ee;font-size:12px}
+.timer{font-variant-numeric:tabular-nums;background:#2a3f78;border-radius:99px;padding:4px 12px;font-size:13px;font-weight:600}
+.timer.low{background:#8a3412}
+.wrap{max-width:900px;margin:0 auto;padding:16px max(16px,env(safe-area-inset-left)) 40px}
+.card{background:#fff;border:1px solid var(--line);border-radius:10px;padding:16px;margin-bottom:16px}
+.card h2{margin:0 0 6px;font-size:17px;color:var(--royal-ink)}
+.card p{margin:0 0 10px;color:var(--muted)}
+.steps{display:flex;flex-direction:column;gap:8px;margin:10px 0}
+.step{display:flex;justify-content:space-between;align-items:center;gap:10px;border:1px solid var(--line);border-radius:8px;padding:9px 11px}
+.step span{min-width:0}
+.consent{border:1px solid #f0c9b8;background:#fdf1ec;border-radius:8px;padding:10px 12px;margin:8px 0;font-size:13.5px;display:flex;gap:9px;align-items:flex-start}
+.consent input{margin-top:3px;width:18px;height:18px}
+.agree{display:flex;gap:9px;align-items:flex-start;margin:12px 0;font-size:13.5px}
+.agree input{margin-top:3px;width:18px;height:18px}
+.err{color:var(--warn);font-size:13px;margin-top:8px;white-space:pre-line}
+.big{padding:11px 18px;font-size:15px}
+.state{text-align:center;padding:40px 16px}
+.state h2{color:var(--royal-ink)}
+.doclist{margin:6px 0 0;padding-left:18px;font-size:13px;color:var(--muted)}
+.otp{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:10px 0}
+.otp input{font-size:22px;letter-spacing:.35em;width:9.5em;text-align:center;padding:8px 10px;border:1px solid var(--line);border-radius:8px}
+.privacy{border:1px solid var(--line);background:#f7f8fb;border-radius:8px;padding:10px 12px;margin:8px 0;font-size:12.5px;color:var(--fg);max-height:150px;overflow:auto}
+</style>
+</head>
+<body>
+<div class="bar no-print">
+  <div><b>ERMANO LENDING CORPORATION</b><small>Loan documents for e-signature</small></div>
+  <span class="timer" id="timer" hidden></span>
+</div>
+
+<main class="wrap">
+  <div class="card state no-print" id="loading"><h2>Loading…</h2></div>
+  <div class="card state no-print" id="blocked" hidden><h2>Link unavailable</h2><p id="blockedMsg"></p></div>
+
+  <div class="card no-print" id="verify" hidden>
+    <h2>Verify your mobile number</h2>
+    <p id="verifyMsg"></p>
+    <div class="otp"><input id="otp" inputmode="numeric" autocomplete="one-time-code" maxlength="6" aria-label="6-digit verification code" placeholder="000000"><button class="btn royal big" id="verifyBtn" type="button">Open my documents</button></div>
+    <div class="err" id="verifyErr" role="alert"></div>
+    <p style="font-size:12.5px">The code was sent by ERMANO Lending to the mobile number you gave your loan officer. Do not share it. Five wrong entries cancel this link.</p>
+  </div>
+
+  <div class="card no-print" id="intro" hidden>
+    <h2 id="hello"></h2>
+    <p>Please read every document below. When you are ready, complete each step, then submit. You can submit only once. The documents are dated on the day you submit.</p>
+    <ul class="doclist" id="docList"></ul>
+    <div class="steps" id="steps"></div>
+    <div id="consentBox"></div>
+    <div class="privacy" id="privacy"></div>
+    <label class="agree"><input type="checkbox" id="privacyAck"> <span>I have read the Data Privacy Notice above and consent to the processing described.</span></label>
+    <label class="agree"><input type="checkbox" id="agree"> <span id="agreeText"></span></label>
+    <button class="btn royal big" id="submit" type="button">Submit signed documents</button>
+    <div class="err" id="err" role="alert"></div>
+  </div>
+
+  <div class="card no-print" id="done" hidden>
+    <h2>Documents signed and submitted</h2>
+    <p id="doneMsg"></p>
+    <button class="btn" id="printCopy" type="button">Print / save a copy</button>
+  </div>
+
+  <div class="pages" id="pages"></div>
+</main>
+
+<script>
+/* ERMANO e-Sign v3 — shared computation engine, versioned document renderers and signature pad (Admin and Sign pages). */
+var Forms = (function(){
+  var LOGO = '/9j/4AAQSkZJRgABAQEA3ADcAAD/2wBDAAgGBgcGBQgHBwcJCQgKDBQNDAsLDBkSEw8UHRofHh0aHBwgJC4nICIsIxwcKDcpLDAxNDQ0Hyc5PTgyPC4zNDL/2wBDAQkJCQwLDBgNDRgyIRwhMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjL/wAARCADtASUDASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwD32iiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKQsFYL/EegqO4nW2t3mcEhRwq9WPYD3J4H1rjZ5p/EuuXOlJKBplmwXU5Y2J+1SkZ+zKRwEUH5+5zggZbOtKlz6vZETnymsPEsmovt0GybUEB5uzIIrXuCBJgl+QeUVhngkVA9n4iYFm1Kwh3cmMQTybfbd565/75H0roIFjhhWKNFREUKqqMAAdABUcpBq1NRfur9TOSutWc0+o69pUIEkC3UcYY+ZasWZuOC0UhLED0WXPTArV0jxRZaoQm9FYsUVwTsZwcbDnBSTGCUYA88bsEhLg9a47xBavbtJqVhCklyFxPbkkLdxj+BsfxD+FuoPsTXSqUaqtazMlUcHq9D06iuV8F+JY9ZtPsrTmaWKJJYZnI3XEDdGI/vqQUb3APG4AdVXBKLi7M607q4UUUVIwooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKAMHxLqa6ciSuheO1t59QkQH/AFiwp9367nUj/dryhr660rw/4figvnF5LGdUuZV+/JJKdyMx/i43gg8HvXe/EKby4ZIgGL3Gi6jDEoGd7lYiFHuQrHHsa88TSLvXdG0bUNPaKSNNJhgYM+CXj3AqPfJI9OK9jL+TTn2/4c87G83K+Xf/AIY1x8S9cRAvl2DYGCzRNk+/DYz+FWYtU8V3DG2stQU3YJa/vrpFW1s9vAh3YK7/AJvmAXOSB/C1cW1prWnTwXMVsyXEd4sEWx0kbz8BlAUE5P4Y7VzWv+JdU1y7MuqXs1w6k7Vc4VOgO1RwvQdAK76mHo3TpKNvvOai6n/LxvyO71Px54s8N6jcadrEFpNcA7lklhIDJyAyFCoKnHXH5EEVzOsfETWNReM5ggSN1k8qFSFdlORkklseozjgccVgLqmqz6fBozS4s5sy2yXW1UGGOWjd8bcsGB2kZORyalPhDWJBuU2xjKb0kEwZX9ACM/n096xST+FK/l/Wh0NRXxP7z0nwhqY03xiYVaYxW2pCFmGNohvEyEA9PPEZ/wAmvcK+efDdwreLNRjUF/P1bSo4yoyCUcMw/BVJPpivoavKxySrM6sM26av2X5BRRRXGdAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUjusaM7sFRRlmY4AHqaWuU+Ik19beFXnso3cRyhp9naPBySPQHb/PtWtGn7WooXtczqz9nBytex0dtf2d60i2t3BO0eN4ikDFc9M46VYrwz4XTanqnj03dvkWkMDi7cqcMrD5UBx13bW7cKfpXudbY3DLD1fZp3JoVXUhzNWCiiiuQ2CiiigAooooA5/xhZXNzogurJHkvNPlF3FEvWUKCroBg5LRs4H+0RXj3g/WY9F1K48NSSZtZCbrS5SeHhf5gvODnqenXd6DP0DXi/xO+H/nNNqWkXKMFcz/AGQOBLBKTlmh9Qx+Yp1zkrycV2YSok+VnPiKfNE0rl1aeO5QhLmLPlyjIZcqVPIIOCGI4IPPBBwRyfirSY9dtF2WcEGoRgBLiNysQQMQsYTrjadxY5O7gcHjG0zXvEtrELfVdC1O525xcRWzbj6ZGAPx4+netYau8i5bTdVQ/wB1rCXP6Ka9eCoS1crP7jz17aGiV0JbaesSyrLHFHayvHcNp8eHt0uFUq0qAgFd2SdowBnHIC4i1rWI9NspLiUg7RhVzjc3YCqt3q98AwttA1idh0/0N1U/iRkflVPQfDus+IvEEEuqRmyZMsjXUZjhtgP4zuxvb0UHJOMkDka+2o0YtUt/618/QXs51Jc1Q7b4SeH7xtShuroyr9iaS8ueMK11Mm1V5X+GIksAeC69RXtdZPhvS9L0fRIrPSZFlt1JZpvMEjSyE/M7MOrE9fyGAAK1q+crT55tnrU1aIUUUVkWFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFef/ABJ8R3WkvaWlpcyQF0aR/LbaTzgcjnsa9Arw74z3Bj8W2keePsCH/wAiSf4V6WU041MUlPbU48fzewai7HQ+A/iL9qvP7J1u5QO2BbXD4G4/3GPr6E9eRnJFel3U62tpNcskjrFG0hSJCzMAM4UDkn0FfOPg3wbL42i1UW16ttc2QiZBIpKSb9/BI5H3Bzg/SutsLL4m+EZktreGW/tVYKiLIs0TBQTgbiGQYz/dzwOuK68fhMPOtL2U1FrdPRfIzw9WpCmlNNrueoeGfENr4q8PW2tWUcsdvcF9izABhtcqc4JHVT3rWrzrw14mN1pUtprF6lrNqQuXSKM+XPZv5kiurIPnQZUlWPO7cpIO0He8OeJ/tkq6ZqLqL3B8mbAC3IAyfYSAAkr0IBZeNyp5U8PJczWqR1RrRdk9Gzp6KKK5zYKKKKAOa8d6w2keF5/KdkuLo/Z4mXIK7gdxyCCpChsHscV4FcWg1K8stKjKxPqFzHaBwudodgCfyzXsfxL8P3uoW39rxXERt9PtpGaBlwwH3mKt3LbUGCQPlzmvFdF1Waw8U2mp3FjM9pAJFKJIof50Kbh1AK7iR/SvfwCisNLk1kzzMRzOuubSKLHieeHzr66traKAMZJI41QAJnJAH0pfEFpFataRrDGhWwtAwVQPm+zx7j9Sc1leJb2C6JSwS7aNvvNcRpGQPortn061p+IvE+i69dSXxXUba4lALW628bohAAwH8wEjjj5RXdKcI1L20tbZnNCFV01fe/co4STwvp90kUce2a5tH2qAXZH8zcT34mVf+AVBpzn+zNUji3rNA0d0HQhQIifLcE9WO9ocDtlvU1n2OqR/YXsb5Z0h88zxPCFcxlhhxtJXO7bHznjZ054Z9vt7PUBNaJLdQmJ43W4jEZIdSp4DMMjIYE9GAOOK53UXIlbVeR1cj5n5nqHwe8XPY+IX0S8nJttQ5hLt9yYDjknjcBj1JCiveq+XPBPhWXxZrITRdUltLizKTtNcQBCgDD5k2u2WB5AOOnUV9R14+OUPaXj1Oyg3y2YUUUVxGwUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABWJresahpLmWPTIp7FUBadrkoVYkjG0IeOnOe9bdZmu6Fa+IdO+x3Uk8YDb0kgk2sjYIz3B4J4YEe2QK0pOCmvaK66/1oRUUnF8jszjbn4pmBiq6Xbsw7Nelf/adeX/EfX/+EmvLfVVtEt5YYvIdI5zLuUEsG+4uMEtn6j3q14z8OX+h6vDY6ff2+stOzKIYmVJ42AZtrLuOSVXjpuPAGcCuJu7q6sLtobmG4s7qIgmOZDHIh6jg8jsa+pw2GwNlUoytLzv+p5DqYq9qmq+QaN4l1Pw/f/btKvHtp8bWK4IYejA8EfWvXvCfxmfW7ldH1lI7C5ugYbfULYZVJGAC7kbPfv06ZGMmvG219woS5tbK9hMhkkWeBd8jEkndMu2U8n+/+lUNUe1XUpjZbRauRJEiuX8tWAYIWIGSudpPcqa5MRThOTVRK/dHZTbSvE9c8UaVrPgu6WW+dLq1uZMLfJkGWQgkhwSSGwpOSWyB1zxWPp3imHUL1NP1CQaczuPLuXlPlqQQVbeBlSG5DY+UjJIxw34lfFa28Z2Vrpum2U0FpFMJ3luCBI7hWUDapIAwx7nPHTHODo+m7NPXUNZuksrK4+S3ia3E9xdkg/6mI9sjG8lQCcAk5FOlWfsF7XR/10MKlCPtLx1R9MeHNRvbm2ksdWTy9Vstqz9MSqR8sq4/hbBHsyuO2a2q4DwNYatPLpWpSWP9n6ZaafLZwQ3bM166mRSvmDYoUAJwOcZPJzmu/rwaySnoelBtx1CiiisizE8ZHHgnXD6WM3/oBrwPwmyT3pjdI3DvbRkOiv8AK91CjYBBGdrMM+9e9eN+PAmvf9eE3/oBr538CSmTXYkz1ns//S23r18DPlw9Q48RG9SJ7J4o8EaJpvhPWdQgtY/tFtYzTxs0ERAZULDjZ6ivNPAfgvSfFer+Io79JlSzmQQiF9gAZpMjp/sivb/Gwz4C8RD10y5/9FNXzlofjrUfB2sawdOhs5ftk/7w3CM2NrPjG1h/eNZYaVSpTlZ66fqXUUYyWnf9D0G6+FPhyPxJYWCC7EM1pczP++5LI8IXt0xI36VzXxJ8B6P4V8P217p32jzZLxYW82TcNpR29PVRTX+LetTahBqLWum+fBDJCoEUm3a7IxyN/XMa9/WsHxb8QNW8W6dFYX8FjHDFOJwbeN1YsFZccseMMa6lQrxs5PT1M+ZPY7D9n/8A5GHV/wDr0X/0MV79Xgf7Pyn+3dYbsLZB/wCPV77Xm4z+MzppfCJRRRXKaBRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFeKeJviOYNb17w1r9zqGnMt1+4e0ETKsOweWDlSWDZEjAkddpwMg+r654j0fw3aC51e/htUP3Qxy78gfKoyzYyM4HFfNXjLXvDfiP4hDWntL86XOE+1R5VZWZV2ZHJAGAvGQTg8rnI6sPB/HKN4mVV3XKnZj5vDd3cWdzdaHq8PiS6uHBkLKBcpGiggeW5JclieF3Y8tT3wM54PEOs+HbkXEepXkGjtsnid932Tr1jJLKMKckAAbTk9RWfrFtosCG40bUJ1uTcyAwRxt5Kx5yrI7EPjkKFYE/KxJGQDqWfiS8lgC6xcwapmMxFb6yErhewEwdZQPYMBya9GnNp/uru3R6r79DlcFvP71ocTOQCcdKWWaaS2t2kfciBoox/dAO4j83Ndf9p0kNkeGtGYe5ux/O5NVrlNNu8K2m20CDosEkoAPHIDOeeB+VOVOpJ3UWv69SlOK6mJoKR3Ot2kMts90HkCpbIcGdzwkecggM20Eg5AJI5Fddp9j/aOnaj4w1rUxmKZYRarIkcl2nyrNGnI2KsTgAAYwQBjFTeGrO00W9j1bRbO71DUUBWLz7ceTaueNwwx8xsHgnaFPOG4xp+GLnS9Msbvwj4rtbO0aW5WeO8urcyERuFVwjqT5bYVSrcqCGDYxWNanONnPRFRnCTaW462lPgL7F4k8KalezWjiGTUtJuFYMisoI3uF2MMkqGwCpZcZzXus/jfw1bWsFxLq8ASZFkRVyz7WUMpKgEjIIPIrxDxPrWlf8I9D4J8KtJfyzXLie8lkDZTzSwQO3GGZVkZgVUY75ONaVfD1nOm0PqLwRxwxluEKxoqLntyFGetLD4SOIns7Lt3IrYl0Y+bPQm+KGiyXTW9jaajfSYO3yIAQ34Eg/pSL421p4llfw0lpE52rLeX6xgfVSoP4Vx+nXGv6x/omi2gt7cZBFsgRVzzy54B+mM1NqFt4f8NyNJ4l1p76/wAjdZ2R3vkEcMx6cEddp64zXY8Bh4S5LXfbVv8ACyXz0Ob61Xmrx276JfqZniHSpPEmty6hqOuxJvwojsImkCAADgSBRjjPBPJqrH8PLe2E0uoXeorYMoBkneGzVhkEZLqQegOM9qZN4/1i8LWvhTSLfS4lXDzqoklVSed8r8KuSOTjGBzXJ3thJqFwZtX1a51G4C/MRKWCDHeR89D1AGPRq6vq9RrltZdv87bfezK/2pS+5f5/5I0r+z8A6VI6/a/t5A+5E7P+G5VVT+BxWRPceHpZQ1n4auJS5yWnuXQkn/gRzWno3h251qdo/D+jvdbSQ0sXyxRnHIMz9+h2jOQeK9M0X4QSAb9c1YqGBDWmmAxIQTyrSH53UgdDjGTisatXD0FaTTfkv6/I1p0p1HdXt5ux5AYfs1yYrzT9J01d+wrc+Y0kZxkbkBL46c7cV0WheFNQ1NY54vC13foRudWt4rKIg/daOWTJcd/uivN1Mslu/OBuRTtGMjDdcdelfX/g/jwRoA/6h1v/AOi1rDE4udKKcVub08PGbtI88sfhLftPLJMNF02M48tIopLiTHcMwMQz9Aa7bS/BNjpZfbqGqyqwwEN20ar9PL2n8ya6aivKni6095HVHD047Ir2tnFZpsiadh/02neU/m5JqxRRXO23qzYKKKKQBRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABXn3xO+In/CHWK2OngPq9ymY2ZcrCnTeexPoPxPHB9Br5h+KtndN4w1TUJxFuW6+zSCPqo2BoWb03RnA9fLb0rqwlOM5+90M6jaWhxupajfavfS3t/cyXNzKcvJI2Sf8B6DoKznhZv4qmzWjZaNe32GRBHGRnfJwDxkY7mvZ9nz6HI5KOrZjeQxxlulXtP02/v5PLsoJZiDglRwv1PQfjXZWfhzS7FTPdt54Qgl5jtQc8cZ+g5JFF740t7SEW+lQKwUYDsu1FHHReD6+n41osLGnq3Yx+sObtBXIbLwPLHF9o1jUY7aFcFljIyB7seAc/WpDqnhjRvksrH+0JhgGSU5HB65YdfoMVggav4kuhvkkn2nlnOEjzgfQdBwBk4710Nromk6Hbi61KRJpP9sZUH0C/wAXXv6Z4ranBv4Vp3ZjVqKOk3d9kEF14o8S48qb7DaHGZIwYxx6H7x/A447U268PeGtK4vLi6v7zHzRrJtG73xyv5k1U1LxddXZMdoWt4fUH52/Ht+H51X0fS7nVZP3Q2Qq2HlboPp6n2+nStFSpyfvakN1Ert8q8v8y5YwxveGLTLARtLwI4t0jEDnGSSfqBgcZxXewaNpPh2wGoeKbpVJBMdnE2WkOOnHJOSOnA4ycVzlx4i07wbD9n02FLjUGHzO5zt/3iP/AEEY9eO/FzXupa/qStPLLd3cp2ruP1OB2A6nsBzSqVNPZUvdXluFKDn78vxO41z4n6nqCmx0Zf7K00EhI7cbZGGQeWH3fouOpBJrNj0i00nbLrxd7nCummxNhyDz+9b/AJZ8fwjLc87etZtvew6F5q2LpNfkbGvV5EXqIvftv6+mOp2fCHhXUPE2opHAgC8PJLICUiQ/xN65wcL1Y+gBI1pOnQpt35Y9e7+f9P0KnzTkktX0Ft49V8QTR2FjaFwPnhsbRdqKOm49gOQDI5yeMk1xt1qU1+JFjGyAYwuOOfX1PXk/gBX1poXhzTfDlq0NhAA8mPOnfBkmI6Fm79TgdBngAV8pWFkWt5+OgT+dcuHxbxs5RgrQX/BNZUFQipTd2fRvwk3f8Kw0fcSW/f5J7/vpK7auQ+F8fl/DnSk6Y87/ANHPXUTW7SA4nkT/AHTXzeIilXmvN/menTd4JrsfIVnYl7aUY58xP5PX1b4VXZ4P0RfSwgH/AJDWucT4VaBGxKNcKCQSoYY4zjt7muqstLWxt4oI7mcxxKERS3QAYAr0MwxVCvTjGn08jmw1OtGbc1oX6KQDAxkn60teQdoUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABXDePfBD66rarpSxNqiweRLbTk+TfQ53eW/IwwPKsCCDjkYDL3NFXCbhLmQmk1ZnzEnhyytdSe1ghlt9SjbDWGokCdTxjyzgLJk42lcO2eFxzVPUtW/s2eS08hzdxkq6SKV2H0PfPt+tfTGsaBpPiC1+z6tYQXcYBC+YvzJnrtYcqeByCK46/8AhXA8axWGqyC2UFVtNQhW7jjU/wAERbDxD1KtnpzxXt4fNIcvLLT+v66fM8+rg25cy1PnW5nvtSlUSu8hzhEA4BOBwB9B9a2NN8KuwWa/yqnkQqef+BHt9B69q9WT4c32mFXTQbWaeR+ZLC8JWJfZJgD/AOP1i+IPDPiCS4+x2Fnd2qFSWuJrWR/wBhEmK7o1cO/eUr/NHLP29+SMbLuclqGvW2kRfZbVEaVQQEThU+uPft/KuRur24vZjLcytI+MZPYew7Vs33grW7K68n7K8n+2UeFf/IqpUmn+GXil83UZbJVU/LF9thbcffDdPaj2k6sktkaRhToR5t3+JX0XRHvXWe5BS2HOOhk/wHv/APrrS1vxIlnb/wBm6XhGX5XkTgIPRff37fXpLqcl/MgtNLWOSR+GeOePIHoPm6+/+RlDwD4sePzI9AvZExkGNN2fypV6vs1yQ+bM6cVVlz1Hp0RgIsk8oVQXdz+dX/tS2Vu9tasC8gxPOP4h/cX/AGfX1+ldTp/wr8Z3dkXg0loS4+f7Q4ibH93DYNb2n/AbXp4YpL2/s7VmPzxZLMo+oGM1y+2hTXxK/qdbXN0dvRnI+EdAn1/VIIApCO2AzLlVA6u3+yPwycDqcV9PaDpWm6Fpcdhp3EY+Z3Y5eVz1dj3Jx9AAAAAABz/hv4c2nh+EqL2WUsADhdowOgAyfU+9dbBZQ26gICceprz8dilVajB+6vx8zehScfektWNntHmHy3Uif7tcWnwm0WMvsuLhQ+Mjjt07V31Fc1LFVqN/ZytcupQp1fjVzF0nw5Ho9nHa293P5Medqk9Mkk/qTWwibB95j9adRWU6kpvmk9TSMIwVohRRRUFBRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRQSFUsTgDkmsFrx08uNDNNKx2qiSYLnGTjJA6Anr2rCtWVNpWvcuEOY3qKwDNqf/AEC7/wD8CI//AI5VjThqD6gJJ4bi3t1iZSksitvYlcEYY9AG9PvUoV5SlZxaG4JK9zXxS1zM+rgRCdBcSGRlCRROckuwAAyQByR1OBTvtGrH/mDal/4Ew/8Ax2s1i+b4YtlextuzpKK5ifXf7OtZ7lzIRArNJGzbj8ucr168Hp+tamqzmEwneyqd2QrEemOn41SxcXBytsJ0ndLuadJmsOy1REvEjklJSUhPnbOG7dT36e5IrZmmjt4WllYKijkmtKVaNSPMiZwcXYfRXMy6q0sjOZWXPRUcgAVq6C1zJpKPdOzSNLKQWOTs8xtn/ju2oo4mNWTjFFTpOCuzRorL1fUVtgLdHKyMMkgdB9ex/wA8cGsSHWDtWeGeaQKQ2C5IccHjdxgjoemCCKVTFwhPlHCjKSudfRTY5EmiSWN1eN1DKynIIPQisDU7p49QlQzSKBjaFkK8YHofXNaV6ypR5nqRTg5ux0NFY2m6yjOttcSDJOI5GPU9lPv6Hv069bGt3X2SxBBKl3CZUkEcE9R9KSrwlT9ohunJS5WaNFc9odzcZ1C7nuHkskjTarMWKuu8v155BT8qpTa1d3VwiRmTe7Yjihz6dM/TuePpUPFRUU7avoUqDbavsddRXJef4jzj+zL0e/nQf/HKik1TULS6KzSTRTKASkhyMH26Edsj354qZYvl1lFoaoX2kjsqKq6beDUNOhuhty6/MFOQGBwwH0IIq1XWmmroxas7MKKKKYgooooAKKKKACiiigAooooAKKKKACiiigCnqzxx6PeGVwieSwLE9MjH9a4bSbq41XUVgtJIxcxo0yFzjAGFJBxwfnx9Ca7DxJps+r6Bc2NsYxNJsKmRiq8OG5IBPb0rgW+HWvN96TTT9Zn/APjdefi6c5VE1G6R1UJRUHd2Z1Z0/wAS5/4+48f9dT/hWnaC70vRrme/mM0qB5j824KAvQH8M/jXAD4ca6D97S/+/wA//wAbrqNC8O6ppPhjUdPkktXurmRmjAdvLVSirgnbnsT0706Kmm/da073Co4tbr7jAsNYmF8kttbtOyEsIlUt+g9M1rXHjLU7VQ82meShOA0kbgE+nNP8KeFdT0PV5Lq7ntWhaBowsTMx3FlIPKj0P510msaXFrGmTWcuBvGUcjOxh0bqP58jI71FHD1VT0dn2KqVabntdHEaTaXfiS4YsiGyMh+1SP0bOCyhQQcsG68Ac9xtN/xnfta6lAm/5TDnHocn/wCtTfDfhfX9C1VbhprJrdxsmjWd/mX1xswSO34jIyaTxL4R1jWNclvLeaz8ghQiyyMCAAM8BT3z3qPYyVCyi7t6j54+1vfRGfqMclvoWlamqlYb22jaReBskZAx9+eT06g5PIqWTxFf66LSxiiRpyAuN333xyxOPlGMkgA4GevSu4u9Mt7zSX011KwNGIxt6rjoR9MA/hWd4c8L2+gLJIZBcXcnymcptIT+6Bk4GRk+vGegxtLCy57RdovchV48t5brY47xAkWi3kVtHN5tz5QNzIBt3Pz27DGABzxjk9a62z1YaX4G02+vMed9ih/ds20vIUHy/wA/wBrE8ReDNW1TxBcX9o9kIZNmBLK4bhQOQEPp61Z8T+Gdb1y+TyJbGOyhXbCjOwI4GScKf59AKmEJ03OUY+g5OM1FN+pzQ1eK+vw+ozSLBI+ZyjHeV9B6Z4HUYBOCCBWl4h8RabeywTWEjh1TY6spAwOVx2HU/p6V1GleEtNstMgt7q2huZ1X95K6glmPJx7c4HsBTr/wppVzYTww2cEMzxkRyBT8jY4PB7HHFSsJV9m43WpXt6fMnZ6FXwTq41DTZbVmYy2r9Tk5RsleTx1DDA6AD1rldUvHvvE0+nzNhZro23/AS20fzrT8NeEtd0TXIbySTTzDtaOYJKzMUI6DKD+IKevaobbwNrD+IodRvrizMa3S3D+VI5YlWDDAKgdQO9EoVZ04Ra2YlKEZyaY/xNptxo7NOgMunyHG48mIn+FvY9j+B5wWz7vxVLeaJHZzHdLHICJCeWGDjPv7/wD669OljjmieKVFeN1KsrDIYHqCK871X4d3xv3bSprUWjcqtxKwZD6cKcj3zn+dFfDTi26Wz3Q6VWMrKpuh+mT3dj4C1W/yAZ7tWjz/AHD5UZ/k1N8E3D3Pignf8q2UoK+pLx4P6H866bSvDzJ4QTRdVMcjfOHMJyBmQspBIHI+XqOo71yE/wAONVSZxDd20kIA2sSys3HOVxgc+5pypVIOE0r2WwRnCSlFu12en15t4y1WBteZYH3NFGIpCOm4EnGfbOD7gis//hXmrhsCCDHruWtbTfh1N9rD6pcxm3Ug+XCx3P6gnjb26Z79OtFaVavHk5LCpxp0nzOVzsPD4T/hHtPdIzGJIElKkYILDcc++Sa0qKK9GKskjkbu7hRRRTEFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFAEGLxBId8Epx+7TaY+fdst/Ks9r/W4IDJPokUzZwI7K9DsR6/vFjH61r0U0/IDmNQ8Y3WmIjXHg/xG4c4H2aGGcj6iOViKpT/ABP0axgEup6drenKf+fvTnT9eRXaUValDrH8f+HJs+jOET4weEZFzHcXcnstq/P6VA/xi0JX2rpmsyDP3lt0A/Vwa9CIB6jNRG1tycmCIn3QVrGeHW8H/wCBf8AzlGq9pL7v+CeeXfxi0+OPNro99I3pcFYh+Y3Vn/8AC2dW1MiLR9Et/tHdWmM5P0VQpr1VIo4/uRov+6oFPraOIwsdqN/WT/yMnRxD/wCXn4f8E8hk8Q/E3VbpYrSwls2x0Sw8tD9WmBH60kmgfFTXDtu9VewCdG+1LDu/78Z/WvX6Kbx6+xSivldhHCv7U2/meUwfDPxhcQEX/j2+if8AuRSzTL+Zdf5VInwQ0y4XdquvareTnq6sqA/gwY/rXqVFYvGVns7eiRsqMEedWXwT8HWv+uivbz/rvcY/9AC1e/4VB4FP/MDP/gZP/wDF129FZvEVX9p/eWoRXQ42H4U+CIPuaFGf9+eV/wCbGtOPwN4Uixt8N6Vx0LWiMf1Fb9FS6tR7yf3j5V2KNtoul2Qxa6baW/8A1xhVP5CluNLtrlSrvdqCMfuruWP/ANBYVdoqOZ9x2KOn6TbaaGEEl6+7k/aL2af8vMZsfhV3BzncfpS0UNt7gFFFFIAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooA/9k=';
+  var MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  var PPY = { daily:365, weekly:52, biweekly:26, semimonthly:24, monthly:12 };
+  var FREQ_LABEL = { daily:'Daily', weekly:'Weekly', biweekly:'Bi-weekly', semimonthly:'Semi-monthly', monthly:'Monthly' };
+  var CHARGE_DEFS = [
+    { key:'processing', label:'Processing fee' },
+    { key:'ci',         label:'Credit investigation / verification fee' },
+    { key:'notarial',   label:'Notarial / documentary charges' },
+    { key:'insurance',  label:'Insurance / credit-life premium (if applicable)' },
+    { key:'taxes',      label:'Taxes / government charges' },
+    { key:'other',      label:'Other charge (specify)' }
+  ];
+  var ROLE_LABELS = { borrower:'Borrower', pnFig:'Borrower (amount in handwriting)', spouse:'Spouse of borrower', comaker:'Co-maker', grantor:'Grantor / collateral owner', grSpouse:'Spouse of grantor', surety:'Surety / guarantor', suSpouse:'Spouse of surety', creditor:'Creditor representative', approver:'Approver (second signatory)', custodian:'Custodian', w1:'Witness 1', w2:'Witness 2' };
+  var DOC_TITLES = { DS:'Disclosure Statement', PN:'Promissory Note and Loan Agreement', RS:'Repayment Schedule', MCSA:'Movable Collateral Security Agreement', CSDA:'Cash Security Deposit Agreement', SUR:'Suretyship Agreement', GUA:'Guaranty Agreement', REL:'Collateral Release Acknowledgment', DAP:'Security Deposit Application Acknowledgment', DRF:'Security Deposit Refund Acknowledgment', RST:'Loan Restructuring and Rescheduling Agreement', SET:'Early Settlement Statement', PDC:'PDC Acknowledgment Receipt', BP22:'BP22 Undertaking' };
+
+  var F = {
+    S: { f:{}, checks:[], sig:{}, meta:{}, docHash:'', legacy:false, templates:{}, templateStatus:{}, settings:{}, docSet:null },
+    canSign: function(){ return false; },   // host overrides: (role) -> bool
+    onSign: function(){},                   // host overrides: (role, sigObj|null)
+    ROLE_LABELS: ROLE_LABELS, DOC_TITLES: DOC_TITLES, CHARGE_DEFS: CHARGE_DEFS, FREQ_LABEL: FREQ_LABEL
+  };
+  function co(){ return (F.S.settings && F.S.settings.companyName) || 'ERMANO LENDING CORPORATION'; }
+  function coAddr(){ return (F.S.settings && F.S.settings.companyAddress) || 'E. Sabellano St., Greenbelt Drive, Quiot, Cebu City'; }
+
+  /* ---------- helpers ---------- */
+  var esc = F.esc = function(s){ return String(s==null?'':s).replace(/[&<>"']/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); };
+  var num = F.num = function(v){ var n=parseFloat(String(v==null?'':v).replace(/,/g,'')); return isFinite(n)?n:0; };
+  var money = F.money = function(n){ return Number(n||0).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}); };
+  var r2 = function(n){ return Math.round(n*100)/100; };
+  var parseISO = F.parseISO = function(s){ if(!s) return null; var p=String(s).slice(0,10).split('-').map(Number); if(p.length<3||!p[0]||!p[1]||!p[2]) return null; return new Date(p[0],p[1]-1,p[2]); };
+  var addMonths = function(d,k){ var y=d.getFullYear(), m=d.getMonth()+k, day=d.getDate(); var last=new Date(y,m+1,0).getDate(); return new Date(y,m,Math.min(day,last)); };
+  var addDays = function(d,k){ var x=new Date(d.getFullYear(),d.getMonth(),d.getDate()); x.setDate(x.getDate()+k); return x; };
+  var eom = function(d){ return new Date(d.getFullYear(),d.getMonth()+1,0); };
+  var nextSemi = function(d){ var day=d.getDate(), last=eom(d).getDate(); if(day<15) return new Date(d.getFullYear(),d.getMonth(),15); if(day<last) return eom(d); return new Date(d.getFullYear(),d.getMonth()+1,15); };
+  var mdy = F.mdy = function(d){ return d ? String(d.getMonth()+1).padStart(2,'0')+'/'+String(d.getDate()).padStart(2,'0')+'/'+d.getFullYear() : ''; };
+  var longDate = F.longDate = function(d){ return d ? MONTHS[d.getMonth()]+' '+d.getDate()+', '+d.getFullYear() : ''; };
+  var isoD = F.isoD = function(d){ return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); };
+  var ord = function(n){ var s=['th','st','nd','rd'], v=n%100; return n+(s[(v-20)%10]||s[v]||s[0]); };
+  var stampTime = F.stampTime = function(iso){ if(!iso) return ''; var d=new Date(iso); return d.toLocaleString('en-US',{timeZone:'Asia/Manila',month:'2-digit',day:'2-digit',year:'numeric',hour:'numeric',minute:'2-digit'}); };
+  var stampDate = F.stampDate = function(iso){ if(!iso) return null; var s=new Date(iso).toLocaleDateString('en-CA',{timeZone:'Asia/Manila'}); return parseISO(s); };
+  F.todayISO = function(){ return isoD(new Date()); };
+  F.fmtManila = function(iso){ return iso ? new Date(iso).toLocaleString('en-US',{timeZone:'Asia/Manila',month:'short',day:'numeric',year:'numeric',hour:'numeric',minute:'2-digit'}) : ''; };
+  var cb = function(on){ return '<span class="cbx">'+(on?'☑':'☐')+'</span>'; };
+  var blank = function(v, w){ return '<span class="u l" style="min-width:'+(w||1.2)+'in">'+(v===''||v==null?'&nbsp;':esc(v))+'</span>'; };
+  var NONE = '<b>NONE</b>';
+
+  function words(n){
+    var a=['','ONE','TWO','THREE','FOUR','FIVE','SIX','SEVEN','EIGHT','NINE','TEN','ELEVEN','TWELVE','THIRTEEN','FOURTEEN','FIFTEEN','SIXTEEN','SEVENTEEN','EIGHTEEN','NINETEEN'];
+    var t=['','','TWENTY','THIRTY','FORTY','FIFTY','SIXTY','SEVENTY','EIGHTY','NINETY'];
+    function h(x){ var s=''; if(x>=100){ s+=a[Math.floor(x/100)]+' HUNDRED'; x%=100; if(x) s+=' '; } if(x>=20){ s+=t[Math.floor(x/10)]; if(x%10) s+=' '+a[x%10]; } else if(x) s+=a[x]; return s; }
+    if(!n) return 'ZERO';
+    var parts=[], units=[[1e9,'BILLION'],[1e6,'MILLION'],[1e3,'THOUSAND']];
+    units.forEach(function(u){ if(n>=u[0]){ parts.push(h(Math.floor(n/u[0]))+' '+u[1]); n%=u[0]; } });
+    if(n) parts.push(h(n));
+    return parts.join(' ');
+  }
+  var pesoWords = F.pesoWords = function(v){ var p=Math.floor(r2(v)), c=Math.round((r2(v)-p)*100); return words(p)+' PESOS'+(c?(' AND '+String(c).padStart(2,'0')+'/100'):'')+' ONLY'; };
+
+  /* ---------- engine v2 ---------- */
+  F.chargeRows = function(){
+    var f=F.S.f, saved={};
+    (f.charges||[]).forEach(function(c){ saved[c.key]=c; });
+    var classes=(F.S.settings&&F.S.settings.chargeClasses)||{};
+    return CHARGE_DEFS.map(function(d){
+      var c=saved[d.key]||{};
+      return { key:d.key, label: d.key==='other' && f.otherLabel ? 'Other charge: '+f.otherLabel : d.label, basis:c.basis||'', amount:num(c.amount), deducted:!!c.deducted, cls: (classes[d.key] || ((d.key==='processing'||d.key==='ci')?'finance':'other'))==='finance'?'finance':'other' };
+    });
+  };
+  function irr(cfs){
+    var f=function(r){ var s=0; for(var k=0;k<cfs.length;k++) s+=cfs[k]/Math.pow(1+r,k); return s; };
+    var lo=0, hi=10; if(f(lo)<=0) return null; if(f(hi)>0) return null;
+    for(var i=0;i<200;i++){ var mid=(lo+hi)/2; if(f(mid)>0) lo=mid; else hi=mid; }
+    return (lo+hi)/2;
+  }
+  function dueDates(start, freq, n, firstDue){
+    var out=[];
+    for(var k=0; k<n; k++){
+      var d;
+      if(freq==='monthly') d = firstDue ? addMonths(firstDue,k) : addMonths(start,k+1);          // anchored on the release day-of-month (end-of-month safe)
+      else if(freq==='semimonthly') d = (k===0 && firstDue) ? firstDue : nextSemi(k===0 ? start : out[k-1]);
+      else { var step = freq==='biweekly'?14 : freq==='weekly'?7 : 1; d = (k===0 && firstDue) ? firstDue : addDays(k===0 ? start : out[k-1], step); }
+      out.push(d);
+    }
+    return out;
+  }
+  F.computeV2 = function(){
+    var f=F.S.f, P=r2(num(f.amount)), n=Math.max(1,Math.round(num(f.installments)||1)), freq=PPY[f.frequency]?f.frequency:'monthly';
+    var rate=num(f.rate), rm = f.ratePer==='year' ? rate/12 : rate, ry = f.ratePer==='year' ? rate : rate*12;
+    var i = rm/100*12/PPY[freq];
+    var basis = f.basis==='declining' ? 'declining' : 'addon';
+    var rel=parseISO(f.releaseDate), dues = rel ? dueDates(rel, freq, n, parseISO(f.firstDue)) : [];
+    var rows=[], interest=0, inst=0, bal=P;
+    if(basis==='addon'){
+      interest=r2(P*i*n); inst=r2((P+interest)/n);
+      var pr=r2(P/n), ir=r2(interest/n), sp=0, si=0;
+      for(var k=1;k<=n;k++){
+        var prin = k<n? pr : r2(P-sp), intr = k<n? ir : r2(interest-si);
+        sp=r2(sp+prin); si=r2(si+intr); bal=r2(bal-prin);
+        rows.push({k:k, due:dues[k-1]||null, inst:r2(prin+intr), prin:prin, int:intr, bal:bal});
+      }
+    } else {
+      var A = i>0 ? r2(P*i/(1-Math.pow(1+i,-n))) : r2(P/n);
+      for(var j=1;j<=n;j++){
+        var it=r2(bal*i), pp = j<n ? r2(A-it) : bal;
+        bal=r2(bal-pp); interest=r2(interest+it);
+        rows.push({k:j, due:dues[j-1]||null, inst:r2(pp+it), prin:pp, int:it, bal:bal});
+      }
+      inst=A;
+    }
+    var scheduledTotal=r2(rows.reduce(function(a,r){ return a+r.inst; },0));
+    var charges=F.chargeRows();
+    var financeTotal=r2(interest+charges.filter(function(c){ return c.cls==='finance'; }).reduce(function(a,c){ return a+c.amount; },0));
+    var otherTotal=r2(charges.filter(function(c){ return c.cls==='other'; }).reduce(function(a,c){ return a+c.amount; },0));
+    var deductions=r2(charges.filter(function(c){ return c.deducted; }).reduce(function(a,c){ return a+c.amount; },0));
+    var financeDeducted=r2(charges.filter(function(c){ return c.deducted && c.cls==='finance'; }).reduce(function(a,c){ return a+c.amount; },0));
+    var notDeducted=r2(charges.filter(function(c){ return !c.deducted; }).reduce(function(a,c){ return a+c.amount; },0));
+    var depWithheld = !!(f.secDeposit && f.depWithheld), dep = depWithheld ? r2(num(f.depAmount)) : 0;
+    var net=r2(P-deductions-dep), amountFinanced=r2(P-financeDeducted), totalPayable=r2(scheduledTotal+notDeducted);
+    var cfs=[-net].concat(rows.map(function(x){ return x.inst; }));
+    if(dep>0 && cfs.length>1) cfs[cfs.length-1]=r2(cfs[cfs.length-1]-dep);   // refundable deposit returns at maturity
+    var r = net>0 ? irr(cfs) : null;
+    var eirMonth = r===null ? null : (Math.pow(1+r, PPY[freq]/12)-1)*100;
+    var annualRate = eirMonth===null ? null : eirMonth*12;                     // R.A. 3765 §4(7) simple annual rate, monthly EIR × 12
+    var termMonths = freq==='monthly'?n : freq==='semimonthly'?n/2 : freq==='biweekly'?n*14/30.4375 : freq==='weekly'?n*7/30.4375 : n/30.4375;
+    var termText = freq==='monthly'? n+' month'+(n===1?'':'s') : freq==='semimonthly'? (n%2===0? (n/2)+' month'+(n===2?'':'s') : n+' semi-monthly periods') : freq==='biweekly'? (2*n)+' weeks' : freq==='weekly'? n+' week'+(n===1?'':'s') : n+' day'+(n===1?'':'s');
+    var secured = !!(f.secCollateral||f.secDeposit);
+    var smallLoan = !secured && P>0 && P<=10000 && termMonths<=4 && (f.purposeClass||'general')==='general';
+    var warn=[], violations=[];
+    if(smallLoan){
+      var dq=(F.S.settings&&F.S.settings.delinquency)||{};
+      if(rm>6) violations.push('Nominal interest '+rm.toFixed(2)+'% per month exceeds the 6% per month ceiling (SEC MC 14, s. 2025).');
+      if(eirMonth!==null && eirMonth>12) violations.push('Effective interest '+eirMonth.toFixed(2)+'% per month exceeds the 12% per month ceiling (SEC MC 14, s. 2025).');
+      if(num(dq.rate)>5) violations.push('Delinquency charge '+dq.rate+'% per month exceeds the 5% per month ceiling (SEC MC 14, s. 2025).');
+      if(P>0 && (financeTotal+otherTotal)/P>1) violations.push('Total cost '+money(financeTotal+otherTotal)+' exceeds 100% of the amount borrowed (SEC MC 14, s. 2025).');
+      warn=violations.slice();
+    }
+    return { P:P, n:n, freq:freq, i:i, rm:rm, ry:ry, basis:basis, rows:rows, interest:interest, inst:inst, scheduledTotal:scheduledTotal,
+      firstDue:dues[0]||null, maturity:dues[n-1]||null, due:dues[n-1]||null, vd:rel, termText:termText, termMonths:termMonths,
+      charges:charges, financeTotal:financeTotal, otherTotal:otherTotal, deductions:deductions, financeDeducted:financeDeducted, otherDeducted:r2(deductions-financeDeducted), depWithheld:dep, net:net, amountFinanced:amountFinanced, gross:P, totalPayable:totalPayable, total:scheduledTotal,
+      eirMonth:eirMonth, eirText: eirMonth===null?'N/A':eirMonth.toFixed(2)+'%', annualRate:annualRate, annualText: annualRate===null?'N/A':annualRate.toFixed(2)+'%',
+      smallLoan:smallLoan, warnings:warn, violations:violations,
+      sched: rows.map(function(x){ return {date:x.due, amount:x.inst}; }) };
+  };
+  /** Early-settlement statement after `paid` installments, settling on `date`. Declining: remaining principal + interest accrued pro rata. Add-on: remaining installments less the Rule of 78 rebate. */
+  F.settlement = function(paid, dateISO){
+    var c=F.computeV2(), n=c.n; paid=Math.max(0,Math.min(n,Math.round(num(paid)||0)));
+    var d=parseISO(dateISO)||new Date();
+    var remainingRows=c.rows.slice(paid), remainingPrin=r2(remainingRows.reduce(function(a,r){ return a+r.prin; },0));
+    var remainingSched=r2(remainingRows.reduce(function(a,r){ return a+r.inst; },0)), remainingInt=r2(remainingRows.reduce(function(a,r){ return a+r.int; },0));
+    var out={ paid:paid, date:d, method:'', remainingPrincipal:remainingPrin, remainingScheduled:remainingSched, accrued:0, rebate:0, payoff:0, note:'' };
+    if(c.basis==='declining'){
+      var lastDue = paid>0 ? c.rows[paid-1].due : c.vd, nextDue = remainingRows.length? remainingRows[0].due : null;
+      var frac = (lastDue && nextDue && nextDue>lastDue) ? Math.max(0,Math.min(1,(d-lastDue)/(nextDue-lastDue))) : 0;
+      out.method='Declining balance: outstanding principal plus interest accrued pro rata from the last due date to the settlement date';
+      out.accrued=r2(remainingPrin*c.i*frac); out.payoff=r2(remainingPrin+out.accrued);
+    } else {
+      var N=n, k=n-paid, digits=N*(N+1)/2, unearned=r2(c.interest*(k*(k+1)/2)/digits);
+      out.method='Add-on (precomputed): remaining installments less the unearned finance charge rebated by the Rule of 78 (R.A. 7394 Art. 138)';
+      out.rebate=unearned; out.payoff=r2(remainingSched-unearned); out.accrued=r2(remainingInt-unearned);
+    }
+    out.note='Charges payable separately, delinquency charges on overdue installments and any amount already past due are added to the payoff by the ledger; the cash security deposit, if any, is refunded under its Agreement.';
+    return out;
+  };
+  /* legacy v1 engine (packages created before v2) */
+  F.computeV1 = function(){
+    var f=F.S.f, P=num(f.amount), r=num(f.rate)/100, n=Math.max(1,Math.round(num(f.term)||1));
+    var interest=r2(P*r*n), total=r2(P+interest), inst=r2(total/n);
+    var vd=parseISO(f.valueDate), due=vd?addMonths(vd,n):null;
+    var nonFin=r2(num(f.procFee)+num(f.creditRisk)+num(f.insurance)+num(f.taxes)+num(f.notarial)+num(f.otherFee));
+    var sched=[]; for(var k=1;k<=n;k++) sched.push({ date: vd?addMonths(vd,k):null, amount: k<n?inst:r2(total-inst*(n-1)) });
+    return { P:P, n:n, interest:interest, total:total, inst:inst, vd:vd, due:due, nonFin:nonFin, deductions:nonFin, net:r2(P-nonFin), pct:P?r2(interest/P*100):0, eff:(f.effRate!==''&&f.effRate!=null)?num(f.effRate):num(f.rate), sched:sched };
+  };
+  F.compute = function(){ return F.S.legacy ? F.computeV1() : F.computeV2(); };
+  function nextCheckNo(start,k){ if(!start) return ''; var m=String(start).match(/^(.*?)(\d+)$/); if(!m) return k?'':start; return m[1]+String(Number(m[2])+k).padStart(m[2].length,'0'); }
+  F.buildChecks = function(){
+    var c=F.compute();
+    F.S.checks = c.sched.map(function(s,k){ return { no: nextCheckNo(F.S.f.checkStart,k), bank: F.S.f.bank||'', date: s.date?isoD(s.date):'', amount: s.amount.toFixed(2) }; });
+  };
+  F.docSet = function(){
+    var f=F.S.f;
+    if(F.S.legacy) return ['DS','PN','PDC','BP22'];
+    var d=['DS','PN','RS']; if(f.secCollateral) d.push('MCSA'); if(f.secDeposit) d.push('CSDA');
+    if(f.secSurety && f.suName) d.push(f.suType==='guaranty'?'GUA':'SUR');
+    if(f.incPDC) d.push('PDC'); if(f.incBP22) d.push('BP22');
+    if(f.incREL && f.secCollateral) d.push('REL'); if(f.incDAP && f.secDeposit) d.push('DAP'); if(f.incDRF && f.secDeposit) d.push('DRF'); if(f.incRST) d.push('RST'); if(f.incSET) d.push('SET');
+    return d;
+  };
+  F.thirdPartyGrantor = function(){ var f=F.S.f; return !!(f.secCollateral && !f.borrowerIsGrantor && f.grName); };
+  F.custodyAny = function(){ return (F.S.f.assets||[]).some(function(a){ return a.custody==='creditor'; }); };
+  F.grantorRole = function(){ return F.thirdPartyGrantor() ? 'grantor' : 'borrower'; };
+  F.requiredParties = function(){
+    var f=F.S.f, r=['borrower','pnFig'];
+    if(f.civilStatus==='Married' && f.spouseName) r.push('spouse');
+    if(f.cmName) r.push('comaker');
+    if(F.thirdPartyGrantor()){ r.push('grantor'); if(f.grCivilStatus==='Married' && f.grSpouseName) r.push('grSpouse'); }
+    if(f.secSurety && f.suName){ r.push('surety'); if(f.suCivilStatus==='Married' && f.suSpouseName) r.push('suSpouse'); }
+    return r;
+  };
+
+  /* ---------- signature boxes ---------- */
+  function sigBox(k, opt){
+    opt=opt||{};
+    var s=F.S.sig[k], can=F.canSign(k), cls='sig'+(can?' clickable':'')+(opt.cls?' '+opt.cls:'');
+    if(s && s.img) return '<div class="'+cls+'" data-sig="'+k+'"><img src="'+s.img+'" alt="signature">'+(opt.noStamp?'':'<span class="stamp">e-signed '+esc(stampTime(s.at))+'</span>')+'</div>';
+    if(can) return '<div class="'+cls+'" data-sig="'+k+'" role="button" tabindex="0"><span class="hint">'+(k==='pnFig'?'Tap to write amount':'Tap to sign')+'</span></div>';
+    return '<div class="sig'+(opt.cls?' '+opt.cls:'')+'"></div>';
+  }
+  function sigBlock(k,name,caption){ return sigBox(k)+'<div class="sigline"><b>'+(name?esc(name):'&nbsp;')+'</b>'+esc(caption)+'</div>'; }
+  function sigAt(k){ var s=F.S.sig[k]; return s ? stampTime(s.at) : ''; }
+  function sigDate(k){ var s=F.S.sig[k]; return s ? mdy(stampDate(s.at)) : ''; }
+  /* template-style row: Printed name ___  Signature ___  Date/time ___ */
+  function sigRow(k, name, labels, extra){
+    labels=labels||{}; var dateVal = labels.dateValue!==undefined ? labels.dateValue : (labels.time ? sigAt(k) : sigDate(k));
+    return '<div class="sg3"><div class="cell"><div class="v">'+(name?esc(name):'&nbsp;')+'</div><div class="c">'+esc(labels.name||'Printed name')+'</div></div>'+
+      '<div class="cell">'+sigBox(k,{noStamp:true})+'<div class="c">Signature</div></div>'+
+      '<div class="cell"><div class="v">'+(dateVal?esc(dateVal):'&nbsp;')+'</div><div class="c">'+esc(labels.date||(labels.time?'Date/time':'Date'))+'</div></div>'+(extra||'')+'</div>';
+  }
+  function draftLine(code){
+    var t=(F.S.templateStatus||{})[code];
+    if(t && (t.legalStatus==='APPROVED'||t.legalStatus==='SUPERSEDED')) return '';
+    return '<div class="draftline">DRAFT — pending legal review · template '+code+' '+esc((F.S.templates||{})[code]||'')+' · not for execution until approved</div>';
+  }
+  function hdr(title, sub){
+    return '<div class="hdr"><img src="'+LOGO+'" alt=""><div class="t"><h1 class="co">'+esc(co())+'</h1><div class="addr">'+esc(coAddr())+'</div><div class="dt">'+title+'</div>'+(sub?'<div class="ds">'+sub+'</div>':'')+'</div><div></div></div>';
+  }
+  function delinq(){ var d=(F.S.settings&&F.S.settings.delinquency)||{}; return (d.reviewed && num(d.rate)>0) ? d : null; }
+
+  /* =================================================================== */
+  /*  DS v2 — Disclosure Statement (Revised)                             */
+  /* =================================================================== */
+  function dsV2(){
+    var f=F.S.f, c=F.computeV2(), st=F.S.settings||{}, d=delinq();
+    var bDate=F.S.sig.borrower?stampDate(F.S.sig.borrower.at):null;
+    var secured=!!(f.secCollateral||f.secDeposit);
+    var securedDesc=[]; if(f.secCollateral) securedDesc.push('Movable collateral — Security Agreement No. '+(f.saNo||'')); if(f.secDeposit) securedDesc.push('Cash security deposit — Agreement No. '+(f.csdNo||''));
+    var chargeRows=c.charges.map(function(ch){
+      var has=ch.amount>0||ch.basis;
+      return '<tr><td><b>'+esc(ch.label)+'</b></td><td>'+(has?esc(ch.basis||'—'):NONE)+'</td><td class="a">'+(ch.amount>0?money(ch.amount):(has?'0.00':NONE))+'</td><td class="c">'+(has?cb(ch.deducted)+' Yes '+cb(!ch.deducted)+' No':'—')+'</td></tr>';
+    }).join('');
+    var p1 = '<div class="page doc">'+draftLine('DS')+hdr('DISCLOSURE STATEMENT ON LOAN / CREDIT TRANSACTION','(Pursuant to the Truth in Lending Act, R.A. No. 3765, and applicable regulations)')+
+      '<table class="kvt"><tr><th>Borrower / Customer Name</th><td>'+blank(f.name,4)+'</td></tr>'+
+      '<tr><th>Address</th><td>'+blank(f.address,4)+'</td></tr>'+
+      '<tr><th>Contact Number</th><td>'+blank(f.contact,1.8)+' &nbsp;Email (if any): '+blank(f.email,2)+'</td></tr>'+
+      '<tr><th>Loan / Account No.</th><td>'+blank(f.loanId,1.8)+' &nbsp;Date of Disclosure: '+blank(bDate?mdy(bDate):'',1.6)+'</td></tr>'+
+      '<tr><th>Loan Purpose</th><td>'+blank(f.purpose,4)+'</td></tr>'+
+      '<tr><th>Loan Type</th><td>'+cb(f.loanType==='Personal')+' Personal '+cb(f.loanType==='Business')+' Business '+cb(f.loanType==='Salary')+' Salary '+cb(f.loanType==='Other')+' Other: '+blank(f.loanType==='Other'?f.loanTypeOther:'',1.6)+'</td></tr>'+
+      '<tr><th>Secured Status</th><td>'+cb(!secured)+' Unsecured '+cb(secured)+' Secured (describe collateral in separate signed document): '+blank(securedDesc.join('; '),2.2)+'</td></tr></table>'+
+      '<h2>A. LOAN AMOUNT AND PROCEEDS</h2>'+
+      '<table class="kvt"><tr><th>1. Principal / Amount Financed</th><td>₱ '+blank(money(c.amountFinanced),1.6)+'</td></tr>'+
+      '<tr><th>2. Gross Loan Amount</th><td>₱ '+blank(money(c.gross),1.6)+'</td></tr>'+
+      '<tr><th>3. Less: Itemized deductions withheld from proceeds</th><td>See itemized charges below &nbsp;(₱ '+money(c.deductions)+')</td></tr>'+
+      '<tr><th>4. Net Amount Actually Released to Borrower</th><td>₱ '+blank(money(c.net),1.6)+'</td></tr>'+
+      '<tr><th>Mode / Date of Release</th><td>'+cb(f.releaseMode==='Cash')+' Cash '+cb(f.releaseMode==='Bank transfer')+' Bank transfer '+cb(f.releaseMode==='Other')+' Other: '+blank(f.releaseMode==='Other'?f.releaseModeOther:'',1)+' &nbsp;Date: '+blank(mdy(c.vd),1)+'</td></tr></table>'+
+      '<h2>B. FINANCE CHARGES AND OTHER CHARGES</h2>'+
+      '<table class="chg"><tr><th>Charge / Description</th><th>Rate or Basis</th><th class="a">Amount (₱)</th><th class="c">Deducted from proceeds?</th></tr>'+
+      '<tr><td><b>Nominal interest</b></td><td>'+esc(num(f.rate).toFixed(2))+' % '+cb(f.ratePer!=='year')+' per month '+cb(f.ratePer==='year')+' per year</td><td class="a">'+money(c.interest)+'</td><td class="c">'+cb(false)+' Yes '+cb(true)+' No</td></tr>'+
+      chargeRows+
+      '<tr class="tot"><td><b>TOTAL FINANCE CHARGES</b></td><td></td><td class="a">'+money(c.financeTotal)+'</td><td></td></tr>'+
+      '<tr class="tot"><td><b>TOTAL OTHER / NON-FINANCE CHARGES</b></td><td></td><td class="a">'+money(c.otherTotal)+'</td><td></td></tr></table>'+
+      '<p class="fine">All charges must be lawful, actually applicable, accurately computed, and disclosed before the borrower signs. Do not insert a fee merely because a blank appears in this form. Identify the recipient and purpose of any third-party charge where applicable.</p>'+
+      '<h2>C. INTEREST AND REPAYMENT TERMS</h2>'+
+      '<table class="kvt"><tr><th>Interest method</th><td>'+cb(true)+' Simple interest '+cb(false)+' Other method (describe and explain): '+blank('',1.6)+'</td></tr>'+
+      '<tr><th>Interest rate</th><td>'+esc(num(f.rate).toFixed(2))+' % per '+cb(f.ratePer!=='year')+' month '+cb(f.ratePer==='year')+' year; equivalent annual rate: '+esc(c.ry.toFixed(2))+' %</td></tr>'+
+      '<tr><th>Interest computation basis</th><td>'+cb(c.basis==='declining')+' Declining balance '+cb(c.basis==='addon')+' Add-on / precomputed '+cb(false)+' Other: '+blank('',1.2)+'</td></tr>'+
+      '<tr><th>Effective Interest Rate (EIR)</th><td>'+esc(c.eirText)+' '+cb(true)+' per month '+cb(false)+' per year &nbsp;<span class="fine">(Internal rate of return per payment period of the net proceeds against the scheduled installments, converted to a monthly rate; computation attached as the Repayment Schedule.)</span></td></tr>'+
+      '<tr><th>Loan term</th><td>'+esc(c.termText)+'</td></tr>'+
+      '<tr><th>Number of installments</th><td>'+c.n+'</td></tr>'+
+      '<tr><th>Payment frequency</th><td>'+['daily','weekly','biweekly','semimonthly','monthly'].map(function(k){ return cb(c.freq===k)+' '+FREQ_LABEL[k]; }).join(' ')+' '+cb(false)+' Other</td></tr>'+
+      '<tr><th>Installment amount</th><td>₱ '+money(c.inst)+(c.basis==='addon'&&c.rows.length>1&&c.rows[c.rows.length-1].inst!==c.inst?' (last installment ₱ '+money(c.rows[c.rows.length-1].inst)+')':'')+'</td></tr>'+
+      '<tr><th>First due date / final maturity date</th><td>'+esc(mdy(c.firstDue))+' / '+esc(mdy(c.maturity))+'</td></tr>'+
+      '<tr><th>Total scheduled payments</th><td>₱ '+money(c.scheduledTotal)+'</td></tr>'+
+      '<tr><th>Total amount payable over full term</th><td>₱ '+money(c.totalPayable)+'</td></tr>'+
+      '<tr><th>Payment place / channels</th><td>'+(st.paymentChannels?esc(st.paymentChannels):NONE)+'</td></tr></table>'+
+      '<p class="fine">Attach a dated repayment schedule showing each due date, installment amount, and the allocation between principal and interest. If the payment amount or schedule may change, explain the trigger and calculation in a signed addendum. The Repayment Schedule forming part of this transaction follows the Promissory Note.</p>'+
+      '</div>';
+    var dq = d ? {
+      grace: d.grace?esc(d.grace):'0', rate: esc(d.rate)+' % per '+cb(d.per==='month')+' month '+cb(d.per!=='month')+' other: '+blank(d.per!=='month'?d.perOther:'',1),
+      base: cb(d.base==='installment')+' Overdue scheduled installment only '+cb(d.base!=='installment')+' Other lawful basis (specify): '+blank(d.base!=='installment'?d.baseOther:'',1.2),
+      method: esc(d.method||'—'), begins: esc(d.begins||'—'), max: esc(d.max||'—'), partial: esc(d.partial||'—')
+    } : null;
+    var collat = f.secCollateral ? (f.assets||[]).map(function(a,i){ return (i+1)+') '+[a.category,a.makeModel,a.idNumbers].filter(Boolean).join(' — ')+(num(a.value)?'; est. ₱ '+money(num(a.value))+(a.valuationDate?' ('+mdy(parseISO(a.valuationDate))+')':''):''); }).join('; ') : '';
+    if(f.secDeposit) collat += (collat?'; ':'')+'Cash security deposit ₱ '+money(num(f.depAmount))+' held under Agreement No. '+(f.csdNo||'');
+    var secDoc = [];
+    if(f.secCollateral) secDoc.push('Movable Collateral Security Agreement No. '+(f.saNo||'')+(F.S.sig[F.grantorRole()]?' dated '+mdy(stampDate(F.S.sig[F.grantorRole()].at)):''));
+    if(f.secDeposit) secDoc.push('Cash Security Deposit Agreement No. '+(f.csdNo||'')+(F.S.sig.borrower?' dated '+mdy(stampDate(F.S.sig.borrower.at)):''));
+    var guar = f.secSurety && f.suName ? esc(f.suName)+(f.suType?' ('+esc(f.suType)+' — separate agreement pending legal review)':'') : 'NONE';
+    var p2 = '<div class="page doc">'+draftLine('DS')+hdr('DISCLOSURE STATEMENT ON LOAN / CREDIT TRANSACTION (continued)','Loan / Account No. '+esc(f.loanId)+' · '+esc(f.name))+
+      '<h2>D. LATE PAYMENT / DEFAULT CHARGES</h2>'+
+      '<p class="fine">No late-payment or non-payment charge may be imposed unless its rate, calculation basis, triggering event, and timing are stated in the signed loan agreement and this disclosure. Complete the following only after legal review:</p>'+
+      '<table class="kvt"><tr><th>Grace period, if any</th><td>'+(dq?dq.grace:NONE)+' calendar days after scheduled due date</td></tr>'+
+      '<tr><th>Delinquency charge</th><td>'+(dq?dq.rate:NONE+' — no delinquency charge is stipulated')+'</td></tr>'+
+      '<tr><th>Charge applies to</th><td>'+(dq?dq.base:NONE)+'</td></tr>'+
+      '<tr><th>Calculation method</th><td>'+(dq?dq.method:NONE)+'</td></tr>'+
+      '<tr><th>When charge begins</th><td>'+(dq?dq.begins:NONE)+'</td></tr>'+
+      '<tr><th>Maximum / aggregate limitation, if applicable</th><td>'+(dq?dq.max:NONE)+'</td></tr>'+
+      '<tr><th>Treatment of partial payments</th><td>'+(dq?dq.partial:NONE)+'</td></tr></table>'+
+      '<p class="fine">For consumer credit transactions within Article 134 of R.A. No. 7394, a delinquency charge may be agreed upon on an installment not paid in full on or before the tenth day after its scheduled or deferred due date. Confirm whether the transaction is within that law\'s scope before applying this timing rule. A separate SEC ceiling applies to the specific small-loan category described in the scope note on the cover.</p>'+
+      '<p class="fine">No daily penalty, automatic capitalization of unpaid interest, interest-on-penalty, or duplicate penalty on the same overdue amount is authorized by this form. Any different treatment requires a separate, express, lawful written stipulation reviewed by counsel.</p>'+
+      '<h2>E. PREPAYMENT, RESCHEDULING AND EARLY SETTLEMENT</h2>'+
+      '<p>The borrower may request a statement of the amount required for full or partial early payment. Any rebate of unearned finance charges, and any right to prepay without penalty under applicable law, shall be honored. No prepayment fee is charged under this template. Any rescheduling or restructuring must be documented in a written agreement signed by both parties, stating the revised balance, charges, schedule, and effect on the original obligations.</p>'+
+      '<h2>F. COLLATERAL AND GUARANTORS (IF ANY)</h2>'+
+      '<p>Collateral description and valuation: '+(collat?esc(collat):'NONE')+'</p>'+
+      '<p>Separate security document / date: '+(secDoc.length?esc(secDoc.join('; ')):'NONE')+' &nbsp; Guarantor(s): '+guar+'</p>'+
+      '<h2>G. BORROWER ACKNOWLEDGMENT</h2>'+
+      '<p>I acknowledge that I received this completed Disclosure Statement and the repayment schedule before the loan transaction was consummated. I confirm that the amounts, rates, fees, payment dates, and other charges have been explained to me in a language I understand, and that I have had the opportunity to ask questions and obtain a copy.</p>'+
+      sigRow('borrower', f.name, {name:'Borrower printed name', time:true})+
+      sigRow('creditor', (f.credName||'')+(f.credPos?', '+f.credPos:''), {name:'Creditor representative', time:true})+
+      sigRow('w1', f.w1, {name:'Witness (optional)'})+
+      '</div>';
+    return [p1,p2];
+  }
+
+  /* =================================================================== */
+  /*  PN v2 — Promissory Note and Loan Agreement (Revised)               */
+  /* =================================================================== */
+  var PN2 = {
+    s3:'An event of default occurs if the Borrower fails to pay an amount when due and the failure continues after any applicable grace period and written notice required by law or this Note; materially breaches another obligation under the loan documents and fails to cure within a reasonable period stated in a written notice; or becomes subject to another event of default expressly permitted by applicable law and specifically identified in a signed addendum.',
+    s3b:'After an event of default, and subject to applicable law and any required notice or opportunity to cure, the Lender may declare the unpaid balance immediately due and payable by written notice to the Borrower. Acceleration shall not authorize the Lender to collect unearned future interest or charges that are not legally due. The Lender may pursue lawful civil remedies to recover the outstanding obligation.',
+    s4:'Unless mandatory law requires otherwise or the parties agree in writing to a different lawful allocation, payments shall be applied first to any matured and properly disclosed lawful charges, then to accrued contractual interest, and then to principal. The Lender shall record and disclose the allocation. The Lender shall not apply a payment in a manner that creates an undisclosed fee or charge.',
+    s5:'The Borrower may request early settlement or partial prepayment. The Lender shall calculate the settlement amount in accordance with applicable law, including any required rebate of unearned finance charges and any statutory right to prepay without penalty. No prepayment service fee is imposed under this Note. Any extension, deferment, restructuring, or change in payment date must be set out in a written agreement signed by the Borrower and the Lender, with a revised disclosure and repayment schedule where required.',
+    s6:'The Lender may undertake lawful collection activities and may refer the account to counsel or commence appropriate proceedings when warranted. The Borrower shall be liable only for reasonable attorney\'s fees and costs of suit that are expressly agreed in a valid written stipulation and/or are recoverable under applicable law and allowed by the court. No automatic 25% fee or minimum fee is created by this Note. Any actual collection expense charged to the Borrower must have a lawful basis, be reasonable, and be properly documented.',
+    s7:'Each co-maker who signs below expressly agrees to be jointly and severally liable with the Borrower for the obligations stated in this Note, to the extent permitted by law. A person is not a co-maker or solidary obligor merely because their name, contact information, or signature appears as a witness. Each co-maker must be clearly identified and must sign in the designated co-maker section after receiving the completed Disclosure Statement.',
+    s8:'Any collateral securing this loan must be identified in a separate written security agreement that describes the property, the secured obligations, and the lawful enforcement process. Nothing in this Note authorizes the Lender to seize, sell, or dispose of property without the process and notices required by applicable law. Any set-off shall be made only where legally permitted, properly documented, and consistent with the parties\' separate written agreement and applicable banking, privacy, and property laws.',
+    s9:'Notices may be delivered to the postal address, email address, or mobile number stated in this Note, subject to applicable law and proof of delivery. The Borrower shall promptly notify the Lender of any change in contact details. Collection communications must remain lawful, proportionate, respectful, and limited to the Borrower and persons legally authorized to be contacted, such as a properly identified guarantor where permitted. No threat, public shaming, harassment, or unauthorized disclosure of personal data is permitted.',
+    s10:'This Note shall be governed by the laws of the Republic of the Philippines. Any court action shall be filed in the court with proper subject-matter and territorial jurisdiction under applicable procedural and consumer-protection laws. Any venue stipulation shall not deprive a borrower of a venue or remedy that cannot lawfully be waived.',
+    s11:'This Note, the completed Disclosure Statement, the repayment schedule, and any signed security or restructuring agreement constitute the written loan documents for this transaction. No oral representation shall amend them. Any amendment or waiver must be in writing and signed by the parties. If any provision is held invalid or unenforceable, the remaining provisions shall remain effective to the extent permitted by law; the invalid provision shall not be used to impose a charge prohibited by law.',
+    s12:'I / WE confirm that we have read or have had this Note and the Disclosure Statement explained to us; received copies before or at consummation as required by law; understood the repayment schedule and charges; and signed voluntarily. We acknowledge that the Lender has not promised any charge or remedy other than those expressly written in the loan documents.'
+  };
+  function pnV2(){
+    var f=F.S.f, c=F.computeV2(), d=delinq();
+    var bDate=F.S.sig.borrower?stampDate(F.S.sig.borrower.at):null;
+    var cmOn=!!f.cmName, consent=(F.S.meta&&F.S.meta.consents&&F.S.meta.consents.comaker)||null;
+    var dueEvery = c.freq==='daily'?cb(true)+' day '+cb(false)+' week '+cb(false)+' 15th and 30th '+cb(false)+' month '+cb(false)+' other: '+blank('',1)
+                 : c.freq==='weekly'?cb(false)+' day '+cb(true)+' week '+cb(false)+' 15th and 30th '+cb(false)+' month '+cb(false)+' other: '+blank('',1)
+                 : c.freq==='semimonthly'?cb(false)+' day '+cb(false)+' week '+cb(true)+' 15th and 30th '+cb(false)+' month '+cb(false)+' other: '+blank('',1)
+                 : c.freq==='monthly'?cb(false)+' day '+cb(false)+' week '+cb(false)+' 15th and 30th '+cb(true)+' month '+cb(false)+' other: '+blank('',1)
+                 : cb(false)+' day '+cb(false)+' week '+cb(false)+' 15th and 30th '+cb(false)+' month '+cb(true)+' other: '+blank('every two weeks',1);
+    var dqText = d ? esc(d.rate)+' % per '+cb(d.per==='month')+' month '+cb(d.per!=='month')+' other: '+blank(d.per!=='month'?d.perOther:'',1)+', calculated solely on: '+cb(d.base==='installment')+' the overdue scheduled installment amount (excluding future installments) '+cb(d.base!=='installment')+' other specifically described lawful base: '+blank(d.base!=='installment'?d.baseOther:'',1.6)+'. The charge shall begin on '+blank(d.begins||'',1.4)
+                   : NONE+' % per '+cb(false)+' month '+cb(false)+' other: '+blank('',1)+', calculated solely on: '+cb(false)+' the overdue scheduled installment amount (excluding future installments) '+cb(false)+' other specifically described lawful base: '+blank('NONE — no delinquency charge is stipulated',1.6)+'. The charge shall begin on '+blank('N/A',1);
+    var p1='<div class="page doc pn2">'+draftLine('PN')+hdr('PROMISSORY NOTE AND LOAN AGREEMENT','')+
+      '<table class="kvt"><tr><th>Promissory Note No.</th><td>'+blank(f.pnNo||f.loanId,1.8)+'</td></tr>'+
+      '<tr><th>Principal Amount</th><td><span class="figrow">₱ '+blank(money(c.P),1.6)+'<span class="figcell'+(F.S.sig.pnFig?' done':'')+'">'+sigBox('pnFig',{noStamp:true})+'</span><span class="fine">(amount in figures, in the Borrower\'s handwriting)</span></span></td></tr>'+
+      '<tr><th>Date of Note</th><td>'+blank(bDate?mdy(bDate):'',1.8)+'</td></tr>'+
+      '<tr><th>Release / Value Date</th><td>'+blank(mdy(c.vd),1.8)+'</td></tr>'+
+      '<tr><th>Final Maturity Date</th><td>'+blank(mdy(c.maturity),1.8)+'</td></tr>'+
+      '<tr><th>Borrower</th><td>'+blank(f.name,4)+'</td></tr>'+
+      '<tr><th>Address / Contact</th><td>'+blank([f.address,f.contact,f.email].filter(Boolean).join(' · '),4)+'</td></tr>'+
+      '<tr><th>Co-maker(s), if any</th><td>'+blank(cmOn?f.cmName:'NONE',4)+'</td></tr></table>'+
+      '<p>FOR VALUE RECEIVED, I / WE, the undersigned Borrower and any co-maker(s) who sign this Note, jointly and severally where expressly stated below, promise to pay '+esc(co())+' (the “Lender”), at its office stated above or through a payment channel officially designated by the Lender, the principal amount of ₱'+blank(money(c.P),1.4)+' (Philippine pesos: '+blank(pesoWords(c.P),3.2)+'), together with the interest and other charges expressly stated in this Note and the completed Disclosure Statement attached to and forming part of this transaction.</p>'+
+      '<h2>1. INTEREST AND PAYMENT SCHEDULE</h2>'+
+      '<p>The principal shall earn interest at the rate of '+blank(num(f.rate).toFixed(2),.7)+' % per '+cb(f.ratePer!=='year')+' month '+cb(f.ratePer==='year')+' year, computed on a '+cb(c.basis==='addon')+' simple-interest basis '+cb(c.basis==='declining')+' declining-balance basis '+cb(false)+' other method expressly described here: '+blank('',2)+'. The interest method, effective rate, total finance charges, and total amount payable shall be fully stated in the Disclosure Statement and attached repayment schedule. No interest shall be charged unless expressly stipulated in writing.</p>'+
+      '<p>The Borrower shall pay '+blank(String(c.n),.6)+' installments of ₱'+blank(money(c.inst),1.2)+' each, due every '+dueEvery+', beginning '+blank(mdy(c.firstDue),1)+' and ending '+blank(mdy(c.maturity),1)+', in accordance with the attached repayment schedule. The repayment schedule is incorporated into this Note.</p>'+
+      '<h2>2. LATE PAYMENT AND DELINQUENCY CHARGE</h2>'+
+      '<p>If an installment is not paid when due, the Lender may impose only the delinquency charge expressly stated in the completed Disclosure Statement and this paragraph, subject to applicable law. The agreed charge is '+dqText+', subject to any mandatory statutory waiting period or other applicable restriction.</p>'+
+      '<p>No charge shall be assessed twice for the same period and same overdue amount. Partial payments shall be credited in accordance with the written payment-allocation policy disclosed to the Borrower. The Lender shall provide an updated statement showing principal, accrued interest, payments, and delinquency charges upon reasonable request.</p>'+
+      '<p>The parties expressly agree that no 1% per day charge, automatic capitalization of unpaid interest, interest on penalties, or compounding of penalties is created by this Note. Any amendment to the charge structure must be in a separate written instrument signed by both parties and must comply with applicable law.</p>'+
+      '<h2>3. DEFAULT; NOTICE; ACCELERATION</h2><p>'+esc(PN2.s3)+'</p><p>'+esc(PN2.s3b)+'</p>'+
+      '<h2>4. APPLICATION OF PAYMENTS</h2><p>'+esc(PN2.s4)+'</p>'+
+      '<h2>5. PREPAYMENT AND RESTRUCTURING</h2><p>'+esc(PN2.s5)+'</p>'+
+      '<h2>6. COLLECTION; COSTS; ATTORNEY\'S FEES</h2><p>'+esc(PN2.s6)+'</p>'+
+      '</div>';
+    var p2='<div class="page doc pn2">'+draftLine('PN')+hdr('PROMISSORY NOTE AND LOAN AGREEMENT (continued)','Promissory Note No. '+esc(f.pnNo||f.loanId)+' · '+esc(f.name))+
+      '<h2>7. CO-MAKER / SOLIDARY LIABILITY (IF APPLICABLE)</h2><p>'+esc(PN2.s7)+'</p>'+
+      '<h2>8. COLLATERAL; NO UNAUTHORIZED SELF-HELP SALE</h2><p>'+esc(PN2.s8)+'</p>'+
+      '<h2>9. NOTICES AND BORROWER CONTACT INFORMATION</h2><p>'+esc(PN2.s9)+'</p>'+
+      '<h2>10. GOVERNING LAW; VENUE</h2><p>'+esc(PN2.s10)+'</p>'+
+      '<h2>11. ENTIRE AGREEMENT; AMENDMENTS; SEVERABILITY</h2><p>'+esc(PN2.s11)+'</p>'+
+      '<h2>12. BORROWER\'S ACKNOWLEDGMENT</h2><p>'+esc(PN2.s12)+'</p>'+
+      '<div class="sigsec"><div class="sh">BORROWER</div>'+sigRow('borrower', f.name, {name:'Printed Name', date:'Date / Place', dateValue: F.S.sig.borrower ? sigDate('borrower')+(f.signPlace?' / '+f.signPlace:'') : ''})+
+        '<div class="line2">Government ID type / last 4 digits: '+blank((f.idType||'')+(f.idLast4?' / '+f.idLast4:''),2.4)+'</div></div>'+
+      '<div class="sigsec"><div class="sh">CO-MAKER (ONLY IF EXPRESSLY AGREED TO SOLIDARY LIABILITY)</div>'+
+        (cmOn ? sigRow('comaker', f.cmName, {name:'Printed Name'})+'<div class="line2">Address / Contact: '+blank([f.cmAddress,f.cmContact].filter(Boolean).join(' · '),3.6)+(consent?' <span class="fine">Solidary liability expressly agreed (e-consent '+esc(stampTime(consent.at))+')</span>':'')+'</div>'
+              : '<div class="line2">Printed Name: '+blank('NONE',2.4)+' &nbsp;Signature: '+blank('',1.6)+'</div><div class="line2">Address / Contact: '+blank('',3)+' &nbsp;Date: '+blank('',1.2)+'</div>')+'</div>'+
+      '<div class="sigsec"><div class="sh">FOR '+esc(co())+'</div>'+sigRow('creditor', (f.credName||'')+(f.credPos?' — '+f.credPos:''), {name:'Authorized Representative / Position'})+'</div>'+
+      '<div class="sigsec"><div class="sh">WITNESSES</div><div class="two"><div>'+sigBlock('w1', f.w1, '1. Witness')+'</div><div>'+sigBlock('w2', f.w2, '2. Witness')+'</div></div></div>'+
+      '</div>';
+    return [p1,p2];
+  }
+
+  /* =================================================================== */
+  /*  RS v1 — Repayment Schedule (generated)                              */
+  /* =================================================================== */
+  function rsV1(){
+    var f=F.S.f, c=F.computeV2(), per=36, pages=[], rows=c.rows;
+    for(var s=0; s<rows.length; s+=per){
+      var chunk=rows.slice(s,s+per), last=(s+per>=rows.length);
+      var body=chunk.map(function(r){ return '<tr><td class="c">'+r.k+'</td><td>'+esc(mdy(r.due))+'</td><td class="a">'+money(r.inst)+'</td><td class="a">'+money(r.prin)+'</td><td class="a">'+money(r.int)+'</td><td class="a">'+money(r.bal)+'</td></tr>'; }).join('');
+      pages.push('<div class="page doc">'+draftLine('RS')+hdr('REPAYMENT SCHEDULE', 'Incorporated into Promissory Note No. '+esc(f.pnNo||f.loanId)+(pages.length?' (continued)':''))+
+        (pages.length?'':'<table class="kvt"><tr><th>Borrower</th><td>'+esc(f.name)+'</td><th>Loan / PN No.</th><td>'+esc(f.loanId)+'</td></tr>'+
+        '<tr><th>Principal</th><td>₱ '+money(c.P)+'</td><th>Release / value date</th><td>'+esc(mdy(c.vd))+'</td></tr>'+
+        '<tr><th>Interest</th><td>'+esc(num(f.rate).toFixed(2))+' % per '+(f.ratePer==='year'?'year':'month')+', '+(c.basis==='declining'?'declining balance':'add-on / precomputed')+'</td><th>Frequency / installments</th><td>'+FREQ_LABEL[c.freq]+' · '+c.n+'</td></tr>'+
+        '<tr><th>Net proceeds</th><td>₱ '+money(c.net)+'</td><th>EIR (per month)</th><td>'+esc(c.eirText)+'</td></tr></table>')+
+        '<table class="sched"><tr><th class="c">#</th><th>Due date</th><th class="a">Installment (₱)</th><th class="a">Principal (₱)</th><th class="a">Interest (₱)</th><th class="a">Remaining balance (₱)</th></tr>'+body+
+        (last?'<tr class="tot"><td></td><td><b>TOTAL</b></td><td class="a"><b>'+money(c.scheduledTotal)+'</b></td><td class="a"><b>'+money(c.P)+'</b></td><td class="a"><b>'+money(c.interest)+'</b></td><td></td></tr>':'')+'</table>'+
+        (last?'<p class="fine">Dated '+esc(longDate(F.S.sig.borrower?stampDate(F.S.sig.borrower.at):null)||'upon signing')+'. Each installment is applied as shown. Total scheduled payments ₱ '+money(c.scheduledTotal)+'; total amount payable over the full term ₱ '+money(c.totalPayable)+' (includes charges not deducted from proceeds, if any). EIR is the internal rate of return per period of the net proceeds against the installments above, expressed per month.</p>'+
+          '<div class="two"><div>'+sigRow('borrower', f.name, {name:'Received and acknowledged by Borrower'})+'</div><div>'+sigRow('creditor', (f.credName||'')+(f.credPos?' — '+f.credPos:''), {name:'For '+co()})+'</div></div>':'')+
+        '</div>');
+    }
+    return pages;
+  }
+
+  /* =================================================================== */
+  /*  MCSA v1 — Movable Collateral Security Agreement (Form A)           */
+  /* =================================================================== */
+  var MCSA = {
+    s1:'For valuable consideration and to secure the Secured Obligations, the Grantor grants to the Secured Creditor a security interest in the movable property described in Schedule A (the “Collateral”), together with identifiable proceeds and insurance proceeds to the extent permitted by law. This Agreement creates a security interest only; it does not transfer ownership of the Collateral.',
+    s2:'The security interest secures the Borrower’s obligations under the identified Promissory Note and completed Disclosure Statement, limited to principal actually released, lawful contractual interest, and lawful, properly disclosed charges and recoverable enforcement expenses. It does not secure unrelated debts unless separately and expressly agreed in a signed writing.',
+    s3:['The Grantor is the lawful owner of the Collateral or is duly authorized to encumber it and has capacity to sign.','The Grantor has disclosed all co-owners, liens, security interests, leases, restrictions and third-party rights known to the Grantor.','The Collateral is accurately described in Schedule A, including serial, chassis, engine or registration numbers where applicable. Proof of ownership and identification are attached.','The Grantor shall not dispose of or further encumber the Collateral in violation of this Agreement or applicable law.'],
+    s4b:'under a separate inventory and receipt. The party holding the Collateral shall take the care required by law, keep it reasonably safe, and not use it except as expressly authorized in writing. Record condition, photographs, keys, accessories and documents in Schedule B.',
+    s5:'The Grantor shall maintain the Collateral in reasonable condition and promptly notify the Secured Creditor of material damage, loss, seizure or third-party claims. No undisclosed storage, inspection, insurance or handling fee may be imposed.',
+    s6:'The parties authorize the Secured Creditor to register a notice of the security interest in the Personal Property Security Registry (PPSR), where appropriate under R.A. No. 11057 and its implementing rules. Registration does not cure a defect in ownership, authority or the underlying agreement.',
+    s7:'Upon default under the Promissory Note, and after any notice, cure period or procedure required by law and the loan documents, the Secured Creditor may enforce its security interest only in accordance with R.A. No. 11057, its implementing rules and other applicable law. Taking possession without judicial process is permitted only where legally authorized, expressly stipulated where required, and achievable without breach of the peace. No entry into a private residence without permission, force, intimidation or prohibited self-help is authorized.',
+    s7b:'Any disposition must be commercially reasonable and follow required notices and procedures. Proceeds shall be applied in the order required by law and the Secured Creditor shall provide an accounting. Any surplus shall be returned to the person entitled to it; any deficiency may be claimed only to the extent allowed by law. The Secured Creditor shall not automatically appropriate the Collateral as its own property.',
+    s8:'Upon full payment and discharge of the Secured Obligations, the Secured Creditor shall promptly release the Collateral in its custody and take steps required to terminate or discharge any registered security interest, subject to applicable law. Any release fee must have a lawful basis and have been disclosed.',
+    s9:'Notices shall be sent to the addresses stated above using a method providing reasonable proof of delivery. The Grantor may request this Agreement and notices in Filipino as provided by applicable law. Personal information shall be handled only for lawful, disclosed purposes.',
+    s10:'This Agreement is governed by Philippine law and supplements the identified Promissory Note and Disclosure Statement. Amendments must be in writing and signed by affected parties.'
+  };
+  function mcsaV1(){
+    var f=F.S.f, c=F.computeV2(), third=F.thirdPartyGrantor(), gr=F.grantorRole();
+    var gName = third ? f.grName : f.name, gAddr = third ? f.grAddress : f.address, gId = third ? f.grId : [f.idType,f.idLast4].filter(Boolean).join(' / ');
+    var gDate = F.S.sig[gr] ? stampDate(F.S.sig[gr].at) : null;
+    var pnDate = F.S.sig.borrower ? stampDate(F.S.sig.borrower.at) : null;
+    var custodyItems=(f.assets||[]).map(function(a,i){ return a.custody==='creditor' ? ((i+1)+') '+[a.category,a.makeModel].filter(Boolean).join(' ')) : null; }).filter(Boolean);
+    var anyCust=custodyItems.length>0;
+    var p1='<div class="page doc pn2">'+draftLine('MCSA')+hdr('MOVABLE COLLATERAL SECURITY AGREEMENT','(For personal property; subject to R.A. No. 11057 and applicable rules) · Agreement No. '+esc(f.saNo||''))+
+      '<p>This Agreement is made on '+blank(gDate?longDate(gDate):'',1.6)+' at '+blank(f.signPlace,1.8)+', Philippines, by and between:</p>'+
+      '<table class="kvt"><tr><th>SECURED CREDITOR</th><td>'+esc(co())+', '+esc(coAddr())+' (the “Secured Creditor”).</td></tr>'+
+      '<tr><th>GRANTOR / OWNER</th><td>Name: '+blank(gName,1.8)+' Address: '+blank(gAddr,2)+' ID: '+blank(gId,1.2)+'</td></tr>'+
+      '<tr><th>BORROWER (if different)</th><td>'+(third?'Name: '+blank(f.name,1.8)+' Address: '+blank(f.address,2.4):'Same as Grantor')+'</td></tr>'+
+      '<tr><th>RELATED PROMISSORY NOTE</th><td>PN / Loan Account No.: '+blank(f.pnNo||f.loanId,1.4)+' Date: '+blank(pnDate?mdy(pnDate):'',1)+' Principal: ₱'+blank(money(c.P),1.2)+'</td></tr></table>'+
+      '<h2>1. Grant of security interest</h2><p>'+esc(MCSA.s1)+'</p>'+
+      '<h2>2. Secured obligations</h2><p>'+esc(MCSA.s2)+'</p>'+
+      '<h2>3. Grantor’s representations</h2><ul>'+MCSA.s3.map(function(t){ return '<li>'+esc(t)+'</li>'; }).join('')+'</ul>'+
+      '<h2>4. Possession, custody and care</h2><p>'+cb(!anyCust)+' Grantor retains possession and use. '+cb(anyCust)+' Secured Creditor takes physical custody of the following item(s): '+blank(custodyItems.join('; '),2.4)+' '+esc(MCSA.s4b)+'</p>'+
+      '<h2>5. Continuing duties</h2><p>'+esc(MCSA.s5)+'</p>'+
+      '<h2>6. Perfection and priority</h2><p>'+esc(MCSA.s6)+'</p>'+
+      '<h2>7. Default and enforcement</h2><p>'+esc(MCSA.s7)+'</p><p>'+esc(MCSA.s7b)+'</p>'+
+      '<h2>8. Release and termination</h2><p>'+esc(MCSA.s8)+'</p>'+
+      '<h2>9. Notices, language and privacy</h2><p>'+esc(MCSA.s9)+'</p>'+
+      '<h2>10. Governing law and entire agreement</h2><p>'+esc(MCSA.s10)+'</p>'+
+      '<p class="fine">Signatures and Schedules A and B follow on the next page and form part of this Agreement.</p>'+
+      '</div>';
+    var sigs='<h2>SIGNATURES</h2>'+
+      sigRow(gr, gName, {name:'GRANTOR — Printed name'})+
+      (third ? sigRow('borrower', f.name, {name:'BORROWER (if different) — Printed name'}) : '')+
+      sigRow('creditor', (f.credName||'')+(f.credPos?' — '+f.credPos:''), {name:co()+' — Authorized representative / position'})+
+      '<div class="two"><div>'+sigBlock('w1', f.w1, 'WITNESS 1')+'</div><div>'+sigBlock('w2', f.w2, 'WITNESS 2')+'</div></div>';
+    var pages=[p1], assets=f.assets||[], per=3;
+    for(var s=0;s<Math.max(assets.length,1);s+=per){
+      var chunk=assets.slice(s,s+per), lastChunk=(s+per>=assets.length);
+      var schedA=chunk.length?chunk.map(function(a,i){
+        return '<table class="kvt sa"><tr><th colspan="4" class="sah">Asset '+(s+i+1)+' of '+assets.length+'</th></tr>'+
+          '<tr><th>Type / category</th><td>'+esc(a.category||'')+'</td><th>Make / model / year / color</th><td>'+esc(a.makeModel||'')+'</td></tr>'+
+          '<tr><th>Serial / chassis / engine / plate / ID</th><td>'+esc(a.idNumbers||'')+'</td><th>Registration / title / ownership document no.</th><td>'+esc(a.docNo||'')+'</td></tr>'+
+          '<tr><th>Estimated value and valuation date</th><td>₱'+esc(num(a.value)?money(num(a.value)):'')+' &nbsp;Date: '+esc(mdy(parseISO(a.valuationDate)))+'</td><th>Current location</th><td>'+esc(a.location||'')+'</td></tr>'+
+          '<tr><th>Existing liens / co-owners / restrictions</th><td>'+esc(a.liens||'NONE')+'</td><th>Photographs / attachments</th><td>'+cb(!!a.photos)+' Attached '+cb(!a.photos)+' Not applicable</td></tr>'+
+          '<tr><th>Possession</th><td colspan="3">'+(a.custody==='creditor'?'Secured Creditor custody (see Schedule B)':'Grantor retains possession')+'</td></tr></table>';
+      }).join('') : '<p>No asset recorded.</p>';
+      pages.push('<div class="page doc pn2">'+draftLine('MCSA')+hdr('MOVABLE COLLATERAL SECURITY AGREEMENT — SIGNATURES AND SCHEDULES','Agreement No. '+esc(f.saNo||'')+' · Grantor '+esc(gName))+
+        (s?'':sigs)+
+        '<h2>SCHEDULE A — COLLATERAL DESCRIPTION'+(s?' (continued)':'')+'</h2>'+schedA+
+        (lastChunk && anyCust ? '<h2>SCHEDULE B — CUSTODY AND CONDITION RECEIPT (if lender takes possession)</h2>'+
+          '<p>Item received: '+blank(f.cuItems||custodyItems.join('; '),2.4)+' Accessories / keys / documents: '+blank(f.cuAccessories,2)+'</p>'+
+          '<p>Condition and visible defects: '+blank(f.cuCondition,4.8)+'</p>'+
+          '<p>Date/time/place received: '+blank([f.cuReceivedAt,f.cuReceivedPlace].filter(Boolean).join(', '),2.4)+' Received by: '+blank(f.custodianName,2)+'</p>'+
+          '<p>Delivery is for safekeeping as collateral only, not an absolute sale or transfer of ownership.</p>'+
+          '<div class="two"><div>'+sigRow(gr, gName, {name:'Grantor signature — printed name'})+'</div><div>'+sigRow('custodian', f.custodianName, {name:'Custodian signature — printed name'})+'</div></div>' : '')+
+        '</div>');
+    }
+    return pages;
+  }
+
+  /* =================================================================== */
+  /*  CSDA v1 — Cash Security Deposit Agreement (Form B)                  */
+  /* =================================================================== */
+  var CSDA = {
+    s1:'The Depositor voluntarily delivers the amount stated above solely as security for the specific obligations under the identified loan. The deposit is not additional loan principal, a finance charge, processing fee, penalty, forfeiture or income of the Company merely upon receipt. The Company acknowledges receipt and shall issue an official receipt.',
+    s2:'The Company shall not automatically forfeit the deposit because of delay, default, cancellation or termination. The deposit may be applied only to an amount that is due, lawful, properly payable and supported by a written computation. Before application, the Company shall give written notice identifying the proposed amount and basis and a reasonable opportunity to raise an accounting error. Every application shall be recorded in the loan ledger.',
+    s3:'The Company shall keep an accurate record of the deposit and shall not characterize it as interest or a penalty. The parties shall obtain legal advice on whether the arrangement is a pledge, security interest, deposit or other form of security, and whether segregation, control, perfection or regulatory requirements apply. This form does not itself perfect a security interest in a bank deposit account or override the bank’s rights.',
+    s4b:'business days, without undisclosed deduction. If the loan is cancelled before release or rescinded, the Company shall promptly return the deposit, less only an amount lawfully due and specifically agreed in writing. The Company shall provide a final accounting.',
+    s5:'After default, the Company may apply some or all of the deposit only against matured, lawful amounts due, in accordance with this Agreement, the loan documents and applicable law, with required notice and accounting. The Company shall not apply it to unearned future interest, unlawful penalties, unrelated debts or disputed sums without lawful basis. Any remaining balance shall be returned or continue to be held only as lawfully agreed.',
+    s6:'This Agreement does not make the Depositor a surety for another person’s debt. A third person who agrees to answer for a borrower’s debt must sign a separate, express guaranty or suretyship agreement. A cash deposit is not itself a suretyship.',
+    s7:'The Depositor may request a statement showing the amount held, any application and remaining balance. Personal information shall be handled only for lawful, disclosed purposes and in accordance with applicable privacy laws.',
+    s8:'This Agreement is governed by Philippine law and supplements the identified Promissory Note and Disclosure Statement. Amendments must be in writing and signed by both parties.'
+  };
+  function csdaV1(){
+    var f=F.S.f, c=F.computeV2(), st=F.S.settings||{};
+    var bDate=F.S.sig.borrower?stampDate(F.S.sig.borrower.at):null, dep=num(f.depAmount);
+    return ['<div class="page doc pn2">'+draftLine('CSDA')+hdr('CASH SECURITY DEPOSIT AGREEMENT AND ACKNOWLEDGMENT','(Use only where borrower pays cash to secure identified loan obligations) · Agreement No. '+esc(f.csdNo||''))+
+      '<p>This Agreement is made on '+blank(bDate?longDate(bDate):'',1.6)+' at '+blank(f.signPlace,1.8)+', Philippines, by and between '+esc(co())+' (the “Company”) and:</p>'+
+      '<table class="kvt"><tr><th>BORROWER / DEPOSITOR</th><td>Name: '+blank(f.name,1.8)+' Address: '+blank(f.address,2)+' ID: '+blank([f.idType,f.idLast4].filter(Boolean).join(' / '),1.2)+'</td></tr>'+
+      '<tr><th>LOAN ACCOUNT / NOTE</th><td>PN / Account No.: '+blank(f.pnNo||f.loanId,1.6)+' Date: '+blank(bDate?mdy(bDate):'',1)+'</td></tr>'+
+      '<tr><th>LOAN PRINCIPAL</th><td>₱'+blank(money(c.P),1.6)+'</td></tr>'+
+      '<tr><th>CASH SECURITY DEPOSIT</th><td>₱'+blank(money(dep),1.4)+' (in words: '+blank(dep?pesoWords(dep):'',3)+')</td></tr>'+
+      '<tr><th>DATE AND MODE RECEIVED</th><td>Date: '+blank(mdy(parseISO(f.depDate)),1)+' '+cb(f.depMode==='Cash')+' Cash '+cb(f.depMode==='Bank transfer')+' Bank transfer &nbsp;Reference: '+blank(f.depReference,1.6)+'</td></tr></table>'+
+      '<h2>1. Purpose and nature of deposit</h2><p>'+esc(CSDA.s1)+'</p>'+
+      '<h2>2. No automatic forfeiture</h2><p>'+esc(CSDA.s2)+'</p>'+
+      '<h2>3. Custody and treatment</h2><p>'+esc(CSDA.s3)+'</p>'+
+      '<h2>4. Refund and release</h2><p>When the secured obligations are fully paid and discharged, the Company shall return the unapplied deposit balance within '+blank(st.depositRefundDays||'',.7)+' '+esc(CSDA.s4b)+'</p>'+
+      '<h2>5. Application after default</h2><p>'+esc(CSDA.s5)+'</p>'+
+      '<h2>6. No suretyship created</h2><p>'+esc(CSDA.s6)+'</p>'+
+      '<h2>7. Statements, notices and privacy</h2><p>'+esc(CSDA.s7)+'</p>'+
+      '<h2>8. Governing law and amendments</h2><p>'+esc(CSDA.s8)+'</p>'+
+      '<h2>SIGNATURES AND RECEIPT</h2>'+
+      sigRow('borrower', f.name, {name:'DEPOSITOR / BORROWER — Printed name'})+
+      sigRow('creditor', (f.credName||'')+(f.credPos?' — '+f.credPos:''), {name:co()+' — Authorized representative / position'})+
+      '<div class="two"><div class="line2">OFFICIAL RECEIPT NO.: '+blank(f.depOR,1.8)+'</div><div>'+sigBlock('w1', f.w1, 'Witness')+'</div></div>'+
+      '</div>'];
+  }
+
+  /* =================================================================== */
+  /*  PDC v1 and BP22 v1 — company forms (unchanged text)                 */
+  /* =================================================================== */
+  function signedOn(){
+    var d = F.S.sig.borrower ? stampDate(F.S.sig.borrower.at) : parseISO(F.S.f.signDate);
+    if(!d) return '____ day of ______________ 20___';
+    return '<span class="u" style="min-width:.55in">'+ord(d.getDate())+'</span> day of <span class="u" style="min-width:1.2in">'+MONTHS[d.getMonth()]+'</span> 20<span class="u" style="min-width:.35in">'+String(d.getFullYear()).slice(2)+'</span>';
+  }
+  function hdr2(title){ return '<div class="hdr2"><img src="'+LOGO+'" alt=""><div><h1 class="co">'+esc(co())+'</h1><div class="addr">'+esc(coAddr())+'</div></div></div><div class="doc-title">'+title+'</div>'; }
+  function pdcV1(){
+    var f=F.S.f, c=F.compute();
+    var rows=F.S.checks.map(function(k){ return '<tr><td>'+esc(k.no)+'</td><td>'+esc(k.bank)+'</td><td>'+mdy(parseISO(k.date))+'</td><td class="a">'+money(num(k.amount))+'</td></tr>'; }).join('');
+    var tot=F.S.checks.reduce(function(a,k){ return a+num(k.amount); },0);
+    return ['<div class="page serif">'+draftLine('PDC')+hdr2('PDC ACKNOWLEDGMENT RECEIPT')+
+     '<p>I, <span class="u" style="min-width:4.2in">'+esc(f.name)+'</span>, hereby acknowledge that I issued and delivered the following Post-Dated Checks (PDCs) to <span class="u" style="min-width:3.2in">'+esc(co())+'</span> as payment for my loan obligation.</p>'+
+     '<div style="margin:14px 0 18px"><div class="fieldl"><span>Borrower Name:</span><span><b>'+esc(f.name)+'</b></span></div><div class="fieldl"><span>Address:</span><span>'+esc(f.address)+'</span></div>'+
+      '<div class="fieldl"><span>Loan Amount: ₱</span><span>'+money(c.P)+'</span></div><div class="fieldl"><span>Purpose of Loan:</span><span>'+esc(f.purpose)+'</span></div></div>'+
+     '<table class="ctable"><thead><tr><th>CHECK NO.</th><th>BANK</th><th>CHECK DATE</th><th class="a">AMOUNT</th></tr></thead><tbody>'+rows+'</tbody><tfoot><tr><td colspan="3">TOTAL ('+F.S.checks.length+' check'+(F.S.checks.length===1?'':'s')+')</td><td class="a">'+money(tot)+'</td></tr></tfoot></table>'+
+     '<p>The above checks are issued as payment/security for the loan obligation. I undertake to maintain sufficient funds in my account on the due dates of the checks.</p>'+
+     '<p style="margin-top:18px">Signed this '+signedOn()+' at <span class="u l" style="min-width:3in">'+esc(f.signPlace)+'</span>.</p>'+
+     '<div class="two" style="margin-top:26px"><div><div>BORROWER:</div>'+sigBlock('borrower', f.name, 'Signature over printed name')+'</div><div><div>CO-MAKER (if any):</div>'+(f.cmName?sigBlock('comaker', f.cmName, 'Signature over printed name'):'<div class="sig"></div><div class="sigline"><b>NONE</b>Signature over printed name</div>')+'</div></div>'+
+     '<div style="margin-top:22px;width:3in"><div>Witnessed by:</div>'+sigBlock('w1', f.w1, 'Witness')+'</div></div>'];
+  }
+  function bp22V1(){
+    var f=F.S.f, c=F.compute();
+    var items=[
+     'That I obtained a loan from <span class="u" style="min-width:3in">'+esc(co())+'</span> in the amount of ₱<span class="u" style="min-width:1.4in">'+money(c.P)+'</span>;',
+     'That as security and payment for my loan obligation, I voluntarily issued Post-Dated Checks (PDCs) in favor of the lender, corresponding to the agreed payment schedule.',
+     'That I shall maintain my bank account in an <b>active and existing status</b> throughout the term of the loan and until all my obligations have been fully paid. I shall not close, suspend, or allow the account to become inactive while any issued PDC remains outstanding.',
+     'That I shall maintain <b>sufficient cleared funds</b> in my bank account on or before the due date of each Post-Dated Check to ensure its payment upon presentment.',
+     'That I shall not issue any stop-payment order, request payment suspension, or perform any act that may prevent the payment of the issued checks, except with the prior written consent of the lender.',
+     'That if any Post-Dated Check is lost, becomes stale, is dishonored, or cannot be negotiated for any reason attributable to me, I undertake to immediately replace it with another valid check or settle the corresponding amount in cash or through another payment method acceptable to the lender, without prejudice to any applicable penalties or legal remedies.',
+     'That in the event any Post-Dated Check is dishonored due to insufficient funds, account closure, inactive account, stop-payment order, irregular signature, or any other reason attributable to me, I agree to immediately pay:<ul><li>the amount due;</li><li>applicable penalties and interest, if any;</li><li>bank charges;</li><li>collection expenses; and</li><li>reasonable attorney\'s fees and legal costs, where applicable.</li></ul>',
+     'That I acknowledge that the issuance of a dishonored or worthless check may subject me to civil and/or criminal liability under <b>Batas Pambansa Blg. 22</b>, as amended, and other applicable laws.',
+     'That I certify that I have read and fully understood this Undertaking, and that I am signing it voluntarily, freely, and without force, intimidation, or undue influence.'
+    ].map(function(t,i){ return '<li><p>'+(i+1)+'. '+t+'</p></li>'; }).join('');
+    var idNo = F.S.legacy ? (f.idNo||'') : (f.idLast4?'•••• '+f.idLast4:'');
+    return ['<div class="page serif bp" style="font-size:10pt;line-height:1.3">'+draftLine('BP22')+hdr2('UNDERTAKING FOR BOUNCED CHECKS / BP22')+
+     '<p>I, <span class="u" style="min-width:3.6in">'+esc(f.name)+'</span>, of legal age, Filipino, and residing at <span class="u l" style="min-width:4in">'+esc(f.address)+'</span>, hereby undertake and agree to the following:</p><ol>'+items+'</ol>'+
+     '<p>IN WITNESS WHEREOF, I have hereunto affixed my signature this '+signedOn()+' at <span class="u l" style="min-width:2.6in">'+esc(f.signPlace)+'</span>.</p>'+
+     '<div class="two"><div><div>BORROWER:</div>'+sigBlock('borrower', f.name, 'Signature over printed name')+'<div style="margin-top:8px">Valid ID Presented:</div><div class="fieldl"><span></span><span>'+esc(f.idType)+'</span></div><div class="fieldl"><span>ID Number:</span><span>'+esc(idNo)+'</span></div></div>'+
+     '<div><div>CO-MAKER (if any):</div>'+(f.cmName?sigBlock('comaker', f.cmName, 'Signature over printed name'):'<div class="sig"></div><div class="sigline"><b>NONE</b>Signature over printed name</div>')+'</div></div>'+
+     '<div style="margin-top:8px">Witnesses:</div><div class="wit2"><div>'+sigBlock('w1', f.w1, 'Witness')+'</div><div>'+sigBlock('w2', f.w2, 'Witness')+'</div></div></div>'];
+  }
+
+  /* =================================================================== */
+  /*  Legacy v1 DS / PN (packages signed before v2 keep their text)       */
+  /* =================================================================== */
+  function ck(on){ return '<span class="ck">('+(on?'✓':'&nbsp;&nbsp;')+')</span>'; }
+  function dsV1(){
+    var f=F.S.f, c=F.computeV1(), single=c.n===1, col=f.collateral||'';
+    function row(label,nd,d,cls){ return '<tr><td class="'+(cls||'')+'">'+label+'</td><td class="p">₱</td><td class="m">'+nd+'</td><td class="gap"></td><td class="p">₱</td><td class="m">'+d+'</td></tr>'; }
+    var moneyOrBlank=function(n){ return n?money(n):''; };
+    return ['<div class="page">'+
+    '<div class="hdr"><img src="'+LOGO+'" alt=""><div class="t"><h1 class="co">'+esc(co())+'</h1><div>DISCLOSURE STATEMENT ON LOAN/CREDIT TRANSACTION</div><div>(As Required under R.A. 3765, Truth in Lending Act)</div></div><div></div></div>'+
+    '<div class="dshead"><div></div><div>Borrower ID: <span class="u l">'+esc(f.borrowerId)+'</span></div><div>Borrower Name: <span class="u l">'+esc(f.name)+'</span></div><div>Loan ID: <span class="u l">'+esc(f.loanId)+'</span></div><div style="grid-column:1/-1">Address: <span class="u l">'+esc(f.address)+'</span></div></div>'+
+    '<table class="ds" style="margin-top:4px"><tr><td colspan="6" style="height:6px"></td></tr>'+
+     '<tr><td>1. LOAN GRANTED (Amount to be financed):</td><td></td><td></td><td></td><td class="p">₱</td><td class="m"><b>'+money(c.P)+'</b></td></tr>'+
+     '<tr><td><b>2. FINANCE CHARGES</b></td><td></td><td><b>Not deducted from<br>Proceeds of Loans</b></td><td></td><td></td><td><b>Deducted From<br>Proceeds of Loans</b></td></tr>'+
+     '<tr><td class="ind1">a. Interest: <span class="u" style="min-width:.8in">'+esc(num(f.rate).toFixed(2))+'%</span> per month</td><td colspan="5"></td></tr>'+
+     row('From: <span class="u">'+mdy(c.vd)+'</span> to <span class="u">'+mdy(c.due)+'</span><br><span class="small" style="padding-left:.6in">(MM/DD/YYYY)</span>', money(c.interest), '', 'ind1')+
+     '<tr><td class="ind1" colspan="6">'+ck(f.interestType==='Simple')+'Simple '+ck(f.interestType==='Compound')+'Compound '+ck(f.ratePeriod==='Monthly')+'Monthly '+ck(f.ratePeriod==='Quarterly')+'Quarterly '+ck(f.ratePeriod==='Semi-Annual')+'Semi-Annual '+ck(f.ratePeriod==='Annual')+'Annual</td></tr>'+
+     row('<b>b. Non-interest charges (Specify):</b>','','','ind1')+row('<b>c. Other charges (Specify):</b>','','','ind1')+row('<b>• &nbsp;Total Finance Charge:</b>', money(c.interest), '', 'ind1')+
+     '<tr><td colspan="6"><b>3. NON-FINANCE CHARGES</b> (If any)</td></tr>'+
+     row('<b>a. Insurance Premium:</b>','',moneyOrBlank(num(f.insurance)),'ind1')+row('<b>b. Credit Risk Fee</b>','',moneyOrBlank(num(f.creditRisk)),'ind1')+row('<b>c. Processing Fee</b>','',moneyOrBlank(num(f.procFee)),'ind1')+
+     row('<b>d. Taxes:</b>','',moneyOrBlank(num(f.taxes)),'ind1')+row('<b>e. Notarial/Documentary Stamps:</b>','',moneyOrBlank(num(f.notarial)),'ind1')+row('<b>f. Other (Specify):</b> '+(f.otherLabel?'<span class="u l">'+esc(f.otherLabel)+'</span>':''),'',moneyOrBlank(num(f.otherFee)),'ind1')+
+     row('<b>Total Non-Finance Charges:</b>','',moneyOrBlank(c.nonFin),'ind2')+
+     '<tr><td colspan="6"><b>4. TOTAL DEDUCTIONS FROM PROCEEDS OF LOAN</b></td></tr><tr><td class="ind1">(Finance Charges + Non-Finance Charges):</td><td></td><td></td><td></td><td class="p">₱</td><td class="m">'+money(c.deductions)+'</td></tr>'+
+     '<tr><td colspan="6"><b>5. NET PROCEEDS OF LOAN</b></td></tr><tr><td class="ind1">(Amount Financed - Total Deductions):</td><td></td><td></td><td></td><td class="p">₱</td><td class="m"><b>'+money(c.net)+'</b></td></tr>'+
+     '<tr><td colspan="6"><b>6. PERCENTAGE OF FINANCE CHARGES TO TOTAL AMOUNT FINANCED:</b></td></tr><tr><td colspan="6" class="ind1">Computed in accordance with Sec. 2(f) of CB Circular 158 (<span class="u" style="min-width:.8in">'+c.pct.toFixed(2)+'</span>) %</td></tr>'+
+     '<tr><td colspan="6"><b>7. EFFECTIVE INTEREST RATE</b>: ( <span class="u" style="min-width:.6in">'+c.eff.toFixed(2)+'%</span> % per month)</td></tr>'+
+     '<tr><td colspan="6"><b>8. SCHEDULE OF PAYMENT</b></td></tr>'+
+     '<tr><td colspan="4" class="ind1">'+ck(single)+' a. Single Payment due on: <span class="u">'+(single?mdy(c.due):'&nbsp;')+'</span></td><td class="p">₱</td><td class="m">'+(single?money(c.total):'')+'</td></tr>'+
+     '<tr><td colspan="6" class="ind1">'+ck(!single)+' b. Installment Information: Payable in: <span style="display:inline-block;text-align:center;margin-left:.3in"><span class="u" style="min-width:1.4in">'+(single?'':c.n+' &nbsp; Months')+'</span><br><span class="small">(No. of Payment)</span></span> <span style="display:inline-block;text-align:center"><span class="u" style="min-width:1.4in">'+(single?'':money(c.inst))+'</span><br><span class="small">(Payment Frequency)</span></span> <b>'+(single?'':'monthly installment')+'</b></td></tr>'+
+     '<tr><td colspan="6"><b>9. COLLATERAL</b> (If any)</td></tr><tr><td colspan="6" class="ind1">This loan is wholly/partly secured by: (check one)<br>'+ck(col==='Unsecured')+'Unsecured &nbsp; '+ck(col==='Secured wholly/part')+'Secured wholly/part by &nbsp; '+ck(col==='Real Estate')+'Real Estate<br>'+ck(col==='Chattels')+'Chattels &nbsp; '+ck(col==='Government Securities')+'Government Securities &nbsp; Per Deed dated <span class="u">'+(col&&col!=='Unsecured'&&col!=='Other'?esc(f.collateralOther):'&nbsp;')+'</span><br>'+ck(col==='Other')+'Other: <span class="u l" style="min-width:2in">'+(col==='Other'?esc(f.collateralOther):'&nbsp;')+'</span></td></tr>'+
+     '<tr><td colspan="6"><b>10. ADDITIONAL CHARGES IN CASE CERTAINS STIPULATIONS ARE NOT MET BY THE BORROWER</b></td></tr></table>'+
+    '<table class="addl"><tr><td><b>NATURE</b></td><td style="border:0"><b>AMOUNT/PERCENTAGE</b></td></tr><tr><td>Attorney’s Fee</td><td>25 % of the entire claim</td></tr><tr><td>Liquidated Damages</td><td>&nbsp;</td></tr><tr><td>Late Payment Penalties</td><td><b>'+money(num(f.lateFixed)).replace(/\.00$/,'')+'</b> or 15% of monthly amortization (whichever is higher)</td></tr><tr><td>Prepayment Service Fee</td><td>10% of Principal Amount</td></tr></table>'+
+    '<div style="width:5.2in;margin:6px auto 0">'+sigBlock('creditor', (f.credName||'')+(f.credPos?' — '+f.credPos:''), 'Signature of Creditor/Authorized Representative over printed name and Position')+'</div>'+
+    '<p style="margin:10px .2in 4px;font-weight:700;text-align:justify;font-size:9pt;text-indent:.6in">I HEREBY ACKNOWLEDGE RECEIPT OF A COPY OF THE CREDIT TRANSACTION OF THIS STATEMENT PRIOR TO THE CONSUMMATION AND THAT I UNDERSTAND AND FULLY AGREE TO THE TERMS AND CONDITIONS THEREOF:</p>'+
+    '<div style="display:grid;grid-template-columns:2.6in 1fr;gap:.6in;align-items:end;margin-top:4px"><div><div style="display:flex;gap:6px;align-items:flex-end"><span>Date:</span><span class="u" style="flex:1">'+mdy(parseISO(f.signDate))+'</span></div><div class="small" style="text-align:center;padding-left:.4in">(MM/DD/YYYY) or (MM-DD-YYYY)</div></div><div>'+sigBlock('borrower', f.name, '(Signature of Borrower over printed name)')+'</div></div></div>'];
+  }
+  var PN1_TEXT = [
+   'In case of non-payment of this Note or the Loan or any portion thereof when they become due and payable, the whole sum of outstanding and unpaid under this Note shall thereupon become immediately due and payable without need of demand or notice to the undersigned. If this Note remains unpaid upon maturity, the undersigned agree to pay a penalty rate of fifteen (15%) percent per month on all unpaid amounts, including the unpaid principal amount, the unpaid interest, and the unpaid penalties on installments in arrears. This shall be in addition to the installment penalty mentioned in the next preceding paragraph.',
+   'In the foregoing instance, the Company is hereby authorized, at its option, and without notice, to set off or apply to the payment of any amount due and outstanding under this Note, any and all money which may come into it possession by way of deposit or any manner, belonging to the undersigned. In the case of property other than money, the undersigned hereby irrevocably appoints the Company as attorney-in-fact of the undersigned to sell dispose of any property of the undersigned, which may be in the Company’s possession, by public or private sale, and to apply the net proceeds thereof (after deducting the amounts for taxes, fees and other related expenses) to the payment of this Note and all obligations hereunder. The undersigned shall pay the deficiency, if any, upon demand. It is understood, however, that the company has no obligation to carry out this authority.',
+   'The above provision shall likewise be applicable in the event of bankruptcy, insolvency, receivership, levy of execution, garnishment, or attachment, or in case of conviction for criminal offense by final judgment. Carrying with it the penalty of Civil interdiction affecting any or all the undersigned, or any of the cases covered by Article 1198 of the Civil code of the Philippines.',
+   'The undersigned and all endorsers, sureties, co-makers and guarantors hereof herby jointly and severally waive presentment for payment, demand, notice of non-payment, notice of protest of this Note, and all endorsers, sureties, co-makers and guarantors hereof consent to any and all extension of time, renewals, waiver and modifications that may be granted by the Company endorsers, guarantors, co-makers or sureties may become parties hereto without notice to them or without affecting their liability hereunder.',
+   'The company shall not by any act of omission or commission be deemed to waive any of its rights or remedies. Hereunder unless such waiver be in writing and signed by the company and then only to the extent specifically set forth therein; a waiver on one events shall not be construed as continuing or as a bar to or waiver of such right or remedy on a subsequent event.',
+   'In the event that the company shall require the services of a lawyer to enforce collection of this Note or any obligation herein, the undersigned shall pay the Company the sum equivalent to 25% of the amount due but no case less than Five Thousand Pesos (5,000.00) as attorney’s fee, plus costs of suit and other judicial or extra-judicial expenses. The undersigned shall also pay the Company all costs and expenses for collection, whether or not the service of lawyer is engaged, or court action is instituted. The undersigned hereby expressly submit to the jurisdiction of the courts of the City of Cebu or of the place of execution of this Note as the case maybe, at the option of the Company, in the event of litigation arising herewith. This is to the exclusion of all other courts.',
+   'The undersigned agree that should any of the stipulations herein held invalid, the legality and enforceability of the remaining stipulations shall not in a way affected or impaired.',
+   'This note is binding upon the undersigned, and the latter’s heirs, assigns, executors, and/or successor-interest.',
+   'DEMAND AND DISHONOR WAIVED. Holder may accept partial payment reserving his right of recourse against each/or all endorsers.'
+  ];
+  function pnV1(){
+    var f=F.S.f, c=F.computeV1();
+    function ln(l,v){ return '<div class="ln"><span>'+l+'</span><span>'+esc(v||'')+'</span></div>'; }
+    return ['<div class="page pn">'+
+     '<div class="pnh"><img src="'+LOGO+'" alt=""><div><h1 class="co">'+esc(co())+'</h1><div class="s">E. SABELLANO ST. GREENBELT DR. QUIOT, CEBU CITY</div><div class="s">PROMISSORY NOTE</div></div><div></div></div>'+
+     '<table class="pntab"><tr><td style="width:.9in">Borrower #:</td><td class="v" style="width:.9in">'+esc(f.borrowerId)+'</td><td style="border:0"></td><td style="border:0;padding:0;vertical-align:bottom;width:1.45in"><div class="pnfigsig">'+sigBox('borrower')+'</div></td><td colspan="4" style="border:0"></td></tr>'+
+      '<tr><td>PN NO.:</td><td class="v">'+esc(f.loanId)+'</td><td style="width:.8in">AMOUNT:</td><td class="figcell'+(F.S.sig.pnFig?' done':'')+'">'+sigBox('pnFig')+'</td><td>VALUE DATE:</td><td class="v">'+mdy(c.vd)+'</td><td>DUE DATE:</td><td class="v">'+mdy(c.due)+'</td></tr>'+
+      '<tr><td colspan="5" style="border:0"></td><td class="small" style="border:0;text-align:center;font-weight:400">(MM/DD/YYYY)</td><td style="border:0"></td><td class="small" style="border:0;text-align:center;font-weight:400">(MM/DD/YYYY)</td></tr></table>'+
+     '<p style="margin-top:8px">For value received, the undersigned jointly and severally promise to pay <b>'+esc(co())+'</b> or order at its Office at E.Sabellano St. Greenbelt Dr.,Cebu City, the sum of</p>'+
+     '<div class="c" style="display:flex;gap:.3in;justify-content:center;margin:-2px 0 10px"><span class="u" style="min-width:3.4in">'+pesoWords(c.P)+'</span><span>(Php <span class="u" style="min-width:1.2in">'+money(c.P)+'</span>)</span></div>'+
+     '<p>The monthly payment shall be <span class="u" style="min-width:3.6in;font-size:8pt">'+pesoWords(c.inst)+'</span><br><span style="margin-left:-.3in">(Php <span class="u" style="min-width:1.4in">'+money(c.inst)+'</span> ) inclusive of monthly interest and its principal loan.</span></p>'+
+     '<p>Interest not paid when due shall be added to the principal and, as part of the principal, shall likewise bear interest at 1% per day.</p>'+
+     PN1_TEXT.map(function(t){ return '<p>'+esc(t)+'</p>'; }).join('')+
+     '<div class="pnsig"><div>'+sigBox('borrower')+'<div class="sigline" style="text-align:left"><b>'+esc(f.name)+'</b>Signature over Printed Name of Borrower</div>'+ln('Address:', f.address)+ln('Contact No:', f.contact)+ln('Res. Cert. No', f.bCtc)+ln('Issued on:', mdy(parseISO(f.bCtcDate)))+ln('At:', f.bCtcAt)+'</div>'+
+      '<div>'+sigBox('comaker')+'<div class="sigline" style="text-align:left"><b>'+(esc(f.cmName)||'&nbsp;')+'</b>Signature over Printed Name of Co-maker</div>'+ln('Address:', f.cmAddress)+ln('Contact No:', f.cmContact)+ln('Res. Cert. No', f.cmCtc)+ln('Issued on:', mdy(parseISO(f.cmCtcDate)))+ln('At:', f.cmCtcAt)+'</div></div>'+
+     '<div class="pnwit"><div>'+sigBlock('w1', f.w1, 'Printed Name & Signature Of Witness')+'</div><div>'+sigBlock('w2', f.w2, 'Printed Name & Signature Of Witness')+'</div></div></div>'];
+  }
+
+  /* =================================================================== */
+  /*  v3 document set — drafts for Philippine counsel review              */
+  /*  (DS v3, PN v3, MCSA v2, CSDA v2, SUR, GUA, REL, DAP, DRF, RST, SET) */
+  /* =================================================================== */
+  function dq3(){
+    var d=(F.S.settings&&F.S.settings.delinquency)||{};
+    return { grace: d.grace===''||d.grace==null ? 5 : num(d.grace), rate: num(d.rate), cap: num(d.cap), has: num(d.rate)>0 };
+  }
+  function credRow(labelName){
+    var f=F.S.f, appr = f.approvalRef ? ' <span class="fine">Approval ref. '+esc(f.approvalRef)+(f.approvedBy?' · approved by '+esc(f.approvedBy):'')+'</span>' : '';
+    return sigRow('creditor', (f.credName||'')+(f.credPos?' — '+f.credPos:''), {name: labelName||(co()+' — Authorized representative / position')})+(appr?'<div class="line2">'+appr+'</div>':'');
+  }
+  function spouseRow(role, name, who){
+    return '<div class="sigsec"><div class="sh">SPOUSE’S CONFORMITY'+(who?' — '+who:'')+'</div>'+
+      '<p class="fine">I, '+(name?'<b>'+esc(name)+'</b>':blank('',2))+', spouse of the '+esc(who||'Borrower')+', have read this instrument and the Disclosure Statement and give my conformity.</p>'+
+      sigRow(role, name, {name:'Spouse — Printed name'})+'</div>';
+  }
+  function privacyContact(){ var st=F.S.settings||{}; return st.privacyContact || (co()+', '+coAddr()); }
+  function esign3(){ return 'Where signed electronically through ERMANO e-Sign, each signer agrees that the drawn signature, the one-time PIN verification of his registered mobile number and the system’s audit record (date, time, device and document hash) identify him and evidence his consent, and that the electronic document has the effect of a written and signed document under R.A. No. 8792 §§7–9.'; }
+  function smallLoanRow(c){ return cb(c.smallLoan)+' Yes '+cb(!c.smallLoan)+' No'; }
+
+  /* ---------- DS v3 ---------- */
+  function dsV3(){
+    var f=F.S.f, c=F.computeV2(), st=F.S.settings||{}, d=dq3();
+    var bDate=F.S.sig.borrower?stampDate(F.S.sig.borrower.at):null;
+    var secured=!!(f.secCollateral||f.secDeposit), secNos=[]; if(f.secCollateral) secNos.push('MCSA No. '+(f.saNo||'')); if(f.secDeposit) secNos.push('CSDA No. '+(f.csdNo||''));
+    var consumer = f.consumerCredit!==false;
+    var chargeRows=c.charges.map(function(ch){
+      var has=ch.amount>0||ch.basis;
+      return '<tr><td><b>'+esc(ch.label)+'</b></td><td>'+(has?esc(ch.basis||'—'):NONE)+'</td><td class="a">'+(ch.amount>0?money(ch.amount):(has?'0.00':NONE))+'</td><td class="c">'+(has?cb(ch.cls==='finance')+' Fin '+cb(ch.cls!=='finance')+' Non-fin':'—')+'</td><td class="c">'+(has?cb(ch.deducted)+' Yes '+cb(!ch.deducted)+' No':'—')+'</td></tr>';
+    }).join('');
+    var p1 = '<div class="page doc pn2">'+draftLine('DS')+hdr('DISCLOSURE STATEMENT ON LOAN / CREDIT TRANSACTION','(Pursuant to the Truth in Lending Act, R.A. No. 3765, and applicable regulations)')+
+      '<table class="kvt"><tr><th>Borrower / Customer Name</th><td>'+blank(f.name,2.6)+' Loan / Account No.: '+blank(f.loanId,1.4)+'</td></tr>'+
+      '<tr><th>Address · Contact · Email</th><td>'+blank([f.address,f.contact,f.email].filter(Boolean).join(' · '),4.4)+'</td></tr>'+
+      '<tr><th>Date of Disclosure</th><td>'+blank(bDate?mdy(bDate):'',1.4)+' <span class="fine">(stamped on signing)</span> &nbsp;Loan Purpose: '+blank(f.purpose,2.2)+'</td></tr>'+
+      '<tr><th>Loan Type · Purpose class</th><td>'+cb(f.loanType==='Personal')+' Personal '+cb(f.loanType==='Business')+' Business '+cb(f.loanType==='Salary')+' Salary '+cb(f.loanType==='Other')+' Other: '+blank(f.loanType==='Other'?f.loanTypeOther:'',1)+' &nbsp;·&nbsp; '+cb((f.purposeClass||'general')==='general')+' General-purpose '+cb(f.purposeClass==='specific')+' Specific purpose: '+blank(f.purposeClass==='specific'?f.purposeOther:'',1.2)+'</td></tr>'+
+      '<tr><th>Secured Status</th><td>'+cb(!secured)+' Unsecured '+cb(secured)+' Secured (see separate signed security document No. '+blank(secNos.join('; '),1.8)+')</td></tr>'+
+      '<tr><th>Covered small loan (SEC MC No. 14, s. 2025)</th><td>'+smallLoanRow(c)+' <span class="fine">(unsecured, general-purpose, ₱10,000 or less, tenor up to four months)</span></td></tr>'+
+      '<tr><th>Consumer credit transaction (R.A. 7394, Title IV)</th><td>'+cb(consumer)+' Yes '+cb(!consumer)+' No <span class="fine">(company policy: every loan is treated as a consumer credit transaction)</span></td></tr></table>'+
+      '<h2>A. LOAN AMOUNT AND PROCEEDS</h2>'+
+      '<table class="kvt"><tr><th>1. Gross loan amount (face amount of the Promissory Note)</th><td>₱ '+blank(money(c.gross),1.6)+'</td></tr>'+
+      '<tr><th>2. Less: finance charges withheld from proceeds (itemized in B)</th><td>₱ '+money(c.financeDeducted)+'</td></tr>'+
+      '<tr><th>3. Amount financed (1 − 2)</th><td>₱ '+blank(money(c.amountFinanced),1.6)+'</td></tr>'+
+      '<tr><th>4. Less: non-finance charges withheld from proceeds (itemized in B)</th><td>₱ '+money(c.otherDeducted)+'</td></tr>'+
+      '<tr><th>5. Less: cash security deposit withheld from proceeds, refundable under CSDA No. '+esc(f.secDeposit?(f.csdNo||''):'')+'</th><td>'+(c.depWithheld>0?'₱ '+money(c.depWithheld):NONE)+'</td></tr>'+
+      '<tr><th>6. Net amount actually released to Borrower</th><td>₱ '+blank(money(c.net),1.6)+'</td></tr>'+
+      '<tr><th>Mode / Date of Release</th><td>'+cb(f.releaseMode==='Cash')+' Cash '+cb(f.releaseMode==='Bank transfer')+' Bank transfer '+cb(f.releaseMode==='Other')+' Other: '+blank(f.releaseMode==='Other'?f.releaseModeOther:'',1)+' &nbsp;Date: '+blank(mdy(c.vd),1)+'</td></tr></table>'+
+      '<h2>B. FINANCE CHARGES AND OTHER CHARGES</h2>'+
+      '<table class="chg"><tr><th>Charge / Description</th><th>Rate or basis (recipient / purpose for third-party charges)</th><th class="a">Amount (₱)</th><th class="c">Class</th><th class="c">Withheld?</th></tr>'+
+      '<tr><td><b>Nominal interest</b></td><td>'+esc(num(f.rate).toFixed(2))+' % '+cb(f.ratePer!=='year')+' per month '+cb(f.ratePer==='year')+' per year</td><td class="a">'+money(c.interest)+'</td><td class="c">'+cb(true)+' Fin</td><td class="c">'+cb(false)+' Yes '+cb(true)+' No</td></tr>'+
+      chargeRows+
+      '<tr class="tot"><td><b>TOTAL FINANCE CHARGES</b></td><td></td><td class="a">'+money(c.financeTotal)+'</td><td colspan="2"></td></tr>'+
+      '<tr class="tot"><td><b>TOTAL OTHER / NON-FINANCE CHARGES</b></td><td></td><td class="a">'+money(c.otherTotal)+'</td><td colspan="2"></td></tr></table>'+
+      '<p class="fine">All charges must be lawful, actually applicable, accurately computed, and disclosed before the Borrower signs. No fee is inserted merely because a blank appears in this form.</p>'+
+      '<h2>C. INTEREST AND REPAYMENT TERMS</h2>'+
+      '<table class="kvt"><tr><th>Interest method</th><td>Simple interest computed on '+cb(c.basis==='addon')+' the original principal for the full term (add-on / precomputed) '+cb(c.basis==='declining')+' the declining outstanding balance</td></tr>'+
+      '<tr><th>Nominal interest rate</th><td>'+esc(num(f.rate).toFixed(2))+' % per '+cb(f.ratePer!=='year')+' month '+cb(f.ratePer==='year')+' year (equivalent nominal annual rate '+esc(c.ry.toFixed(2))+' %)</td></tr>'+
+      '<tr><th>Effective interest rate (EIR), per month</th><td>'+esc(c.eirText)+' <span class="fine">(internal rate of return per payment period of the net proceeds against the scheduled installments, expressed per month)</span></td></tr>'+
+      '<tr><th>Finance charge as a simple annual rate (R.A. 3765 §4(7))</th><td>'+esc(c.annualText)+' per year <span class="fine">(monthly EIR × 12; annualisation convention subject to counsel’s confirmation)</span></td></tr>'+
+      '<tr><th>Loan term · installments · frequency</th><td>'+esc(c.termText)+' · '+c.n+' · '+['daily','weekly','biweekly','semimonthly','monthly'].map(function(k){ return cb(c.freq===k)+' '+FREQ_LABEL[k]; }).join(' ')+'</td></tr>'+
+      '<tr><th>Installment amount</th><td>₱ '+money(c.inst)+(c.rows.length>1&&c.rows[c.rows.length-1].inst!==c.inst?' (last installment ₱ '+money(c.rows[c.rows.length-1].inst)+')':'')+'</td></tr>'+
+      '<tr><th>First due date / final maturity date</th><td>'+esc(mdy(c.firstDue))+' / '+esc(mdy(c.maturity))+'</td></tr>'+
+      '<tr><th>Total scheduled payments · total amount payable over the full term</th><td>₱ '+money(c.scheduledTotal)+' · ₱ '+money(c.totalPayable)+' <span class="fine">(scheduled payments plus charges payable separately)</span></td></tr>'+
+      '<tr><th>Payment place / channels</th><td>'+(st.paymentChannels?esc(st.paymentChannels):NONE)+'</td></tr></table>'+
+      '<p class="fine">The attached dated Repayment Schedule shows each due date, installment and the allocation between principal and interest; it forms part of this transaction.</p>'+
+      '</div>';
+    var collat = f.secCollateral ? (f.assets||[]).map(function(a,i){ return (i+1)+') '+[a.category,a.makeModel,a.idNumbers].filter(Boolean).join(' — ')+(num(a.value)?'; est. ₱ '+money(num(a.value))+(a.valuationDate?' ('+mdy(parseISO(a.valuationDate))+')':''):''); }).join('; ') : '';
+    if(f.secDeposit) collat += (collat?'; ':'')+'Cash security deposit ₱ '+money(num(f.depAmount))+' held under CSDA No. '+(f.csdNo||'');
+    var secDoc=[]; if(f.secCollateral) secDoc.push('MCSA No. '+(f.saNo||'')+(F.S.sig[F.grantorRole()]?' dated '+mdy(stampDate(F.S.sig[F.grantorRole()].at)):'')); if(f.secDeposit) secDoc.push('CSDA No. '+(f.csdNo||'')+(F.S.sig.borrower?' dated '+mdy(stampDate(F.S.sig.borrower.at)):''));
+    var guar = f.secSurety && f.suName ? esc(f.suName)+' — '+(f.suType==='guaranty'?'Guarantor (Civil Code Art. 2047 par. 1)':'Surety (solidary, Art. 2047 par. 2)')+', '+(f.suType==='guaranty'?'Guaranty':'Suretyship')+' Agreement No. '+esc(f.suNo||'')+(F.S.sig.surety?' dated '+mdy(stampDate(F.S.sig.surety.at)):'') : 'NONE';
+    var lang=f.ackLang||'';
+    var p2 = '<div class="page doc pn2">'+draftLine('DS')+hdr('DISCLOSURE STATEMENT ON LOAN / CREDIT TRANSACTION (continued)','Loan / Account No. '+esc(f.loanId)+' · '+esc(f.name))+
+      '<h2>D. LATE PAYMENT / DEFAULT CHARGES</h2>'+
+      '<p class="fine">No late-payment or non-payment charge may be imposed unless its rate, calculation basis, triggering event and timing are stated here and in the signed Promissory Note.</p>'+
+      '<table class="kvt"><tr><th>Grace period</th><td>'+esc(String(d.grace))+' calendar days after the scheduled due date</td></tr>'+
+      '<tr><th>Delinquency charge</th><td>'+(d.has?esc(d.rate.toFixed(2))+' % per month':NONE+' — no delinquency charge is stipulated')+'</td></tr>'+
+      '<tr><th>Applies to</th><td>The overdue scheduled installment only (never to future installments, interest or penalties)</td></tr>'+
+      '<tr><th>Calculation</th><td>The rate multiplied by the unpaid portion of the overdue installment for each month or fraction it remains unpaid after the grace period, without compounding</td></tr>'+
+      '<tr><th>When charge begins</th><td>On the eleventh day after the scheduled due date — the later of the day after the '+esc(String(d.grace))+'-day grace period and the tenth day after the due date (R.A. 7394 Art. 134)</td></tr>'+
+      '<tr><th>Aggregate limit</th><td>'+(d.cap>0?'Total delinquency charges shall not exceed '+esc(d.cap.toFixed(2))+' % of the original principal':'Aggregate limit: '+NONE+' stated')+'; for a covered small loan the total cost of the loan shall not exceed 100 % of the amount borrowed</td></tr>'+
+      '<tr><th>Treatment of partial payments</th><td>Applied as stated in §4 of the Promissory Note; the charge is computed only on the portion still unpaid</td></tr></table>'+
+      '<p class="fine">No daily penalty, automatic capitalization of unpaid interest, interest-on-penalty, or duplicate penalty on the same overdue amount is authorized by this form.</p>'+
+      '<h2>E. PREPAYMENT, RESCHEDULING AND EARLY SETTLEMENT</h2>'+
+      '<p>The Borrower may prepay in full or in part at any time without penalty and may request a written settlement statement. On prepayment of a precomputed (add-on) loan the Company shall rebate the unearned finance charge computed by the Rule of 78 as prescribed by R.A. 7394 Art. 138; on a declining-balance loan the settlement amount is the outstanding principal plus interest accrued to the settlement date. No prepayment fee is charged. Rescheduling or restructuring is valid only under a written Loan Restructuring and Rescheduling Agreement with a revised Disclosure Statement and schedule.</p>'+
+      '<h2>F. COLLATERAL AND GUARANTORS</h2>'+
+      '<p>Collateral description and valuation: '+(collat?esc(collat):'NONE')+'. Separate security document / date: '+(secDoc.length?esc(secDoc.join('; ')):'NONE')+'. Guarantor / Surety: '+guar+'.</p>'+
+      '<h2>G. DATA PRIVACY NOTICE</h2>'+
+      '<p>The Company collects and processes the Borrower’s personal information, including identification details, contact information and signatures, to evaluate, document, administer and collect this loan; to comply with law and SEC, BSP, AMLC and Credit Information Corporation requirements; and to enforce its rights. Recipients may include the Credit Information Corporation, credit bureaus, authorized collection agents, counsel, courts and regulators. Information is retained for '+esc(st.retentionYears||'five (5)')+' years after full settlement unless a longer period is required by law. The Borrower may access, correct or object to the processing of his data under R.A. 10173 by writing to '+esc(privacyContact())+'. By signing, the Borrower consents to this processing.</p>'+
+      '<h2>H. BORROWER ACKNOWLEDGMENT</h2>'+
+      '<p>I acknowledge that I received this completed Disclosure Statement, the Repayment Schedule and the following documents before the loan transaction was consummated: '+cb(true)+' Promissory Note and Loan Agreement '+cb(!!f.secCollateral)+' Security Agreement No. '+esc(f.secCollateral?(f.saNo||''):'')+' '+cb(!!f.secDeposit)+' Cash Security Deposit Agreement No. '+esc(f.secDeposit?(f.csdNo||''):'')+' '+cb(!!(f.secSurety&&f.suName))+' Suretyship / Guaranty Agreement. The amounts, rates, fees, payment dates and other charges were explained to me in '+cb(lang==='English')+' English '+cb(lang==='Filipino')+' Filipino '+cb(lang==='Cebuano')+' Cebuano, I had the opportunity to ask questions and obtain a copy, and I signed voluntarily. If signed electronically: I signed through ERMANO e-Sign after verification of my mobile number, and I agree that my electronic signature and the system’s audit record identify me and evidence my consent (R.A. 8792 §8).</p>'+
+      sigRow('borrower', f.name, {name:'Borrower — printed name', time:true})+
+      credRow('Creditor representative — printed name / position')+
+      sigRow('w1', f.w1, {name:'Witness (optional)'})+
+      '</div>';
+    return [p1,p2];
+  }
+
+  /* ---------- PN v3 ---------- */
+  var PN3 = {
+    s3:'An event of default occurs if the Borrower fails to pay an amount when due and the failure continues for '+'{{CURE}}'+' calendar days after the Lender’s written notice to the Borrower; materially breaches another obligation under the loan documents and fails to cure within '+'{{CURE2}}'+' calendar days after written notice; or becomes subject to another event of default expressly permitted by applicable law and specifically identified in a signed addendum. After an event of default, and subject to applicable law and any required notice or opportunity to cure, the Lender may declare the unpaid balance immediately due and payable by written notice to the Borrower. Acceleration shall not authorize the Lender to collect unearned future interest or charges that are not legally due. The Lender may pursue lawful civil remedies to recover the outstanding obligation.',
+    s4:'Unless mandatory law requires otherwise or the parties agree in writing to a different lawful allocation, payments shall be applied first to matured and properly disclosed lawful charges, then to accrued contractual interest, then to principal. The Lender shall record and disclose the allocation, and the same order shall appear in the loan ledger and on every receipt. The Lender shall not apply a payment in a manner that creates an undisclosed fee or charge.',
+    s5:'The Borrower may prepay in full or in part at any time without penalty. The Lender shall compute the settlement amount in accordance with applicable law and the method stated in §E of the Disclosure Statement, including any rebate of unearned finance charges. No prepayment service fee is imposed. Any extension, deferment, restructuring or change in payment date is valid only under a written Loan Restructuring and Rescheduling Agreement signed by the Borrower and the Lender, with a revised Disclosure Statement and Repayment Schedule.',
+    s6:'The Lender may undertake lawful collection activities and may refer the account to counsel or commence proceedings when warranted. If the Lender is compelled to engage counsel or to litigate to collect any amount due under this Note, the Borrower shall pay attorney’s fees equal to {{ATTY}} percent ({{ATTYN}}%) of the amount then due, in addition to costs of suit, which the parties stipulate as liquidated damages under Civil Code Art. 2208(1), subject to the court’s power to reduce them. No other collection fee, and no minimum fee, is created by this Note. Any actual collection expense charged to the Borrower must have a lawful basis, be reasonable and be documented.',
+    s7:'Each co-maker who signs below expressly agrees to be jointly and severally liable with the Borrower for the obligations stated in this Note, to the extent permitted by law, and confirms receipt of the completed Disclosure Statement and Repayment Schedule before signing. A person is not a co-maker or solidary obligor merely because his name, contact information or signature appears as a witness or contact person. Each co-maker must be clearly identified and must sign in the designated co-maker section.',
+    s8:'Any collateral securing this loan must be identified in a separate written security agreement that describes the property, the secured obligations and the lawful enforcement process. Nothing in this Note authorizes the Lender to seize, sell or dispose of property without the process and notices required by applicable law, including R.A. No. 11057. Any set-off, including against a cash security deposit, shall be made only where legally permitted, properly documented and consistent with the parties’ separate written agreement.',
+    s9:'Notices may be delivered to the postal address, email address or mobile number stated in this Note, and the Borrower agrees that notices sent by SMS or email to those contacts are deemed received on transmission, subject to proof of sending. The Borrower shall promptly notify the Lender of any change in contact details. Collection communications shall remain lawful, proportionate and respectful, shall be made only between 6:00 a.m. and 10:00 p.m. unless the account is more than fifteen days past due or the Borrower consents otherwise, and shall be limited to the Borrower, any co-maker and any named surety or guarantor. No threat, public shaming, harassment or unauthorized disclosure of personal data is permitted.',
+    s10:'This Note is governed by the laws of the Republic of the Philippines. Any action arising from this Note shall be filed in the proper court of {{VENUE}}, without prejudice to the Borrower’s right to file in the court of his residence where the law so provides. No venue stipulation deprives the Borrower of a remedy that cannot lawfully be waived.',
+    s11:'This Note, the completed Disclosure Statement, the Repayment Schedule and any signed security, suretyship, guaranty or restructuring agreement constitute the written loan documents for this transaction. No oral representation amends them. Any amendment or waiver must be in writing and signed by the parties. If any provision is held invalid, the remaining provisions remain effective; an invalid provision shall not be used to impose a charge prohibited by law.',
+    s13:'I / WE confirm that we have read or had this Note and the Disclosure Statement explained to us in a language we understand; received copies before or at consummation; understood the Repayment Schedule and charges; and signed voluntarily. We acknowledge that the Lender has not promised any charge or remedy other than those expressly written in the loan documents.'
+  };
+  function numWord(n){ var w=['zero','one','two','three','four','five','six','seven','eight','nine','ten','eleven','twelve','thirteen','fourteen','fifteen','sixteen','seventeen','eighteen','nineteen','twenty']; return w[n]||String(n); }
+  function pnV3(){
+    var f=F.S.f, c=F.computeV2(), d=dq3(), st=F.S.settings||{};
+    var bDate=F.S.sig.borrower?stampDate(F.S.sig.borrower.at):null;
+    var cmOn=!!f.cmName, consent=(F.S.meta&&F.S.meta.consents&&F.S.meta.consents.comaker)||null;
+    var married = f.civilStatus==='Married' && !!f.spouseName;
+    var atty = num(st.attorneyFee||10), cure=st.cureDays||'10', cure2=st.cureDays2||'15', venue=st.venue||'Cebu City';
+    var freqs=[['daily','day'],['weekly','week'],['biweekly','two weeks'],['semimonthly','15th and 30th'],['monthly','month']];
+    var dueEvery=freqs.map(function(p){ return cb(c.freq===p[0])+' '+p[1]; }).join(' ');
+    var p1='<div class="page doc pn2">'+draftLine('PN')+hdr('PROMISSORY NOTE AND LOAN AGREEMENT','')+
+      '<table class="kvt"><tr><th>Promissory Note No.</th><td>'+blank(f.pnNo||f.loanId,1.8)+' &nbsp;Date of Note: '+blank(bDate?mdy(bDate):'',1.2)+' <span class="fine">(stamped on signing)</span></td></tr>'+
+      '<tr><th>Principal Amount</th><td><span class="figrow">₱ '+blank(money(c.P),1.6)+'<span class="figcell'+(F.S.sig.pnFig?' done':'')+'">'+sigBox('pnFig',{noStamp:true})+'</span><span class="fine">(amount in figures, in the Borrower’s handwriting)</span></span></td></tr>'+
+      '<tr><th>Release / Value Date · Final Maturity Date</th><td>'+blank(mdy(c.vd),1.4)+' · '+blank(mdy(c.maturity),1.4)+'</td></tr>'+
+      '<tr><th>Borrower · Address / Contact</th><td>'+blank(f.name,2)+' · '+blank([f.address,f.contact,f.email].filter(Boolean).join(' · '),3)+'</td></tr>'+
+      '<tr><th>Co-maker(s), if any</th><td>'+blank(cmOn?f.cmName:'NONE',4)+'</td></tr></table>'+
+      '<p>FOR VALUE RECEIVED, I / WE, the undersigned Borrower and any co-maker(s) who sign this Note, jointly and severally where expressly stated below, promise to pay '+esc(co())+' (the “Lender”), at its office stated above or through a payment channel officially designated by the Lender, the principal amount of ₱'+blank(money(c.P),1.4)+' (Philippine pesos: '+blank(pesoWords(c.P),3.2)+'), together with the interest and other charges expressly stated in this Note and the completed Disclosure Statement, which is attached to and forms part of this transaction.</p>'+
+      '<h2>1. INTEREST AND PAYMENT SCHEDULE</h2>'+
+      '<p>The principal shall earn simple interest at the rate of '+blank(num(f.rate).toFixed(2),.7)+' % per '+cb(f.ratePer!=='year')+' month '+cb(f.ratePer==='year')+' year, computed on '+cb(c.basis==='addon')+' the original principal for the full term (add-on / precomputed) '+cb(c.basis==='declining')+' the declining outstanding balance. The interest method, effective rate, simple annual rate, total finance charges and total amount payable are fully stated in the Disclosure Statement and the attached Repayment Schedule. No interest shall be charged unless expressly stipulated in writing. The Borrower shall pay '+blank(String(c.n),.6)+' installments of ₱'+blank(money(c.inst),1.2)+' each'+(c.rows.length>1&&c.rows[c.rows.length-1].inst!==c.inst?' (last installment ₱'+money(c.rows[c.rows.length-1].inst)+')':'')+', due every '+dueEvery+', beginning '+blank(mdy(c.firstDue),1)+' and ending '+blank(mdy(c.maturity),1)+', in accordance with the attached Repayment Schedule, which is incorporated into this Note.</p>'+
+      '<h2>2. LATE PAYMENT AND DELINQUENCY CHARGE</h2>'+
+      '<p>If an installment is not paid in full when due, and remains unpaid after the grace period of '+esc(numWord(d.grace))+' ('+esc(String(d.grace))+') calendar days, the Lender may impose only the delinquency charge stated in the Disclosure Statement and this paragraph: '+(d.has?blank(d.rate.toFixed(2),.7)+' % per month':blank('NONE',.9))+', computed solely on the unpaid portion of the overdue scheduled installment (excluding future installments, accrued interest and any prior charge) for each month or fraction thereof that it remains unpaid, without compounding, beginning on the eleventh day after the due date, the later of the day after the grace period and the tenth day after the due date (R.A. 7394 Art. 134). Total delinquency charges under this Note shall not exceed '+(d.cap>0?blank(d.cap.toFixed(2),.7)+' % of the original principal':blank('NONE stated',1.1))+', and for a covered small loan the total cost of the loan shall not exceed 100% of the amount borrowed. The parties intend this charge as compensation for the Lender’s loss from delay and not as a punitive penalty; the Lender acknowledges the court’s power under Civil Code Arts. 1229 and 2227 to reduce it. No charge shall be assessed twice for the same period and the same overdue amount. Partial payments shall be credited under §4. The Lender shall provide an updated statement of principal, accrued interest, payments and delinquency charges upon reasonable request. The parties expressly agree that no 1% per day charge, automatic capitalization of unpaid interest, interest on penalties, or compounding of penalties is created by this Note. If the rate above is NONE, no delinquency charge is due.</p>'+
+      '<h2>3. DEFAULT; NOTICE; ACCELERATION</h2><p>'+esc(PN3.s3.replace('{{CURE}}',cure).replace('{{CURE2}}',cure2))+'</p>'+
+      '<h2>4. APPLICATION OF PAYMENTS</h2><p>'+esc(PN3.s4)+'</p>'+
+      '<h2>5. PREPAYMENT AND RESTRUCTURING</h2><p>'+esc(PN3.s5)+'</p>'+
+      '<h2>6. COLLECTION; COSTS; ATTORNEY’S FEES</h2><p>'+esc(PN3.s6.replace('{{ATTY}}',numWord(Math.round(atty))).replace('{{ATTYN}}',String(atty)))+'</p>'+
+      '</div>';
+    var p2='<div class="page doc pn2">'+draftLine('PN')+hdr('PROMISSORY NOTE AND LOAN AGREEMENT (continued)','Promissory Note No. '+esc(f.pnNo||f.loanId)+' · '+esc(f.name))+
+      '<h2>7. CO-MAKER / SOLIDARY LIABILITY (IF APPLICABLE)</h2><p>'+esc(PN3.s7)+'</p>'+
+      '<h2>8. COLLATERAL; NO UNAUTHORIZED SELF-HELP SALE</h2><p>'+esc(PN3.s8)+'</p>'+
+      '<h2>9. NOTICES AND CONTACT INFORMATION</h2><p>'+esc(PN3.s9)+'</p>'+
+      '<h2>10. GOVERNING LAW; VENUE</h2><p>'+esc(PN3.s10.replace('{{VENUE}}',venue))+'</p>'+
+      '<h2>11. ENTIRE AGREEMENT; AMENDMENTS; SEVERABILITY</h2><p>'+esc(PN3.s11)+'</p>'+
+      '<h2>12. DATA PRIVACY AND ELECTRONIC SIGNATURE</h2><p>The Borrower and each co-maker have read the Data Privacy Notice in §G of the Disclosure Statement and consent to the processing described. '+esc(esign3())+'</p>'+
+      '<h2>13. ACKNOWLEDGMENT</h2><p>'+esc(PN3.s13)+'</p>'+
+      '<div class="sigsec"><div class="sh">BORROWER</div>'+sigRow('borrower', f.name, {name:'Printed Name', date:'Date / Place', dateValue: F.S.sig.borrower ? sigDate('borrower')+(f.signPlace?' / '+f.signPlace:'') : ''})+
+        '<div class="line2">Government ID type / last 4 digits: '+blank((f.idType||'')+(f.idLast4?' / '+f.idLast4:''),2)+' &nbsp;Civil status: '+cb(f.civilStatus==='Single')+' Single '+cb(f.civilStatus==='Married')+' Married '+cb(f.civilStatus==='Other')+' Other</div></div>'+
+      (married ? spouseRow('spouse', f.spouseName, 'Borrower') : '<div class="sigsec"><div class="sh">SPOUSE’S CONFORMITY (married borrowers)</div><div class="line2">Printed Name: '+blank('N/A',2.4)+' &nbsp;Signature: '+blank('',1.6)+' &nbsp;Date: '+blank('',1)+'</div></div>')+
+      '<div class="sigsec"><div class="sh">CO-MAKER (ONLY IF EXPRESSLY AGREED TO SOLIDARY LIABILITY)</div>'+
+        (cmOn ? '<p class="fine">I expressly agree to be jointly and severally (solidarily) liable with the Borrower for the obligations stated in this Note, to the extent permitted by law. I received the completed Disclosure Statement before signing.'+(consent?' (e-consent '+esc(stampTime(consent.at))+')':'')+'</p>'+sigRow('comaker', f.cmName, {name:'Printed Name'})+'<div class="line2">Address / Contact: '+blank([f.cmAddress,f.cmContact].filter(Boolean).join(' · '),3.6)+'</div>'
+              : '<div class="line2">Printed Name: '+blank('NONE',2.4)+' &nbsp;Signature: '+blank('',1.6)+' &nbsp;Date: '+blank('',1)+'</div>')+'</div>'+
+      '<div class="sigsec"><div class="sh">FOR '+esc(co())+'</div>'+credRow('Authorized Representative / Position')+'</div>'+
+      '<div class="sigsec"><div class="sh">WITNESSES</div><div class="two"><div>'+sigBlock('w1', f.w1, '1. Witness')+'</div><div>'+sigBlock('w2', f.w2, '2. Witness')+'</div></div></div>'+
+      '</div>';
+    return [p1,p2];
+  }
+
+  /* ---------- MCSA v2 ---------- */
+  var MCSA2 = {
+    s1:'For valuable consideration and to secure the Secured Obligations, the Grantor grants to the Secured Creditor a security interest in the movable property described in Schedule A (the “Collateral”), together with identifiable proceeds and insurance proceeds to the extent permitted by law. This Agreement is the written security agreement required by R.A. No. 11057 §6. It creates a security interest only and does not transfer ownership of the Collateral.',
+    s2:'The security interest secures the Borrower’s obligations under the identified Promissory Note and completed Disclosure Statement, limited to principal actually released, lawful contractual interest, the stipulated delinquency charge, lawful and properly disclosed charges, and recoverable enforcement expenses. It does not secure unrelated or future debts unless separately and expressly agreed in a signed writing.',
+    s3:['The Grantor is the lawful owner of the Collateral or is duly authorized to encumber it and has capacity to sign; where the Collateral is community or conjugal property, the spouse’s conformity is given below.','The Grantor has disclosed all co-owners, liens, security interests, leases, restrictions and third-party rights known to the Grantor, and no notice covering the Collateral is registered in the Personal Property Security Registry (PPSR) other than as disclosed in Schedule A.','The Collateral is accurately described in Schedule A, including serial, chassis, engine or registration numbers where applicable; proof of ownership and identification are attached.','The Grantor shall not sell, lease, dispose of or further encumber the Collateral in violation of this Agreement or applicable law, and shall keep any motor vehicle insured naming the Secured Creditor as loss payee where required.'],
+    s4b:'under Schedule B. The party holding the Collateral shall take the care required by law, keep it reasonably safe and not use it except as expressly authorized in writing. Storage by the Secured Creditor is free of charge unless a fee was disclosed in the Disclosure Statement. Condition, photographs, keys, accessories and documents are recorded in Schedule B.',
+    s5:'The Grantor shall maintain the Collateral in reasonable condition and promptly notify the Secured Creditor of material damage, loss, seizure or third-party claims. No undisclosed storage, inspection, insurance or handling fee may be imposed.',
+    s6:'The Grantor irrevocably authorizes the Secured Creditor to register a notice of this security interest in the PPSR under R.A. No. 11057 and its implementing rules, and to amend or continue the notice as needed. Registration number and date shall be recorded in Schedule A. Registration does not cure a defect in ownership, authority or the underlying agreement. Where the Secured Creditor holds the Collateral under Schedule B, the security interest is also perfected by possession.',
+    s7:'Upon an event of default under the Promissory Note, and after the notice and cure period required by §3 of the Note and any procedure required by law, the Secured Creditor may enforce its security interest only in accordance with R.A. No. 11057, its implementing rules and other applicable law. The Grantor expressly agrees that the Secured Creditor may take possession of the Collateral without judicial process under R.A. No. 11057 §47(a), provided possession can be taken without breach of the peace; entering a private residence without permission, or using force, intimidation or any prohibited self-help, is a breach of the peace and is not authorized. Where possession cannot be taken peaceably, the Secured Creditor may apply for the expedited hearing under §47(c).',
+    s7b:'Not later than ten (10) days before any disposition, the Secured Creditor shall send the notice required by §51 to the Grantor, the Borrower and any other person entitled to it; until the Collateral is disposed of, the Grantor may redeem it by paying the secured obligation in full under §45. Any disposition shall be commercially reasonable and follow the required notices and procedures. Proceeds shall be applied in the order required by §52 (costs of taking, holding, preparing and disposing; then the secured obligation; then subordinate claims) and the Secured Creditor shall account to the Grantor; any surplus shall be returned to the person entitled to it, and any deficiency may be claimed only to the extent allowed by law. The Secured Creditor shall not automatically appropriate the Collateral as its own property (Civil Code Art. 2088). After default the Secured Creditor may propose in writing to retain all or part of the Collateral in full or partial satisfaction under §54; retention in full satisfaction takes effect only if no written objection is received within twenty (20) days, and retention in partial satisfaction only with the written consent of each addressee.',
+    s8:'Upon full payment and discharge of the Secured Obligations, the Secured Creditor shall promptly release the Collateral in its custody, sign the Collateral Release Acknowledgment and register the termination of the PPSR notice within {{DAYS}} working days. Any release fee must have a lawful basis and have been disclosed.',
+    s9:'Notices shall be sent to the addresses stated above by a method providing reasonable proof of delivery, including SMS or email to the stated contacts. The Grantor may request this Agreement and notices in Filipino or Cebuano. Personal information shall be handled only for the purposes stated in the Data Privacy Notice in the Disclosure Statement, which the Grantor has received and accepts.',
+    s10:'This Agreement is governed by Philippine law and supplements the identified Promissory Note and Disclosure Statement. Amendments must be in writing and signed by the affected parties. Where signed electronically, §12 of the Promissory Note applies.'
+  };
+  function grantorInfo(){
+    var f=F.S.f, third=F.thirdPartyGrantor();
+    return { third:third, role:F.grantorRole(), name: third?f.grName:f.name, addr: third?f.grAddress:f.address, id: third?f.grId:[f.idType,f.idLast4].filter(Boolean).join(' / '),
+      civil: third?f.grCivilStatus:f.civilStatus, spouse: third?f.grSpouseName:f.spouseName, spouseRole: third?'grSpouse':'spouse' };
+  }
+  function mcsaV2(){
+    var f=F.S.f, c=F.computeV2(), g=grantorInfo(), st=F.S.settings||{};
+    var gDate = F.S.sig[g.role] ? stampDate(F.S.sig[g.role].at) : null, pnDate = F.S.sig.borrower ? stampDate(F.S.sig.borrower.at) : null;
+    var custodyItems=(f.assets||[]).map(function(a,i){ return a.custody==='creditor' ? ((i+1)+') '+[a.category,a.makeModel].filter(Boolean).join(' ')) : null; }).filter(Boolean), anyCust=custodyItems.length>0;
+    var married = g.civil==='Married' && !!g.spouse;
+    var p1='<div class="page doc pn2">'+draftLine('MCSA')+hdr('MOVABLE COLLATERAL SECURITY AGREEMENT','(For personal property; subject to R.A. No. 11057 and applicable rules) · Agreement No. '+esc(f.saNo||''))+
+      '<p>This Agreement is made on '+blank(gDate?longDate(gDate):'',1.6)+' at '+blank(f.signPlace,1.8)+', Philippines, by and between:</p>'+
+      '<table class="kvt"><tr><th>SECURED CREDITOR</th><td>'+esc(co())+', '+esc(coAddr())+' (the “Secured Creditor”).</td></tr>'+
+      '<tr><th>GRANTOR / OWNER</th><td>Name: '+blank(g.name,1.8)+' Address: '+blank(g.addr,1.8)+' ID: '+blank(g.id,1)+'<br>Civil status: '+cb(g.civil==='Single')+' Single '+cb(g.civil==='Married')+' Married '+cb(g.civil==='Other')+' Other &nbsp;Spouse’s name: '+blank(married?g.spouse:'N/A',1.8)+'</td></tr>'+
+      '<tr><th>BORROWER (if different)</th><td>'+(g.third?'Name: '+blank(f.name,1.8)+' Address: '+blank(f.address,2.4):'Same as Grantor')+'</td></tr>'+
+      '<tr><th>RELATED PROMISSORY NOTE</th><td>PN / Loan Account No.: '+blank(f.pnNo||f.loanId,1.4)+' Date: '+blank(pnDate?mdy(pnDate):'',1)+' Principal: ₱'+blank(money(c.P),1.2)+'</td></tr></table>'+
+      '<h2>1. Grant of security interest</h2><p>'+esc(MCSA2.s1)+'</p>'+
+      '<h2>2. Secured obligations</h2><p>'+esc(MCSA2.s2)+'</p>'+
+      '<h2>3. Grantor’s representations and undertakings</h2><ul>'+MCSA2.s3.map(function(t){ return '<li>'+esc(t)+'</li>'; }).join('')+'</ul>'+
+      '<h2>4. Possession, custody and care</h2><p>'+cb(!anyCust)+' Grantor retains possession and use. '+cb(anyCust)+' Secured Creditor takes physical custody of the following item(s): '+blank(custodyItems.join('; '),2.4)+' '+esc(MCSA2.s4b)+'</p>'+
+      '<h2>5. Continuing duties</h2><p>'+esc(MCSA2.s5)+'</p>'+
+      '<h2>6. Perfection and priority</h2><p>'+esc(MCSA2.s6)+'</p>'+
+      '<h2>7. Default and enforcement</h2><p>'+esc(MCSA2.s7)+'</p><p>'+esc(MCSA2.s7b)+'</p>'+
+      '<h2>8. Release and termination</h2><p>'+esc(MCSA2.s8.replace('{{DAYS}}', st.ppsrTerminationDays||'15'))+'</p>'+
+      '<h2>9. Notices, language and privacy</h2><p>'+esc(MCSA2.s9)+'</p>'+
+      '<h2>10. Governing law and entire agreement</h2><p>'+esc(MCSA2.s10)+'</p>'+
+      '<p class="fine">Signatures and Schedules A and B follow on the next page and form part of this Agreement.</p>'+
+      '</div>';
+    var sigs='<h2>SIGNATURES</h2>'+
+      sigRow(g.role, g.name, {name:'GRANTOR — Printed name'})+
+      (married ? sigRow(g.spouseRole, g.spouse, {name:'SPOUSE’S CONFORMITY — Printed name'}) : '')+
+      (g.third ? sigRow('borrower', f.name, {name:'BORROWER (if different) — Printed name'}) : '')+
+      credRow()+
+      '<div class="two"><div>'+sigBlock('w1', f.w1, 'WITNESS 1')+'</div><div>'+sigBlock('w2', f.w2, 'WITNESS 2')+'</div></div>';
+    var pages=[p1], assets=f.assets||[], per=3, first=2;
+    for(var s=0;s<Math.max(assets.length,1);s+=(s?per:first)){
+      var chunk=assets.slice(s,s+(s?per:first)), lastChunk=(s+(s?per:first)>=assets.length);
+      var schedA=chunk.length?chunk.map(function(a,i){
+        return '<table class="kvt sa"><tr><th colspan="4" class="sah">Asset '+(s+i+1)+' of '+assets.length+'</th></tr>'+
+          '<tr><th>Type / category</th><td>'+esc(a.category||'')+'</td><th>Make / model / year / color</th><td>'+esc(a.makeModel||'')+'</td></tr>'+
+          '<tr><th>Serial / chassis / engine / plate / ID</th><td>'+esc(a.idNumbers||'')+'</td><th>Registration / title / ownership document no.</th><td>'+esc(a.docNo||'')+'</td></tr>'+
+          '<tr><th>Estimated value and valuation date</th><td>₱'+esc(num(a.value)?money(num(a.value)):'')+' &nbsp;Date: '+esc(mdy(parseISO(a.valuationDate)))+'</td><th>Current location</th><td>'+esc(a.location||'')+'</td></tr>'+
+          '<tr><th>Existing liens / co-owners / restrictions</th><td>'+esc(a.liens||'NONE')+'</td><th>Insurance policy no. / insurer</th><td>'+esc(a.insurance||'NONE')+'</td></tr>'+
+          '<tr><th>Photographs / attachments</th><td>'+cb(!!a.photos)+' Attached '+cb(!a.photos)+' Not applicable</td><th>PPSR notice no. / date</th><td>'+esc(a.ppsrNo||'')+(a.ppsrDate?' / '+esc(mdy(parseISO(a.ppsrDate))):'')+'</td></tr>'+
+          '<tr><th>Possession</th><td colspan="3">'+(a.custody==='creditor'?'Secured Creditor custody (see Schedule B)':'Grantor retains possession')+'</td></tr></table>';
+      }).join('') : '<p>No asset recorded.</p>';
+      pages.push('<div class="page doc pn2">'+draftLine('MCSA')+hdr('MOVABLE COLLATERAL SECURITY AGREEMENT — SIGNATURES AND SCHEDULES','Agreement No. '+esc(f.saNo||'')+' · Grantor '+esc(g.name))+
+        (s?'':sigs)+
+        '<h2>SCHEDULE A — COLLATERAL DESCRIPTION'+(s?' (continued)':'')+'</h2>'+schedA+
+        (lastChunk && anyCust ? '<h2>SCHEDULE B — CUSTODY AND CONDITION RECEIPT</h2>'+
+          '<p>Item received: '+blank(f.cuItems||custodyItems.join('; '),2.4)+' Accessories / keys / documents: '+blank(f.cuAccessories,2)+'</p>'+
+          '<p>Condition and visible defects: '+blank(f.cuCondition,4.8)+'</p>'+
+          '<p>Date/time/place received: '+blank([f.cuReceivedAt,f.cuReceivedPlace].filter(Boolean).join(', '),2.4)+' Received by: '+blank(f.custodianName,2)+'</p>'+
+          '<p class="fine">Delivery is for safekeeping as collateral only, not an absolute sale or transfer of ownership; the custodian shall exercise the diligence of a good father of a family and shall not use the item.</p>'+
+          '<div class="two"><div>'+sigRow(g.role, g.name, {name:'Grantor signature — printed name'})+'</div><div>'+sigRow('custodian', f.custodianName, {name:'Custodian signature — printed name'})+'</div></div>' : '')+
+        '</div>');
+    }
+    return pages;
+  }
+
+  /* ---------- CSDA v2 ---------- */
+  var CSDA2 = {
+    s1:'The Depositor voluntarily delivers the amount stated above solely as security for the specific obligations under the identified loan. The deposit is not additional loan principal, a finance charge, processing fee, penalty, forfeiture or income of the Company merely upon receipt. The Company acknowledges receipt, has issued the official receipt stated above, records the deposit as a liability to the Depositor in its books, and shall not treat it as revenue. The deposit earns no interest. This form is not used for a covered small loan under SEC MC No. 14, s. 2025 until counsel confirms how the total-cost cap treats refundable deposits.',
+    s2:'The Company shall not automatically forfeit the deposit because of delay, default, cancellation or termination. The deposit may be applied only to an amount that is due, lawful, properly payable and supported by a written computation. Before any application the Company shall give the Depositor written notice identifying the proposed amount and basis, and at least {{NOTICE}} business days to raise an accounting error. Every application shall be recorded in the loan ledger and evidenced by a Security Deposit Application Acknowledgment.',
+    s3:'The parties agree that this Agreement creates a security interest in money in favour of the Company under R.A. No. 11057, perfected by the Company’s possession. The Company shall keep an accurate record of the deposit, shall not characterize it as interest or a penalty, holds it in a segregated account, and bears the risk of its loss. This Agreement does not itself perfect a security interest in any bank account of the Depositor or override the bank’s rights.',
+    s4b:'business days, without undisclosed deduction, by the same channel through which it was received unless the Depositor directs otherwise in writing, and the parties shall sign the Security Deposit Refund Acknowledgment. If the loan is cancelled before release or rescinded, the Company shall promptly return the deposit, less only an amount lawfully due and specifically agreed in writing, and shall provide a final accounting.',
+    s5:'After an event of default under the Promissory Note and the notice in §2, the Company may apply some or all of the deposit only against matured, lawful amounts due, in accordance with this Agreement, the loan documents and applicable law, with accounting. The Company shall not apply it to unearned future interest, unlawful penalties, unrelated debts or disputed sums without lawful basis. Any remaining balance shall be returned or continue to be held only as lawfully agreed.',
+    s6:'This Agreement does not make the Depositor a surety for another person’s debt. A third person who agrees to answer for a borrower’s debt must sign a separate Suretyship or Guaranty Agreement. A cash deposit is not itself a suretyship.',
+    s7:'The Depositor may request a statement showing the amount held, any application and the remaining balance. Notices follow §9 of the Promissory Note. Personal information is handled under the Data Privacy Notice in the Disclosure Statement.',
+    s8:'This Agreement is governed by Philippine law and supplements the identified Promissory Note and Disclosure Statement. Amendments must be in writing and signed by both parties. Where signed electronically, §12 of the Promissory Note applies.'
+  };
+  function csdaV2(){
+    var f=F.S.f, c=F.computeV2(), st=F.S.settings||{};
+    var bDate=F.S.sig.borrower?stampDate(F.S.sig.borrower.at):null, dep=num(f.depAmount);
+    return ['<div class="page doc pn2">'+draftLine('CSDA')+hdr('CASH SECURITY DEPOSIT AGREEMENT AND ACKNOWLEDGMENT','(Use only where the borrower delivers cash to secure identified loan obligations) · Agreement No. '+esc(f.csdNo||''))+
+      '<p>This Agreement is made on '+blank(bDate?longDate(bDate):'',1.6)+' at '+blank(f.signPlace,1.8)+', Philippines, by and between '+esc(co())+' (the “Company”) and:</p>'+
+      '<table class="kvt"><tr><th>BORROWER / DEPOSITOR</th><td>Name: '+blank(f.name,1.8)+' Address: '+blank(f.address,2)+' ID: '+blank([f.idType,f.idLast4].filter(Boolean).join(' / '),1.2)+'</td></tr>'+
+      '<tr><th>LOAN ACCOUNT / NOTE · PRINCIPAL</th><td>PN / Account No.: '+blank(f.pnNo||f.loanId,1.6)+' Date: '+blank(bDate?mdy(bDate):'',1)+' Principal: ₱'+blank(money(c.P),1.2)+'</td></tr>'+
+      '<tr><th>CASH SECURITY DEPOSIT</th><td>₱'+blank(money(dep),1.4)+' (in words: '+blank(dep?pesoWords(dep):'',3)+')</td></tr>'+
+      '<tr><th>DATE AND MODE RECEIVED</th><td>Date: '+blank(mdy(parseISO(f.depDate)),1)+' '+cb(f.depMode==='Cash')+' Cash '+cb(f.depMode==='Bank transfer')+' Bank transfer &nbsp;Reference: '+blank(f.depReference,1.4)+' OR No.: '+blank(f.depOR,1)+'</td></tr>'+
+      '<tr><th>SOURCE</th><td>'+cb(!f.depWithheld)+' Paid by the Depositor separately '+cb(!!f.depWithheld)+' Withheld from the loan proceeds and shown as a deduction in §A of the Disclosure Statement</td></tr></table>'+
+      '<h2>1. Purpose and nature of deposit</h2><p>'+esc(CSDA2.s1)+'</p>'+
+      '<h2>2. No automatic forfeiture</h2><p>'+esc(CSDA2.s2.replace('{{NOTICE}}', String(st.depositNoticeDays||'5')))+'</p>'+
+      '<h2>3. Legal character and custody</h2><p>'+esc(CSDA2.s3)+'</p>'+
+      '<h2>4. Refund and release</h2><p>When the secured obligations are fully paid and discharged, the Company shall return the unapplied deposit balance within '+blank(st.depositRefundDays||'',.7)+' '+esc(CSDA2.s4b)+'</p>'+
+      '<h2>5. Application after default</h2><p>'+esc(CSDA2.s5)+'</p>'+
+      '<h2>6. No suretyship created</h2><p>'+esc(CSDA2.s6)+'</p>'+
+      '<h2>7. Statements, notices and privacy</h2><p>'+esc(CSDA2.s7)+'</p>'+
+      '<h2>8. Governing law, amendments, electronic signature</h2><p>'+esc(CSDA2.s8)+'</p>'+
+      '<h2>SIGNATURES AND RECEIPT</h2>'+
+      sigRow('borrower', f.name, {name:'DEPOSITOR / BORROWER — Printed name'})+
+      credRow()+
+      '<div class="two"><div class="line2">OFFICIAL RECEIPT NO.: '+blank(f.depOR,1.8)+'</div><div>'+sigBlock('w1', f.w1, 'Witness')+'</div></div>'+
+      '</div>'];
+  }
+
+  /* ---------- SUR v1 / GUA v1 ---------- */
+  function suretyDoc(kind){
+    var f=F.S.f, c=F.computeV2(), isSur = kind==='SUR';
+    var sDate=F.S.sig.surety?stampDate(F.S.sig.surety.at):null, pnDate=F.S.sig.borrower?stampDate(F.S.sig.borrower.at):null;
+    var who = isSur?'Surety':'Guarantor', married = f.suCivilStatus==='Married' && !!f.suSpouseName;
+    var cap = num(f.suCap)>0 ? '₱'+money(num(f.suCap)) : 'the full amount due';
+    var ext = f.suExtensions==='release';
+    var title = isSur ? 'SURETYSHIP AGREEMENT' : 'GUARANTY AGREEMENT';
+    var sub = (isSur ? 'Solidary undertaking under Civil Code Art. 2047 par. 2' : 'Subsidiary undertaking under Civil Code Art. 2047 par. 1')+' · Agreement No. '+esc(f.suNo||'');
+    var s2 = isSur
+      ? 'Because the '+who+' binds himself solidarily, this is a suretyship and not a guaranty; the benefit of excussion under Civil Code Art. 2058 does not apply, and the Lender may demand payment from the Surety upon the Borrower’s default and the notice required by §3 of the Note, without first proceeding against the Borrower or any collateral. The Surety’s liability shall not exceed the Borrower’s obligation under the Note (Art. 2054) and in no case '+cap+'.'
+      : 'The Guarantor’s liability is subsidiary. The Lender shall first demand payment from the Borrower and, if the Guarantor invokes the benefit of excussion under Art. 2058 and points out property of the Borrower within the Philippines sufficient to cover the debt (Art. 2060), shall exhaust that property before proceeding against the Guarantor, except in the cases listed in Art. 2059. The Guarantor’s liability shall not exceed the Borrower’s obligation (Art. 2054) and in no case '+cap+'.';
+    var s3 = 'This '+(isSur?'suretyship':'guaranty')+' covers obligations falling due until '+(f.suTerm?esc(f.suTerm):'full settlement of the Note')+' and expires on '+(f.suExpiry?esc(mdy(parseISO(f.suExpiry))):'N/A')+'.';
+    var s4 = cb(!ext)+' The '+who+' consents in advance to extensions of time, reschedulings or restructurings granted to the Borrower in writing, which shall not release the '+who+'. '+cb(ext)+' Any extension without the '+who+'’s written consent releases the '+who+' under Art. 2079.';
+    return ['<div class="page doc pn2">'+draftLine(kind)+hdr(title, sub)+
+      '<p>This Agreement is made on '+blank(sDate?longDate(sDate):'',1.6)+' at '+blank(f.signPlace,1.6)+', Philippines, by '+blank(f.suName,2)+' (the “'+who+'”), of legal age, '+cb(f.suCivilStatus==='Single')+' single '+cb(f.suCivilStatus==='Married')+' married '+cb(f.suCivilStatus==='Other')+' other, residing at '+blank(f.suAddress,2.4)+', ID '+blank(f.suId,1.2)+', in favour of '+esc(co())+' (the “Lender”), with the conformity of '+blank(f.name,2)+' (the “Borrower”).</p>'+
+      '<h2>1. '+(isSur?'Secured':'Guaranteed')+' obligation</h2><p>The '+who+' '+(isSur?'binds himself solidarily with the Borrower to pay':'undertakes to pay')+' the Lender the obligations of the Borrower under Promissory Note No. '+blank(f.pnNo||f.loanId,1.4)+' dated '+blank(pnDate?mdy(pnDate):'',1)+' in the principal amount of ₱'+blank(money(c.P),1.2)+', including lawful contractual interest, the stipulated delinquency charge, lawful and disclosed charges and recoverable costs under that Note'+(isSur?'':', if the Borrower fails to pay them')+', but no other or future debt.</p>'+
+      '<h2>2. Nature of liability'+(isSur?'':'; excussion')+'</h2><p>'+s2+'</p>'+
+      '<h2>3. Term</h2><p>'+s3+'</p>'+
+      '<h2>4. Extensions</h2><p>'+s4+'</p>'+
+      '<h2>5. Information and consent</h2><p>The '+who+' confirms that he received the completed Disclosure Statement and Repayment Schedule, understands the amounts and dates, signs voluntarily and expressly, and is not a mere contact person or character reference of the Borrower. The Lender may contact the '+who+' only in accordance with SEC MC No. 18, s. 2019.</p>'+
+      '<h2>6. Payments and subrogation</h2><p>A '+who+' who pays is subrogated to the Lender’s rights against the Borrower (Civil Code Arts. 2066–2067) and may recover from the Borrower what he paid.</p>'+
+      '<h2>7. Notices, privacy, electronic signature, governing law</h2><p>§§9, 10 and 12 of the Promissory Note apply to the '+who+'. '+esc(esign3())+'</p>'+
+      '<h2>SIGNATURES</h2>'+
+      sigRow('surety', f.suName, {name: who.toUpperCase()+' — Printed name · ID: '+(f.suId||'')})+
+      (married ? sigRow('suSpouse', f.suSpouseName, {name:'SPOUSE’S CONFORMITY — Printed name'}) : '')+
+      sigRow('borrower', f.name, {name:'BORROWER’S CONFORMITY — Printed name'})+
+      credRow()+
+      '<div class="two"><div>'+sigBlock('w1', f.w1, 'WITNESS 1')+'</div><div>'+sigBlock('w2', f.w2, 'WITNESS 2')+'</div></div>'+
+      '</div>'];
+  }
+  function surV1(){ return suretyDoc('SUR'); }
+  function guaV1(){ return suretyDoc('GUA'); }
+
+  /* ---------- REL v1 — Collateral Release Acknowledgment ---------- */
+  function relV1(){
+    var f=F.S.f, c=F.computeV2(), g=grantorInfo(), st=F.S.settings||{};
+    var items=(f.assets||[]).map(function(a,i){ return (i+1)+') '+[a.category,a.makeModel,a.idNumbers].filter(Boolean).join(' — '); }).join('; ');
+    var ppsr=(f.assets||[]).map(function(a){ return a.ppsrNo; }).filter(Boolean).join(', ');
+    return ['<div class="page doc pn2">'+draftLine('REL')+hdr('COLLATERAL RELEASE ACKNOWLEDGMENT','Release No. '+esc(f.relNo||'')+' under Movable Collateral Security Agreement No. '+esc(f.saNo||''))+
+      '<p>'+esc(co())+' (the “Secured Creditor”) certifies that the obligations under Promissory Note No. '+blank(f.pnNo||f.loanId,1.4)+' of '+blank(f.name,2)+' in the principal amount of ₱'+blank(money(c.P),1.2)+' were fully paid and discharged on '+blank(mdy(parseISO(f.relPaidDate)),1.1)+' (Official Receipt No. '+blank(f.relOR,1.1)+'), and accordingly:</p>'+
+      '<ol><li>releases and discharges the security interest over the Collateral described in Schedule A of the Agreement: '+blank(items,4)+';</li>'+
+      '<li>returns to the Grantor the items held under Schedule B, namely '+blank(f.relItems||f.cuItems,2.6)+', in the condition recorded at receipt save for '+blank(f.relCondition||'no change',2)+', together with the accessories, keys and documents listed;</li>'+
+      '<li>undertakes to register the termination of PPSR notice no. '+blank(ppsr,1.6)+' within '+esc(st.ppsrTerminationDays||'15')+' working days and to furnish the Grantor a copy of the termination'+(f.ppsrTerminationRef?' (termination reference: '+esc(f.ppsrTerminationRef)+')':'')+';</li>'+
+      '<li>confirms that no release fee is charged except '+blank(f.relFee||'NONE',1.6)+', which was disclosed in the Disclosure Statement; and</li>'+
+      '<li>has no further claim against the Collateral under the Agreement.</li></ol>'+
+      '<p>The Grantor acknowledges receipt of the items and documents listed above.</p>'+
+      '<h2>SIGNATURES</h2>'+credRow()+
+      sigRow(g.role, g.name, {name:'GRANTOR — Printed name'})+
+      (g.third ? sigRow('borrower', f.name, {name:'BORROWER (if different) — Printed name'}) : '')+
+      '<div class="two"><div>'+sigBlock('w1', f.w1, 'WITNESS')+'</div><div></div></div>'+
+      '</div>'];
+  }
+
+  /* ---------- DAP v1 — Security Deposit Application Acknowledgment ---------- */
+  function dapV1(){
+    var f=F.S.f, st=F.S.settings||{};
+    var tot=r2(num(f.dapPrin)+num(f.dapInt)+num(f.dapDq)+num(f.dapOther)), before=num(f.dapBefore)||num(f.depAmount), applied=num(f.dapApplied);
+    return ['<div class="page doc pn2">'+draftLine('DAP')+hdr('SECURITY DEPOSIT APPLICATION ACKNOWLEDGMENT','Application No. '+esc(f.dapNo||'')+' under Cash Security Deposit Agreement No. '+esc(f.csdNo||''))+
+      '<table class="kvt"><tr><th>Depositor / Borrower</th><td>'+blank(f.name,2.4)+' &nbsp;PN No.: '+blank(f.pnNo||f.loanId,1.4)+'</td></tr>'+
+      '<tr><th>1. Deposit held before this application</th><td>₱ '+blank(money(before),1.4)+'</td></tr>'+
+      '<tr><th>2. Amount due and matured as of '+esc(mdy(parseISO(f.dapAsOf))||'______')+' (per attached written computation)</th><td>Principal ₱ '+money(num(f.dapPrin))+' · Interest ₱ '+money(num(f.dapInt))+' · Delinquency charge ₱ '+money(num(f.dapDq))+' · Other lawful charges ₱ '+money(num(f.dapOther))+' · <b>Total ₱ '+money(tot)+'</b></td></tr>'+
+      '<tr><th>3. Basis of application</th><td>§§2 and 5 of the Deposit Agreement; event of default notified on '+blank(mdy(parseISO(f.dapDefaultNotice)),1)+'; written notice of proposed application sent on '+blank(mdy(parseISO(f.dapNoticeSent)),1)+' to '+blank(f.dapNoticeTo||f.contact,1.4)+'; objection period of '+esc(st.depositNoticeDays||'5')+' business days ended on '+blank(mdy(parseISO(f.dapObjEnd)),1)+'; objections received: '+blank(f.dapObjections||'NONE',2)+'</td></tr>'+
+      '<tr><th>4. Amount applied</th><td>₱ '+blank(money(applied),1.4)+', applied in the order stated in §4 of the Note (charges, then interest, then principal)</td></tr>'+
+      '<tr><th>5. Deposit balance after application</th><td>₱ '+blank(money(r2(before-applied)),1.4)+'</td></tr>'+
+      '<tr><th>6. Approvals</th><td>Requested by: '+blank(f.dapRequestedBy,2)+' &nbsp;Approved by (a different person): '+blank(f.dapApprovedBy,2)+' &nbsp;Ledger posting ref.: '+blank(f.dapLedgerRef,1.2)+'</td></tr></table>'+
+      '<p>The Company confirms that no amount was applied to unearned future interest, unlawful penalties, unrelated debts or disputed sums.</p>'+
+      '<h2>SIGNATURES</h2>'+credRow(co()+' — Signatory 1 (authorized representative / position)')+
+      sigRow('approver', f.dapApprovedBy, {name:co()+' — Signatory 2 (approver)'})+
+      sigRow('borrower', f.name, {name:'DEPOSITOR — receipt of this Acknowledgment (or record of delivery if not signed)'})+
+      '</div>'];
+  }
+
+  /* ---------- DRF v1 — Security Deposit Refund Acknowledgment ---------- */
+  function drfV1(){
+    var f=F.S.f, st=F.S.settings||{};
+    var received=num(f.depAmount), applied=num(f.drfApplied), bal=r2(received-applied), refund=num(f.drfRefundAmt)||bal;
+    return ['<div class="page doc pn2">'+draftLine('DRF')+hdr('SECURITY DEPOSIT REFUND ACKNOWLEDGMENT','Refund No. '+esc(f.drfNo||'')+' under Cash Security Deposit Agreement No. '+esc(f.csdNo||''))+
+      '<table class="kvt"><tr><th>Depositor / Borrower</th><td>'+blank(f.name,2.4)+' &nbsp;PN No.: '+blank(f.pnNo||f.loanId,1.4)+'</td></tr>'+
+      '<tr><th>Deposit received</th><td>₱ '+money(received)+' on '+esc(mdy(parseISO(f.depDate)))+' (OR No. '+esc(f.depOR||'')+')</td></tr>'+
+      '<tr><th>Total applied</th><td>₱ '+money(applied)+' (Application Nos. '+blank(f.drfAppNos||'NONE',1.6)+')</td></tr>'+
+      '<tr><th>Balance refundable</th><td>₱ '+blank(money(bal),1.4)+'</td></tr>'+
+      '<tr><th>Basis</th><td>'+cb(!f.drfCancelled)+' Secured obligations fully paid on '+blank(mdy(parseISO(f.drfPaidDate)),1)+' (OR No. '+blank(f.drfPaidOR,1)+') &nbsp;'+cb(!!f.drfCancelled)+' Loan cancelled / rescinded on '+blank(f.drfCancelled?mdy(parseISO(f.drfCancelDate)):'',1)+'</td></tr>'+
+      '<tr><th>Refund</th><td>₱ '+blank(money(refund),1.4)+' made on '+blank(mdy(parseISO(f.drfRefundDate)),1)+' by '+cb(f.drfMode==='Cash')+' cash '+cb(f.drfMode==='Bank transfer')+' bank transfer to '+blank(f.drfAccount,1.4)+' '+cb(f.drfMode==='Other')+' other, reference '+blank(f.drfRef,1.2)+'</td></tr>'+
+      '<tr><th>Within the '+esc(st.depositRefundDays||'__')+' business days required by §4 of the Deposit Agreement?</th><td>'+cb(f.drfOnTime!==false)+' Yes '+cb(f.drfOnTime===false)+' No (reason: '+blank(f.drfReason,2)+')</td></tr>'+
+      '<tr><th>Deductions</th><td>No deduction was made except '+blank(f.drfDeduction||'NONE',2.4)+', lawfully due and agreed in writing.</td></tr></table>'+
+      '<p>The Depositor acknowledges receipt of the refund and the final accounting and releases the Company from further obligation under the Deposit Agreement, without prejudice to any accounting error raised in writing within '+esc(st.refundDisputeDays||'30')+' days.</p>'+
+      '<h2>SIGNATURES</h2>'+sigRow('borrower', f.name, {name:'DEPOSITOR — Printed name'})+credRow()+
+      '<div class="two"><div>'+sigBlock('w1', f.w1, 'WITNESS')+'</div><div></div></div>'+
+      '</div>'];
+  }
+
+  /* ---------- RST v1 — Loan Restructuring and Rescheduling Agreement ---------- */
+  function rstV1(){
+    var f=F.S.f, g=grantorInfo();
+    var prin=num(f.rstPrin), int_=num(f.rstInt), dq=num(f.rstDq), oth=num(f.rstOther), tot=r2(prin+int_+dq+oth);
+    var amt=num(f.rstAmount)||tot, n=Math.max(1,Math.round(num(f.rstN)||1)), inst=num(f.rstInst)||r2(amt/n);
+    var conformers=[]; if(f.cmName) conformers.push('co-maker '+f.cmName); if(f.secSurety&&f.suName) conformers.push((f.suType==='guaranty'?'guarantor ':'surety ')+f.suName); if(g.third) conformers.push('grantor '+g.name);
+    var bDate=F.S.sig.borrower?stampDate(F.S.sig.borrower.at):null;
+    return ['<div class="page doc pn2">'+draftLine('RST')+hdr('LOAN RESTRUCTURING AND RESCHEDULING AGREEMENT','Restructuring Agreement No. '+esc(f.rstNo||'')+' to Promissory Note No. '+esc(f.pnNo||f.loanId))+
+      '<p>This Agreement is made on '+blank(bDate?longDate(bDate):'',1.6)+' at '+blank(f.signPlace,1.6)+', Philippines, between '+esc(co())+' (the “Lender”) and '+blank(f.name,2)+' (the “Borrower”)'+(conformers.length?', with the conformity of '+esc(conformers.join(', ')):'')+'.</p>'+
+      '<h2>1. Recitals</h2><p>The Borrower owes under the Note, as of '+blank(mdy(parseISO(f.rstAsOf)),1)+': principal ₱'+money(prin)+'; accrued interest ₱'+money(int_)+'; delinquency charges ₱'+money(dq)+(f.rstWaiveDq?' (waived by the Lender)':'')+'; other lawful charges ₱'+money(oth)+'; total ₱'+blank(money(tot),1.2)+' (the “Outstanding Balance”), per the attached statement which the Borrower has reviewed. The Borrower requested, and the Lender agreed to, a restructuring on the terms below.</p>'+
+      '<h2>2. Restructured terms</h2><p>The restructured amount of ₱'+blank(money(amt),1.2)+' '+(f.rstIncludes?'('+esc(f.rstIncludes)+')':'(no charge is capitalized unless expressly listed here)')+' shall be paid in '+blank(String(n),.6)+' installments of ₱'+blank(money(inst),1.1)+' every '+blank(FREQ_LABEL[f.rstFreq]||f.rstFreq||'',1)+', beginning '+blank(mdy(parseISO(f.rstStart)),1)+' and ending '+blank(mdy(parseISO(f.rstEnd)),1)+', with interest at '+blank(num(f.rstRate).toFixed(2),.6)+' % per '+cb(f.rstRatePer!=='year')+' month '+cb(f.rstRatePer==='year')+' year on the '+cb(f.rstBasis!=='addon')+' declining balance '+cb(f.rstBasis==='addon')+' add-on basis, all as stated in the revised Disclosure Statement dated '+blank(mdy(parseISO(f.rstDsDate)),1)+' and the revised Repayment Schedule attached, which replace the original schedule from the effective date. For a covered small loan, the restructured loan must itself comply with SEC MC No. 14, s. 2025 ceilings and the 100% total-cost cap measured on the original amount borrowed.</p>'+
+      '<h2>3. Effect on the Note and security</h2><p>Except as modified here, the Note and its §§2–13 remain in force and are not novated (Civil Code Art. 1292). The Collateral Agreement, Cash Security Deposit Agreement, Suretyship or Guaranty continue to secure the restructured obligation only with the written conformity of the grantor, surety or guarantor given below; absent conformity, counsel shall advise on the effect of Art. 2079 and R.A. No. 11057 §5 before signing.</p>'+
+      '<h2>4. No additional charges</h2><p>No restructuring fee, penalty or interest on penalties is charged except '+blank(f.rstFee||'NONE',1.6)+', which was disclosed in the revised Disclosure Statement. Unearned interest under the original schedule is rebated or excluded as stated in the revised Disclosure Statement.</p>'+
+      '<h2>5. Default</h2><p>Failure to pay a restructured installment is an event of default under §3 of the Note after the notice and cure period stated there.</p>'+
+      '<h2>6. Notices, privacy, electronic signature, governing law</h2><p>§§9, 10 and 12 of the Note apply.</p>'+
+      '<h2>SIGNATURES</h2>'+sigRow('borrower', f.name, {name:'BORROWER — Printed name'})+
+      (f.cmName ? sigRow('comaker', f.cmName, {name:'CO-MAKER (conformity) — Printed name'}) : '')+
+      (f.secSurety&&f.suName ? sigRow('surety', f.suName, {name:(f.suType==='guaranty'?'GUARANTOR':'SURETY')+' (conformity) — Printed name'}) : '')+
+      (g.third ? sigRow('grantor', g.name, {name:'GRANTOR (conformity) — Printed name'}) : '')+
+      credRow()+
+      '<div class="two"><div>'+sigBlock('w1', f.w1, 'WITNESS 1')+'</div><div>'+sigBlock('w2', f.w2, 'WITNESS 2')+'</div></div>'+
+      '<p class="fine">Attachments: statement of account as of the recital date; revised Disclosure Statement; revised Repayment Schedule.</p>'+
+      '</div>'];
+  }
+
+  /* ---------- SET v1 — Early Settlement Statement ---------- */
+  function setV1(){
+    var f=F.S.f, c=F.computeV2(), s=F.settlement(f.setPaid, f.setDate);
+    var rows=c.rows.slice(s.paid).map(function(r){ return '<tr><td class="c">'+r.k+'</td><td>'+esc(mdy(r.due))+'</td><td class="a">'+money(r.inst)+'</td><td class="a">'+money(r.prin)+'</td><td class="a">'+money(r.int)+'</td></tr>'; }).join('');
+    return ['<div class="page doc pn2">'+draftLine('SET')+hdr('EARLY SETTLEMENT STATEMENT','Promissory Note No. '+esc(f.pnNo||f.loanId)+' · '+esc(f.name)+' · as of '+esc(mdy(s.date)))+
+      '<table class="kvt"><tr><th>Loan</th><td>Principal ₱ '+money(c.P)+' · '+esc(num(f.rate).toFixed(2))+' % per '+(f.ratePer==='year'?'year':'month')+' · '+(c.basis==='declining'?'declining balance':'add-on / precomputed')+' · '+c.n+' '+FREQ_LABEL[c.freq].toLowerCase()+' installments</td></tr>'+
+      '<tr><th>Installments paid</th><td>'+s.paid+' of '+c.n+(s.paid?' (through '+esc(mdy(c.rows[s.paid-1].due))+')':'')+'</td></tr>'+
+      '<tr><th>Method</th><td>'+esc(s.method)+'</td></tr>'+
+      '<tr><th>Remaining principal</th><td>₱ '+money(s.remainingPrincipal)+'</td></tr>'+
+      (c.basis==='declining' ? '<tr><th>Interest accrued to settlement date</th><td>₱ '+money(s.accrued)+'</td></tr>'
+        : '<tr><th>Remaining scheduled installments</th><td>₱ '+money(s.remainingScheduled)+'</td></tr><tr><th>Less: unearned finance charge rebated (Rule of 78)</th><td>₱ '+money(s.rebate)+'</td></tr>')+
+      '<tr><th><b>Settlement amount</b></th><td><b>₱ '+money(s.payoff)+'</b></td></tr></table>'+
+      '<p class="fine">'+esc(s.note)+' This statement is valid on the settlement date shown; a later settlement date changes the accrued interest or rebate.</p>'+
+      '<h2>REMAINING SCHEDULE (for reference)</h2>'+
+      '<table class="sched"><tr><th class="c">#</th><th>Due date</th><th class="a">Installment (₱)</th><th class="a">Principal (₱)</th><th class="a">Interest (₱)</th></tr>'+(rows||'<tr><td colspan="5" class="c">All installments paid.</td></tr>')+'</table>'+
+      '<h2>ACKNOWLEDGMENT</h2>'+
+      '<div class="two"><div>'+sigRow('borrower', f.name, {name:'Received by Borrower'})+'</div><div>'+credRow('Prepared for '+co())+'</div></div>'+
+      '</div>'];
+  }
+
+  var DOCS = { DS:{v1:dsV1, v2:dsV2, v3:dsV3}, PN:{v1:pnV1, v2:pnV2, v3:pnV3}, RS:{v1:rsV1}, MCSA:{v1:mcsaV1, v2:mcsaV2}, CSDA:{v1:csdaV1, v2:csdaV2}, SUR:{v1:surV1}, GUA:{v1:guaV1}, REL:{v1:relV1}, DAP:{v1:dapV1}, DRF:{v1:drfV1}, RST:{v1:rstV1}, SET:{v1:setV1}, PDC:{v1:pdcV1}, BP22:{v1:bp22V1} };
+  var CURRENT = { DS:'v3', PN:'v3', RS:'v1', MCSA:'v2', CSDA:'v2', SUR:'v1', GUA:'v1', REL:'v1', DAP:'v1', DRF:'v1', RST:'v1', SET:'v1', PDC:'v1', BP22:'v1' };
+  F.CURRENT = CURRENT;
+
+  /* ---------- render ---------- */
+  F.render = function(el){
+    var set = F.S.docSet || F.docSet(), versions=F.S.templates||{};
+    var pages=[];
+    set.forEach(function(code){
+      var ver = versions[code] || (F.S.legacy && (code==='DS'||code==='PN') ? 'v1' : CURRENT[code]||'v1');
+      var fn = (DOCS[code]||{})[ver] || (DOCS[code]||{}).v1;
+      if(!fn) return;
+      fn().forEach(function(html, i){ pages.push({code:code, ver:ver, html:html}); });
+    });
+    var f=F.S.f, signed=Object.keys(F.S.sig).map(function(k){ return (ROLE_LABELS[k]||k)+' '+stampTime(F.S.sig[k].at); });
+    var N=pages.length;
+    el.innerHTML = pages.map(function(p, i){
+      var foot='<div class="pfoot"><span>Loan '+esc(f.loanId||'')+' · Borrower '+esc(f.borrowerId||'')+(F.S.docHash?' · Doc '+esc(F.S.docHash.slice(0,12)):'')+' · '+p.code+' '+p.ver+(signed.length?' · E-signed: '+esc(signed.join('; ')):'')+'</span><span>Page '+(i+1)+' of '+N+'</span></div>';
+      return p.html.replace(/<\/div>\s*$/, foot+'</div>');
+    }).join('');
+    F.fit(el);
+  };
+  F.fit = function(el){ var w=el.parentElement.clientWidth, z=Math.min(1,w/816); el.style.zoom = z<1 ? z.toFixed(3) : ''; };
+
+  /* ---------- signature pad ---------- */
+  var modal, cv, ctx, cur=null, drawing=false, dirty=false, pts=[];
+  function buildPad(){
+    modal=document.createElement('div'); modal.className='modal no-print'; modal.hidden=true;
+    modal.innerHTML='<div class="pad" role="dialog" aria-modal="true" aria-labelledby="padTitle"><h3 id="padTitle"></h3><p id="padSub"></p><canvas id="padCv"></canvas>'+
+      '<div class="row"><button class="btn" type="button" data-pad="clear">Clear</button><button class="btn danger" type="button" data-pad="remove">Remove</button><button class="btn" type="button" data-pad="cancel">Cancel</button><button class="btn primary" type="button" data-pad="apply">Apply</button></div></div>';
+    document.body.appendChild(modal);
+    cv=modal.querySelector('canvas'); ctx=cv.getContext('2d');
+    function pos(e){ var r=cv.getBoundingClientRect(); return {x:e.clientX-r.left, y:e.clientY-r.top}; }
+    cv.addEventListener('pointerdown',function(e){ e.preventDefault(); cv.setPointerCapture(e.pointerId); drawing=true; pts=[pos(e)]; ctx.beginPath(); ctx.arc(pts[0].x,pts[0].y,1.1,0,Math.PI*2); ctx.fill(); dirty=true; });
+    cv.addEventListener('pointermove',function(e){ if(!drawing) return; e.preventDefault(); var p=pos(e); pts.push(p); if(pts.length>=3){ var a=pts[pts.length-3], b=pts[pts.length-2]; ctx.beginPath(); ctx.moveTo((a.x+b.x)/2,(a.y+b.y)/2); ctx.quadraticCurveTo(b.x,b.y,(b.x+p.x)/2,(b.y+p.y)/2); ctx.stroke(); } });
+    ['pointerup','pointercancel'].forEach(function(t){ cv.addEventListener(t,function(){ drawing=false; }); });
+    modal.addEventListener('click',function(e){
+      var a=e.target.getAttribute('data-pad'); if(!a) return;
+      if(a==='clear') sizeCanvas();
+      if(a==='cancel') modal.hidden=true;
+      if(a==='remove'){ delete F.S.sig[cur]; modal.hidden=true; F.onSign(cur,null); }
+      if(a==='apply'){ var img=dirty?trimmed():null; if(!img){ modal.querySelector('#padSub').textContent = cur==='pnFig'?'Write the amount first.':'Draw a signature first.'; return; } F.S.sig[cur]={img:img, at:new Date().toISOString()}; modal.hidden=true; F.onSign(cur,F.S.sig[cur]); }
+    });
+    document.addEventListener('keydown',function(e){ if(e.key==='Escape') modal.hidden=true; });
+  }
+  function sizeCanvas(){
+    var r=cv.getBoundingClientRect(), dpr=window.devicePixelRatio||1;
+    cv.width=Math.round(r.width*dpr); cv.height=Math.round(r.height*dpr);
+    ctx.setTransform(dpr,0,0,dpr,0,0); ctx.lineCap='round'; ctx.lineJoin='round'; ctx.strokeStyle='#0b1f5c'; ctx.fillStyle='#0b1f5c'; ctx.lineWidth=2.4;
+    ctx.clearRect(0,0,r.width,r.height); dirty=false;
+  }
+  function trimmed(){
+    var w=cv.width,h=cv.height,d=ctx.getImageData(0,0,w,h).data, x0=w,y0=h,x1=-1,y1=-1;
+    for(var y=0;y<h;y++) for(var x=0;x<w;x++){ if(d[(y*w+x)*4+3]>10){ if(x<x0)x0=x; if(x>x1)x1=x; if(y<y0)y0=y; if(y>y1)y1=y; } }
+    if(x1<0) return null;
+    var pad=10; x0=Math.max(0,x0-pad); y0=Math.max(0,y0-pad); x1=Math.min(w-1,x1+pad); y1=Math.min(h-1,y1+pad);
+    var maxW=900, sw=x1-x0+1, sh=y1-y0+1, k=Math.min(1,maxW/sw);
+    var o=document.createElement('canvas'); o.width=Math.round(sw*k); o.height=Math.round(sh*k);
+    o.getContext('2d').drawImage(cv,x0,y0,sw,sh,0,0,o.width,o.height);
+    return o.toDataURL('image/png');
+  }
+  F.openPad = function(role, who){
+    if(!modal) buildPad();
+    cur=role; who=who||{label:ROLE_LABELS[role]||role, name:''};
+    var isFig = role==='pnFig', amt = F.money(F.compute().P);
+    modal.querySelector('.pad').classList.toggle('fig', isFig);
+    modal.querySelector('#padTitle').textContent = isFig ? 'Write the loan amount in figures' : 'Sign as '+who.label;
+    modal.querySelector('#padSub').textContent = isFig ? 'Borrower, write the amount in your own handwriting, e.g. '+amt+'. It goes in the Principal Amount box of the Promissory Note.' : (who.name?who.name+': ':'')+'Draw your signature above the line with your finger, stylus or mouse. It is applied to every document that needs it.';
+    modal.querySelector('[data-pad="remove"]').hidden = !F.S.sig[role];
+    modal.hidden=false;
+    requestAnimationFrame(sizeCanvas);
+  };
+
+  /* ---------- misc ---------- */
+  /* Server calls: google.script.run inside Apps Script pages; the JSON API (doPost) from the installable app. */
+  F.API_RE = /^(https:\/\/script\.google\.com\/macros\/s\/[A-Za-z0-9_-]+\/exec|https:\/\/script\.google\.com\/a\/macros\/[A-Za-z0-9.-]+\/s\/[A-Za-z0-9_-]+\/exec|http:\/\/(127\.0\.0\.1|localhost)(:\d+)?\/exec)$/;
+  F.DEFAULT_API = '';   /* filled by scripts/build-pwa.py --api; empty = ask on first launch */
+  F.setApiUrl = function(u){ u=String(u||'').trim(); if(!F.API_RE.test(u)) return false; try{ localStorage.setItem('esign_api',u); }catch(e){} F._api=u; return true; };
+  F.apiUrl = function(){
+    try{ var q=new URLSearchParams(location.search).get('api'); if(q && F.setApiUrl(q)) return q; }catch(e){}
+    if(F._api) return F._api;
+    try{ var v=localStorage.getItem('esign_api'); if(v) return v; }catch(e){}
+    return F.API_RE.test(F.DEFAULT_API) ? F.DEFAULT_API : '';
+  };
+  F.call = function(fn){
+    var args=Array.prototype.slice.call(arguments,1);
+    if(typeof google!=='undefined' && google.script && google.script.run){
+      return new Promise(function(res,rej){
+        var r=google.script.run.withSuccessHandler(function(x){ if(x&&x.ok) res(x.data); else rej(new Error((x&&x.error)||'Server error')); }).withFailureHandler(function(e){ rej(e instanceof Error?e:new Error(String(e))); });
+        r[fn].apply(r,args);
+      });
+    }
+    var url=F.apiUrl();
+    if(!url) return Promise.reject(new Error('NO_SERVER'));
+    return fetch(url,{ method:'POST', redirect:'follow', headers:{'Content-Type':'text/plain;charset=utf-8'}, body: JSON.stringify({fn:fn, args:args}) })
+      .then(function(r){ return r.text().then(function(t){ var x; try{ x=JSON.parse(t); }catch(e){ throw new Error('The server did not answer as expected (HTTP '+r.status+'). Check the web app URL and that the deployment allows "Anyone".'); } if(x&&x.ok) return x.data; throw new Error((x&&x.error)||'Server error'); }); })
+      .catch(function(e){ if(e instanceof TypeError) throw new Error('No connection. Check your internet and the web app URL.'); throw e; });
+  };
+  F.toast = function(t){
+    var el=document.getElementById('toast');
+    if(!el){ el=document.createElement('div'); el.id='toast'; el.className='toast'; el.setAttribute('role','status'); document.body.appendChild(el); }
+    el.textContent=t; el.hidden=false; clearTimeout(el._t); el._t=setTimeout(function(){ el.hidden=true; },6000);
+  };
+  return F;
+})();
+</script>
+
+<script>
+(function(){
+  var TOKEN = (new URLSearchParams(location.search).get('t')||'').replace(/[^a-f0-9]/gi,'').slice(0,64);
+  var st = { roles:[], submitted:false, expired:false, expiresAt:'', offset:0, busy:false, consent:{}, consentsNeeded:[], otp:'' };
+  var $ = function(id){ return document.getElementById(id); };
+  var base = function(k){ return String(k).split('@')[0]; }, docOf = function(k){ var i=String(k).indexOf('@'); return i<0?'':String(k).slice(i+1); };
+  var LABEL = {
+    borrower:{label:'Your signature (Borrower)',hint:'Tap any “Tap to sign” box in the documents'}, pnFig:{label:'Loan amount in your handwriting',hint:'Promissory Note, Principal Amount box'},
+    spouse:{label:'Spouse’s conformity',hint:'Promissory Note, spouse’s conformity'}, comaker:{label:'Co-maker signature',hint:'Tick the solidary-liability consent first'},
+    grantor:{label:'Grantor / owner signature',hint:'Movable Collateral Security Agreement'}, grSpouse:{label:'Spouse of grantor — conformity',hint:'Movable Collateral Security Agreement'},
+    surety:{label:'Surety / guarantor signature',hint:'Suretyship or Guaranty Agreement'}, suSpouse:{label:'Spouse of surety — conformity',hint:'Suretyship or Guaranty Agreement'}
+  };
+  function nameOf(k){ var f=Forms.S.f, b=base(k), third=Forms.thirdPartyGrantor(); return { borrower:f.name, pnFig:f.name, spouse:f.spouseName, comaker:f.cmName, grantor:third?f.grName:f.name, grSpouse:third?f.grSpouseName:f.spouseName, surety:f.suName, suSpouse:f.suSpouseName }[b]||''; }
+  function steps(){ return st.roles.map(function(r){ var b=base(r), l=LABEL[b]||{label:Forms.ROLE_LABELS[b]||b,hint:''}, d=docOf(r); var nm=nameOf(r); return {k:r, label:l.label+(nm&&b!=='pnFig'?' — '+nm:'')+(d?' ('+(Forms.DOC_TITLES[d]||d)+')':''), hint:d?(Forms.DOC_TITLES[d]||d):l.hint}; }); }
+  function needsConsent(k){ return st.consentsNeeded.indexOf(base(k))>=0; }
+  Forms.canSign = function(k){ if(st.submitted||st.expired) return false; if(needsConsent(k) && !st.consent[base(k)]) return false; return st.roles.indexOf(k)>=0; };
+  Forms.onSign = function(){ draw(); };
+
+  function draw(){
+    Forms.render($('pages'));
+    if(st.submitted){ $('intro').hidden=true; $('done').hidden=false; return; }
+    $('steps').innerHTML = steps().map(function(r){
+      var done=!!Forms.S.sig[r.k], dis = needsConsent(r.k) && !st.consent[base(r.k)];
+      return '<div class="step"><span><b>'+Forms.esc(r.label)+'</b><br><small style="color:var(--muted)">'+Forms.esc(r.hint)+'</small></span>'+
+        '<span style="display:flex;gap:6px;align-items:center"><span class="pill '+(done?'ok':'no')+'">'+(done?'Done':'To do')+'</span><button class="btn sm" type="button" data-go="'+r.k+'"'+(dis?' disabled':'')+'>'+(done?'Redo':(r.k==='pnFig'?'Write':'Sign'))+'</button></span></div>';
+    }).join('');
+  }
+  function who(k){ var b=base(k); return {label:Forms.ROLE_LABELS[b]||b, name:nameOf(k)}; }
+  document.addEventListener('click',function(e){
+    var g=e.target.closest('[data-go]'); if(g){ Forms.openPad(g.dataset.go, who(g.dataset.go)); return; }
+    var s=e.target.closest('.sig.clickable'); if(s && Forms.canSign(s.dataset.sig)) Forms.openPad(s.dataset.sig, who(s.dataset.sig));
+  });
+  document.addEventListener('keydown',function(e){ if((e.key==='Enter'||e.key===' ') && e.target.classList && e.target.classList.contains('clickable')){ e.preventDefault(); Forms.openPad(e.target.dataset.sig, who(e.target.dataset.sig)); } });
+  document.addEventListener('change',function(e){ var c=e.target.dataset.consent; if(c){ st.consent[c]=e.target.checked; if(!st.consent[c] && Forms.S.sig[c] && !Forms.S.sig[c].fileId) delete Forms.S.sig[c]; draw(); } });
+  window.addEventListener('resize',function(){ Forms.fit($('pages')); });
+
+  function manilaToday(){ try{ var d=new Date(Date.now()+st.offset).toLocaleDateString('en-CA',{timeZone:'Asia/Manila'}); return /^\d{4}-\d{2}-\d{2}$/.test(d)?d:''; }catch(e){ return ''; } }
+  function tick(){
+    if(!st.expiresAt || st.submitted){ $('timer').hidden=true; return; }
+    var left=new Date(st.expiresAt).getTime()-(Date.now()+st.offset), t=$('timer'); t.hidden=false;
+    if(left<=0){ st.expired=true; t.textContent='Link expired'; t.classList.add('low'); $('submit').disabled=true; $('verifyBtn').disabled=true; $('err').textContent='This link has expired. Please ask your loan officer for a new link.'; if(!$('intro').hidden) draw(); return; }
+    var today=manilaToday(); if(today && st.roles.indexOf('borrower')>=0 && Forms.S.f.name && today!==Forms.S.f.signDate){ Forms.S.f.signDate=today; draw(); }
+    var h=Math.floor(left/3600000), m=Math.floor(left%3600000/60000), s=Math.floor(left%60000/1000);
+    t.textContent='Expires in '+h+'h '+String(m).padStart(2,'0')+'m '+String(s).padStart(2,'0')+'s'; t.classList.toggle('low', left<3600000);
+    setTimeout(tick,1000);
+  }
+
+  $('submit').addEventListener('click',function(){
+    if(st.busy||st.expired) return;
+    var miss=steps().filter(function(r){ return !Forms.S.sig[r.k]; });
+    if(miss.length){ $('err').textContent='Still to do: '+miss.map(function(r){ return r.label; }).join(', ')+'.'; return; }
+    var noConsent=st.consentsNeeded.filter(function(c){ return !st.consent[c]; });
+    if(noConsent.length){ $('err').textContent='Please tick the solidary-liability consent for the '+noConsent.map(function(c){ return c==='comaker'?'co-maker':'surety'; }).join(' and ')+'.'; return; }
+    if(!$('privacyAck').checked){ $('err').textContent='Please confirm that you have read the Data Privacy Notice.'; return; }
+    if(!$('agree').checked){ $('err').textContent='Please tick the box to confirm you have read and agree to the documents.'; return; }
+    st.busy=true; $('submit').disabled=true; $('submit').textContent='Submitting…'; $('err').textContent='';
+    var sig={}; st.roles.forEach(function(r){ sig[r]=Forms.S.sig[r].img; });
+    Forms.call('borrowerSubmit', TOKEN, { otp:st.otp, sig:sig, consents:st.consent, agree:true, privacy:true, ua:navigator.userAgent }).then(function(r){
+      st.submitted=true; st.roles.forEach(function(k){ Forms.S.sig[k].at=r.submittedAt; Forms.S.sig[k].by='link'; });
+      if(st.roles.indexOf('borrower')>=0) Forms.S.f.signDate=r.signDate;
+      Forms.S.meta.consents=Forms.S.meta.consents||{}; st.consentsNeeded.forEach(function(c){ Forms.S.meta.consents[c]={at:r.submittedAt}; });
+      $('doneMsg').textContent='Submitted '+Forms.fmtManila(r.submittedAt)+'. ERMANO Lending has received your signed documents'+(r.status==='SIGNED'?'.':'; other parties may still need to sign.')+' You can close this page.';
+      $('timer').hidden=true; draw(); window.scrollTo(0,0);
+    }).catch(function(e){ st.busy=false; $('submit').disabled=false; $('submit').textContent='Submit signed documents'; $('err').textContent=e.message; });
+  });
+  $('printCopy').addEventListener('click',function(){ window.print(); });
+
+  function privacyText(d){
+    var st_=d.settings||{};
+    return '<b>Data Privacy Notice (R.A. No. 10173).</b> ERMANO Lending Corporation collects and processes your personal information, including identification details, contact information, your mobile number used for this verification and your signatures, to evaluate, document, administer and collect this loan; to comply with law and SEC, BSP, AMLC and Credit Information Corporation requirements; and to enforce its rights. Recipients may include the Credit Information Corporation, credit bureaus, authorized collection agents, counsel, courts and regulators. Information is retained for '+Forms.esc(st_.retentionYears||'five (5)')+' years after full settlement unless a longer period is required by law. You may access, correct or object to the processing of your data by writing to '+Forms.esc(d.privacyContact||st_.privacyContact||'ERMANO Lending Corporation')+'. Your electronic signature, the verification of your mobile number and the system’s audit record (date, time, device and document hash) identify you and evidence your consent (R.A. No. 8792 §8).';
+  }
+  function opened(d){
+    Forms.S.f=d.f; Forms.S.checks=d.checks; Forms.S.sig=d.sig||{}; Forms.S.meta=d.meta||{}; Forms.S.docHash=d.docHash;
+    Forms.S.legacy=d.templates&&d.templates.DS==='v1'; Forms.S.templates=d.templates||{}; Forms.S.templateStatus=d.templateStatus||{}; Forms.S.settings=d.settings||{}; Forms.S.docSet=d.docSet;
+    st.roles=d.roles; st.submitted=d.submitted; st.expiresAt=d.expiresAt; st.offset=new Date(d.serverNow).getTime()-Date.now(); st.consentsNeeded=d.consentsNeeded||[];
+    if(!d.submitted && st.roles.indexOf('borrower')>=0) Forms.S.f.signDate=d.serverToday;
+    $('loading').hidden=true; $('verify').hidden=true;
+    var f=d.f, names=[]; st.roles.forEach(function(r){ var n=nameOf(r); if(n && names.indexOf(n)<0) names.push(n); });
+    $('hello').textContent='Hello, '+(names.join(' and ')||'');
+    $('docList').innerHTML=d.docSet.map(function(c){ return '<li>'+Forms.esc(Forms.DOC_TITLES[c]||c)+'</li>'; }).join('');
+    $('agreeText').textContent='I have read the documents listed above, I understand them, and I sign them voluntarily.';
+    var cb='';
+    if(st.consentsNeeded.indexOf('comaker')>=0) cb+='<label class="consent"><input type="checkbox" data-consent="comaker"> <span><b>Co-maker '+Forms.esc(f.cmName)+':</b> I expressly agree to be jointly and severally (solidarily) liable with the Borrower for the obligations stated in the Promissory Note, to the extent permitted by law. I received the completed Disclosure Statement before signing.</span></label>';
+    if(st.consentsNeeded.indexOf('surety')>=0) cb+='<label class="consent"><input type="checkbox" data-consent="surety"> <span><b>Surety '+Forms.esc(f.suName)+':</b> I expressly bind myself solidarily with the Borrower under the Suretyship Agreement; I understand that the benefit of excussion does not apply and that the Lender may demand payment from me upon the Borrower’s default. I received the completed Disclosure Statement and Repayment Schedule before signing.</span></label>';
+    $('consentBox').innerHTML=cb;
+    $('privacy').innerHTML=privacyText(d);
+    if(d.submitted){ $('doneMsg').textContent='These documents were signed and submitted '+Forms.fmtManila(d.submittedAt)+'.'; }
+    else $('intro').hidden=false;
+    draw(); tick();
+  }
+  function openDocs(){
+    st.otp=$('otp').value.replace(/\D/g,'');
+    $('verifyErr').textContent=''; $('verifyBtn').disabled=true; $('verifyBtn').textContent='Checking…';
+    Forms.call('borrowerOpen', TOKEN, st.otp).then(opened).catch(function(e){ $('verifyBtn').disabled=false; $('verifyBtn').textContent='Open my documents'; $('verifyErr').textContent=e.message; if(/cancelled/i.test(e.message)){ $('verify').hidden=true; $('blocked').hidden=false; $('blockedMsg').textContent=e.message; } });
+  }
+  $('verifyBtn').addEventListener('click',openDocs);
+  $('otp').addEventListener('keydown',function(e){ if(e.key==='Enter') openDocs(); });
+
+  function friendly(e){ return e && e.message==='NO_SERVER' ? 'This signing link is incomplete. Please ask your ERMANO loan officer to send the link again.' : (e && e.message) || 'Something went wrong.'; }
+  if(!TOKEN){ $('loading').hidden=true; $('blocked').hidden=false; $('blockedMsg').textContent='Open this page from the signing link ERMANO Lending sent to your phone.'; return; }
+  Forms.call('borrowerPeek', TOKEN).then(function(d){
+    st.expiresAt=d.expiresAt; st.offset=new Date(d.serverNow).getTime()-Date.now(); st.roles=d.roles;
+    $('loading').hidden=true;
+    if(!d.needsOtp){ Forms.call('borrowerOpen', TOKEN, '').then(opened).catch(function(e){ $('blocked').hidden=false; $('blockedMsg').textContent=friendly(e); }); return; }
+    $('verifyMsg').textContent='Enter the 6-digit code ERMANO Lending sent to your mobile number'+(d.mobileHint?' ending '+d.mobileHint.replace('•••• ',''):'')+'. Signing as: '+d.roleLabels.filter(function(x){ return !/handwriting/.test(x); }).join(', ')+'.';
+    $('verify').hidden=false; $('otp').focus(); tick();
+  }).catch(function(e){ $('loading').hidden=true; $('blocked').hidden=false; $('blockedMsg').textContent=friendly(e); });
+})();
+</script>
+<script>if("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(function(){});</script>
+</body>
+</html>
