@@ -61,14 +61,14 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
 .pfoot{position:absolute;left:.6in;right:.6in;bottom:.22in;font-size:6.3pt;line-height:1.25;color:#555;display:flex;justify-content:space-between;gap:10px;border-top:.5pt solid #bbb;padding-top:3px}
 .co{margin:0;color:#000;font:700 15pt var(--doc-sans);letter-spacing:.02em}
 .hdr{display:grid;grid-template-columns:1.25in 1fr 1.25in;align-items:center}
-.hdr img{width:1.15in}
+.hdr img{height:.62in;width:auto;max-width:1.15in;object-fit:contain;justify-self:center}
 .hdr .t{text-align:center}
 .hdr .t div{font-size:10pt}
 .hdr .t .addr{font-size:9pt}
 .hdr .t .dt{font-weight:700;font-size:11pt;margin-top:3px}
 .hdr .t .ds{font-size:8.5pt;color:#222}
 .hdr2{display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:6px}
-.hdr2 img{width:1.1in}
+.hdr2 img{height:.62in;width:auto;max-width:1.1in;object-fit:contain}
 .hdr2 .addr{font:10pt var(--doc-sans)}
 .doc-title{text-align:center;color:#2f5597;font-weight:700;font-size:12.5pt;margin:12px 0 18px}
 .u{display:inline-block;border-bottom:1px solid #000;min-width:1in;padding:0 4px;text-align:center;font-weight:700}
@@ -120,6 +120,8 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
 .sig.clickable{cursor:pointer}
 .sig.clickable:hover .hint{background:#e4eafa}
 .sig .stamp{position:absolute;right:0;top:0;font:6pt var(--doc-sans);color:#1d3f8f}
+.sig.paper{align-items:center}
+.sig .paperstamp{border:1px solid #1d3f8f;color:#1d3f8f;font:7pt var(--doc-sans);padding:2px 6px;text-align:center;line-height:1.25}
 .sigline{border-top:1px solid #000;text-align:center;font-size:8.8pt;padding-top:2px}
 .sigline b{display:block;font-size:9.5pt;text-transform:uppercase}
 .sg3{display:grid;grid-template-columns:2.2fr 1.7fr 1.1fr;gap:.18in;align-items:end;margin:6px 0 2px}
@@ -151,7 +153,7 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
 .addl td+td{border-bottom:1px solid #000;text-align:center}
 .pn{font-size:8pt;line-height:1.22}
 .pnh{display:grid;grid-template-columns:1.3in 1fr 1.3in;align-items:center;text-align:center}
-.pnh img{width:1.1in}
+.pnh img{height:.62in;width:auto;max-width:1.1in;object-fit:contain;justify-self:center}
 .pnh .s{font-weight:700;font-size:10.5pt}
 .pntab{width:100%;border-collapse:collapse;margin-top:10px;font-size:9pt}
 .pntab td{border:1px solid #000;padding:2px 4px;font-weight:700}
@@ -255,8 +257,20 @@ details[open] summary::after{content:"–"}
 .preview{min-width:0}
 .login{max-width:360px;margin:12vh auto;background:#fff;border:1px solid var(--line);border-radius:12px;padding:22px;display:flex;flex-direction:column;gap:12px}
 .login h2{margin:0;color:var(--royal-ink)}
-.login input{border:1px solid var(--line);border-radius:6px;padding:10px;font:inherit;font-size:18px;letter-spacing:.3em;text-align:center}
-.login #apiUrl,.login #operator{font-size:14px;letter-spacing:normal;text-align:left;width:100%;box-sizing:border-box}
+.login input{border:1px solid var(--line);border-radius:6px;padding:10px;font:inherit;font-size:15px;width:100%;box-sizing:border-box}
+.login label{font-size:13px;color:var(--muted)}
+.login .mode{display:flex;flex-direction:column;gap:8px}
+.login .mode[hidden]{display:none}
+.login .lnk{background:none;border:0;color:var(--royal);font:inherit;font-size:13px;text-decoration:underline;cursor:pointer;padding:0;align-self:flex-start}
+.envbar{background:#b3261e;color:#fff;text-align:center;font-weight:700;font-size:13px;padding:4px 8px;letter-spacing:.04em}
+.envbar[hidden]{display:none}
+.users{display:flex;flex-direction:column;gap:8px}
+.urow{border:1px solid var(--line);border-radius:8px;padding:10px;display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.urow .hd{grid-column:1/-1;display:flex;justify-content:space-between;gap:8px;align-items:center;flex-wrap:wrap}
+.urow .roles{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:6px 14px}
+.urow .act{grid-column:1/-1;display:flex;gap:6px;flex-wrap:wrap}
+@media (max-width:640px){.urow{grid-template-columns:1fr}}
+.apprbox{border:1px solid var(--line);border-radius:8px;padding:8px 10px;display:flex;flex-direction:column;gap:6px;font-size:12.5px}
 .login #apiBox{display:flex;flex-direction:column;gap:6px}
 .login #apiBox[hidden]{display:none}
 .err{color:var(--warn);font-size:13px}
@@ -291,15 +305,38 @@ details[open] summary::after{content:"–"}
     <label for="apiUrl" style="font-size:13px;color:var(--muted)">ERMANO e-Sign web app URL (from Apps Script &gt; Deploy, ends with /exec)</label>
     <input id="apiUrl" inputmode="url" autocomplete="off" placeholder="https://script.google.com/macros/s/.../exec">
   </div>
-  <label for="operator" style="font-size:13px;color:var(--muted)">Your name (recorded in the audit log)</label>
-  <input id="operator" autocomplete="name" placeholder="e.g. Juan dela Cruz">
-  <label for="pin" style="font-size:13px;color:var(--muted)">Admin PIN</label>
-  <input id="pin" type="password" inputmode="numeric" autocomplete="current-password">
-  <button class="btn royal" id="loginBtn" type="button">Sign in</button>
+  <div class="mode" id="mLogin">
+    <label for="lgUser">Username</label>
+    <input id="lgUser" autocomplete="username" autocapitalize="none" spellcheck="false">
+    <label for="lgPass">Password</label>
+    <input id="lgPass" type="password" autocomplete="current-password">
+    <button class="btn royal" id="loginBtn" type="button">Sign in</button>
+    <button class="lnk" id="toBoot" type="button" hidden>Create the first administrator</button>
+  </div>
+  <div class="mode" id="mBoot" hidden>
+    <div class="note" style="font-size:12.5px">First use: create the System Administrator account. Use the setup PIN printed in the Apps Script log by setup(). It works once.</div>
+    <label for="btPin">Setup PIN</label><input id="btPin" type="password" inputmode="numeric" autocomplete="off">
+    <label for="btName">Your full name</label><input id="btName" autocomplete="name">
+    <label for="btUser">Username</label><input id="btUser" autocomplete="username" autocapitalize="none" spellcheck="false">
+    <label for="btBranch">Branch</label><input id="btBranch" placeholder="e.g. CEBU">
+    <label for="btPass">Password (at least 8 characters)</label><input id="btPass" type="password" autocomplete="new-password">
+    <label for="btPass2">Repeat password</label><input id="btPass2" type="password" autocomplete="new-password">
+    <button class="btn royal" id="bootBtn" type="button">Create administrator</button>
+    <button class="lnk" id="toLogin" type="button">Back to sign in</button>
+  </div>
+  <div class="mode" id="mChange" hidden>
+    <div class="note" style="font-size:12.5px">Choose your own password before you continue.</div>
+    <label for="chOld">Current (temporary) password</label><input id="chOld" type="password" autocomplete="current-password">
+    <label for="chNew">New password (at least 8 characters)</label><input id="chNew" type="password" autocomplete="new-password">
+    <label for="chNew2">Repeat new password</label><input id="chNew2" type="password" autocomplete="new-password">
+    <button class="btn royal" id="changeBtn" type="button">Save password</button>
+  </div>
   <div class="err" id="loginErr" role="alert"></div>
+  <div class="note" id="envNote" style="font-size:12px"></div>
 </section>
 
 <div id="appView" hidden>
+<div class="envbar no-print" id="envBar" hidden></div>
 <header class="topbar no-print">
   <div><b>ERMANO e-Sign</b><small id="pkgLabel">New package</small><small id="opLabel"></small></div>
   <div class="actions">
@@ -307,6 +344,8 @@ details[open] summary::after{content:"–"}
     <button class="btn ghost" id="bDemo" type="button">Load demo</button>
     <button class="btn ghost" id="bSave" type="button">Save</button>
     <button class="btn ghost" id="bConfig" type="button">Settings &amp; Templates</button>
+    <button class="btn ghost" id="bUsers" type="button" hidden>Users</button>
+    <button class="btn ghost" id="bLogout" type="button">Sign out</button>
     <button class="btn ghost" id="bAudit" type="button">Audit log</button>
     <button class="btn ghost" id="bArchive" type="button">Finalize &amp; archive</button>
     <button class="btn primary" id="bPrint" type="button">Print / Save as PDF</button>
@@ -480,9 +519,9 @@ details[open] summary::after{content:"–"}
         <div class="fld"><label for="f_w1">Witness 1</label><input id="f_w1" data-f="w1"></div>
         <div class="fld"><label for="f_w2">Witness 2</label><input id="f_w2" data-f="w2"></div>
         <div class="fld full"><label for="f_custodianName">Custodian (Schedule B)</label><input id="f_custodianName" data-f="custodianName"></div>
-        <div class="note">The company signs only after the credit approval is recorded here, and the approver must be a different person from the operator applying the signature.</div>
-        <div class="fld"><label for="f_approvalRef">Credit approval reference</label><input id="f_approvalRef" data-f="approvalRef" placeholder="CA-2026-0001"></div>
-        <div class="fld"><label for="f_approvedBy">Approved by (name)</label><input id="f_approvedBy" data-f="approvedBy"></div>
+        <div class="note">Filled by the approval (Share for signing &gt; Approve). The company signature is applied by an account other than the approver.</div>
+        <div class="fld"><label for="f_approvalRef">Credit approval reference</label><input id="f_approvalRef" data-f="approvalRef" placeholder="set by the approval"></div>
+        <div class="fld"><label for="f_approvedBy">Approved by</label><input id="f_approvedBy" data-f="approvedBy" placeholder="set by the approval"></div>
       </div>
     </details>
 
@@ -585,17 +624,19 @@ details[open] summary::after{content:"–"}
 <div class="overlay no-print" id="cfgView" hidden>
   <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="cfgTitle">
     <h2 id="cfgTitle">Settings &amp; Templates <button class="btn sm" id="bCfgClose" type="button">Close</button></h2>
-    <div class="tabs"><button type="button" class="on" data-tab="tpl">Templates &amp; legal review</button><button type="button" data-tab="set">Settings</button><button type="button" data-tab="aud">Audit log</button></div>
+    <div class="tabs"><button type="button" class="on" data-tab="tpl">Templates &amp; legal review</button><button type="button" data-tab="set">Settings</button><button type="button" data-tab="aud">Audit log</button><button type="button" data-tab="usr">Users</button><button type="button" data-tab="me">My account</button></div>
     <div id="tabTpl"></div>
     <div id="tabSet" hidden></div>
     <div id="tabAud" hidden></div>
+    <div id="tabUsr" hidden></div>
+    <div id="tabMe" hidden></div>
   </div>
 </div>
 
 <script>
 /* ERMANO e-Sign v3 — shared computation engine, versioned document renderers and signature pad (Admin and Sign pages). */
 var Forms = (function(){
-  var LOGO = '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+fdst/Ks9r/W4IDJPokUzZwI7K9DsR6/vFjH61r0U0/IDmNQ8Y3WmIjXHg/xG4c4H2aGGcj6iOViKpT/ABP0axgEup6drenKf+fvTnT9eRXaUValDrH8f+HJs+jOET4weEZFzHcXcnstq/P6VA/xi0JX2rpmsyDP3lt0A/Vwa9CIB6jNRG1tycmCIn3QVrGeHW8H/wCBf8AzlGq9pL7v+CeeXfxi0+OPNro99I3pcFYh+Y3Vn/8AC2dW1MiLR9Et/tHdWmM5P0VQpr1VIo4/uRov+6oFPraOIwsdqN/WT/yMnRxD/wCXn4f8E8hk8Q/E3VbpYrSwls2x0Sw8tD9WmBH60kmgfFTXDtu9VewCdG+1LDu/78Z/WvX6Kbx6+xSivldhHCv7U2/meUwfDPxhcQEX/j2+if8AuRSzTL+Zdf5VInwQ0y4XdquvareTnq6sqA/gwY/rXqVFYvGVns7eiRsqMEedWXwT8HWv+uivbz/rvcY/9AC1e/4VB4FP/MDP/gZP/wDF129FZvEVX9p/eWoRXQ42H4U+CIPuaFGf9+eV/wCbGtOPwN4Uixt8N6Vx0LWiMf1Fb9FS6tR7yf3j5V2KNtoul2Qxa6baW/8A1xhVP5CluNLtrlSrvdqCMfuruWP/ANBYVdoqOZ9x2KOn6TbaaGEEl6+7k/aL2af8vMZsfhV3BzncfpS0UNt7gFFFFIAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooA/9k=';
+  var LOGO = 'data:image/jpeg;base64,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+fdst/Ks9r/W4IDJPokUzZwI7K9DsR6/vFjH61r0U0/IDmNQ8Y3WmIjXHg/xG4c4H2aGGcj6iOViKpT/ABP0axgEup6drenKf+fvTnT9eRXaUValDrH8f+HJs+jOET4weEZFzHcXcnstq/P6VA/xi0JX2rpmsyDP3lt0A/Vwa9CIB6jNRG1tycmCIn3QVrGeHW8H/wCBf8AzlGq9pL7v+CeeXfxi0+OPNro99I3pcFYh+Y3Vn/8AC2dW1MiLR9Et/tHdWmM5P0VQpr1VIo4/uRov+6oFPraOIwsdqN/WT/yMnRxD/wCXn4f8E8hk8Q/E3VbpYrSwls2x0Sw8tD9WmBH60kmgfFTXDtu9VewCdG+1LDu/78Z/WvX6Kbx6+xSivldhHCv7U2/meUwfDPxhcQEX/j2+if8AuRSzTL+Zdf5VInwQ0y4XdquvareTnq6sqA/gwY/rXqVFYvGVns7eiRsqMEedWXwT8HWv+uivbz/rvcY/9AC1e/4VB4FP/MDP/gZP/wDF129FZvEVX9p/eWoRXQ42H4U+CIPuaFGf9+eV/wCbGtOPwN4Uixt8N6Vx0LWiMf1Fb9FS6tR7yf3j5V2KNtoul2Qxa6baW/8A1xhVP5CluNLtrlSrvdqCMfuruWP/ANBYVdoqOZ9x2KOn6TbaaGEEl6+7k/aL2af8vMZsfhV3BzncfpS0UNt7gFFFFIAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooA/9k=';  // logo.b64 holds the bare base64 JPEG; without the data: prefix the browser requests it as a URL (404)
   var MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
   var PPY = { daily:365, weekly:52, biweekly:26, semimonthly:24, monthly:12 };
   var FREQ_LABEL = { daily:'Daily', weekly:'Weekly', biweekly:'Bi-weekly', semimonthly:'Semi-monthly', monthly:'Monthly' };
@@ -797,9 +838,10 @@ var Forms = (function(){
   /* ---------- signature boxes ---------- */
   function sigBox(k, opt){
     opt=opt||{};
-    var s=F.S.sig[k], can=F.canSign(k), cls='sig'+(can?' clickable':'')+(opt.cls?' '+opt.cls:'');
-    if(s && s.img) return '<div class="'+cls+'" data-sig="'+k+'"><img src="'+s.img+'" alt="signature">'+(opt.noStamp?'':'<span class="stamp">e-signed '+esc(stampTime(s.at))+'</span>')+'</div>';
-    if(can) return '<div class="'+cls+'" data-sig="'+k+'" role="button" tabindex="0"><span class="hint">'+(k==='pnFig'?'Tap to write amount':'Tap to sign')+'</span></div>';
+    var s=F.S.sig[k], can=F.canSign(k), cls='sig'+(can?' clickable':'')+(opt.cls?' '+opt.cls:''), dk=F.curLife?k+'@'+F.curLife:k;
+    if(s && s.img) return '<div class="'+cls+'" data-sig="'+dk+'"><img src="'+s.img+'" alt="signature">'+(opt.noStamp?'':'<span class="stamp">e-signed '+esc(stampTime(s.at))+'</span>')+'</div>';
+    if(s && s.by==='paper') return '<div class="sig paper" data-sig="'+dk+'"><span class="paperstamp">Signed on paper<br><small>'+esc(mdy(stampDate(s.at)))+' · scan on file</small></span></div>';
+    if(can) return '<div class="'+cls+'" data-sig="'+dk+'" role="button" tabindex="0"><span class="hint">'+(k==='pnFig'?'Tap to write amount':'Tap to sign')+'</span></div>';
     return '<div class="sig'+(opt.cls?' '+opt.cls:'')+'"></div>';
   }
   function sigBlock(k,name,caption){ return sigBox(k)+'<div class="sigline"><b>'+(name?esc(name):'&nbsp;')+'</b>'+esc(caption)+'</div>'; }
@@ -1617,6 +1659,7 @@ var Forms = (function(){
       '</div>'];
   }
 
+  var LIFE_CODES = { REL:1, DAP:1, DRF:1, RST:1, SET:1 };
   var DOCS = { DS:{v1:dsV1, v2:dsV2, v3:dsV3}, PN:{v1:pnV1, v2:pnV2, v3:pnV3}, RS:{v1:rsV1}, MCSA:{v1:mcsaV1, v2:mcsaV2}, CSDA:{v1:csdaV1, v2:csdaV2}, SUR:{v1:surV1}, GUA:{v1:guaV1}, REL:{v1:relV1}, DAP:{v1:dapV1}, DRF:{v1:drfV1}, RST:{v1:rstV1}, SET:{v1:setV1}, PDC:{v1:pdcV1}, BP22:{v1:bp22V1} };
   var CURRENT = { DS:'v3', PN:'v3', RS:'v1', MCSA:'v2', CSDA:'v2', SUR:'v1', GUA:'v1', REL:'v1', DAP:'v1', DRF:'v1', RST:'v1', SET:'v1', PDC:'v1', BP22:'v1' };
   F.CURRENT = CURRENT;
@@ -1629,7 +1672,14 @@ var Forms = (function(){
       var ver = versions[code] || (F.S.legacy && (code==='DS'||code==='PN') ? 'v1' : CURRENT[code]||'v1');
       var fn = (DOCS[code]||{})[ver] || (DOCS[code]||{}).v1;
       if(!fn) return;
-      fn().forEach(function(html, i){ pages.push({code:code, ver:ver, html:html}); });
+      // Post-execution documents carry their own signatures (role@DOC). While one renders, its boxes read and write those keys.
+      var saved=F.S.sig, savedCan=F.canSign;
+      if(LIFE_CODES[code]){
+        var v={}; Object.keys(saved).forEach(function(k){ var i=k.indexOf('@'); if(i>0 && k.slice(i+1)===code) v[k.slice(0,i)]=saved[k]; });
+        F.S.sig=v; F.canSign=function(k){ return savedCan(k+'@'+code); }; F.curLife=code;
+      }
+      try { fn().forEach(function(html, i){ pages.push({code:code, ver:ver, html:html}); }); }
+      finally { F.S.sig=saved; F.canSign=savedCan; F.curLife=''; }
     });
     var f=F.S.f, signed=Object.keys(F.S.sig).map(function(k){ return (ROLE_LABELS[k]||k)+' '+stampTime(F.S.sig[k].at); });
     var N=pages.length;
@@ -1742,7 +1792,8 @@ var Forms = (function(){
   var LIFE={ SET:/^(set[A-Z]|incSET$)/, RST:/^(rst[A-Z]|incRST$)/, REL:/^(rel[A-Z]|incREL$|ppsrTerminationRef$)/, DAP:/^(dap[A-Z]|incDAP$)/, DRF:/^(drf[A-Z]|incDRF$)/ };
   var base=function(k){ return String(k).split('@')[0]; }, docOf=function(k){ var i=String(k).indexOf('@'); return i<0?'':String(k).slice(i+1); };
   var lifeKey=function(k){ return Object.keys(LIFE).some(function(d){ return LIFE[d].test(k); }); };
-  var A = { id:'', status:'DRAFT', links:[], dirty:false, busy:false, hours:24, roles:{}, mobile:'', cfg:null, collateral:[], deposit:null, server:null, operator:'', lastOtp:null };
+  var A = { id:'', status:'DRAFT', links:[], dirty:false, busy:false, hours:24, roles:{}, mobile:'', email:null, channel:'remote', idType:'', idLast4:'', wet:{}, cfg:null, collateral:[], deposit:null, server:null, operator:'', lastOtp:null };
+  var CAN = function(p){ return !!(A.cfg && A.cfg.can && A.cfg.can[p]); };
   var locked = function(){ return A.status==='PARTIAL' || A.status==='SIGNED'; };
   var archived = function(){ return !!(A.server && A.server.archived); };
   var lifeLocked = function(d){ return Object.keys(Forms.S.sig).some(function(k){ return docOf(k)===d; }); };
@@ -1754,8 +1805,10 @@ var Forms = (function(){
     if(archived()) return false;
     var b=base(k), d=docOf(k);
     if(!partyOk(b)) return false;
-    if(d){ if(A.status!=='SIGNED') return false; var sg=Forms.S.sig[k]; return !(sg && sg.by==='link'); }
-    if(locked() && PARTY.indexOf(b)>=0) return false;
+    if(!CAN('prepare')) return false;
+    // Parties sign only through a link (their phone or an office device, with their own code) or on paper.
+    if(PARTY.indexOf(b)>=0) return false;
+    if(d){ if(A.status!=='SIGNED') return false; var sg=Forms.S.sig[k]; return !(sg && sg.by!=='office'); }
     return true;
   };
   Forms.onSign = function(role, sig){
@@ -1769,18 +1822,47 @@ var Forms = (function(){
     if(d) m={label:m.label+' — '+(Forms.DOC_TITLES[d]||d), name:m.name}; return m; }
   function keyLabel(k){ var d=docOf(k), b=base(k); return (b==='pnFig'?'amount in handwriting':Forms.ROLE_LABELS[b]||b)+(d?' ('+(Forms.DOC_TITLES[d]||d)+')':''); }
 
-  /* ---------- auth ---------- */
-  function showLogin(msg){ $('appView').hidden=true; $('loginView').hidden=false; $('loginErr').textContent=msg||''; $('pin').focus(); }
-  function guard(p){ return p.catch(function(e){ if(/session ended/i.test(e.message)){ TOK=''; try{sessionStorage.removeItem('esign_adm');}catch(x){} showLogin(e.message); } throw e; }); }
+  /* ---------- auth: accounts (see Auth.gs) ---------- */
+  function mode(m){ ['mLogin','mBoot','mChange'].forEach(function(id){ $(id).hidden = id!==m; }); }
+  function showLogin(msg){ $('appView').hidden=true; $('loginView').hidden=false; $('loginErr').textContent=msg||''; mode('mLogin'); refreshAuthStatus(); try{ $('lgUser').focus(); }catch(e){} }
+  function clearSession(){ TOK=''; try{sessionStorage.removeItem('esign_adm');}catch(x){} }
+  function guard(p){ return p.catch(function(e){
+    if(/session ended|not active/i.test(e.message)){ clearSession(); showLogin(e.message); }
+    else if(/temporary password/i.test(e.message)){ $('appView').hidden=true; $('loginView').hidden=false; mode('mChange'); $('loginErr').textContent=''; }
+    throw e; }); }
   var STANDALONE = !(window.google && google.script && google.script.run);
   if(STANDALONE){ $('apiBox').hidden=false; $('apiUrl').value=Forms.apiUrl(); }
   function saveApi(){ if(!STANDALONE) return true; var u=$('apiUrl').value.trim(); if(!Forms.setApiUrl(u)){ $('loginErr').textContent='Paste the ERMANO e-Sign web app URL from Apps Script (Deploy > Manage deployments). It starts with https://script.google.com/macros/s/ and ends with /exec.'; return false; } return true; }
-  $('loginBtn').onclick=function(){ $('loginErr').textContent=''; if(!saveApi()) return; Forms.call('adminLogin',$('pin').value,$('operator').value).then(function(d){ TOK=d.token; A.operator=d.operator; try{sessionStorage.setItem('esign_adm',TOK);}catch(e){} $('pin').value=''; start(); }).catch(function(e){ $('loginErr').textContent=e.message; }); };
-  $('pin').addEventListener('keydown',function(e){ if(e.key==='Enter') $('loginBtn').click(); });
-  $('operator').addEventListener('keydown',function(e){ if(e.key==='Enter') $('pin').focus(); });
+  function refreshAuthStatus(){
+    if(STANDALONE && !Forms.apiUrl()) return;
+    Forms.call('authStatus').then(function(st){ $('toBoot').hidden=!st.needsFirstAdmin; if(st.needsFirstAdmin) mode('mBoot'); $('envNote').textContent = st.env && st.env!=='PRODUCTION' ? 'Environment: '+st.env+' (test data only)' : ''; })
+      .catch(function(e){ $('loginErr').textContent=e.message; });
+  }
+  function signedIn(d){ TOK=d.token; try{sessionStorage.setItem('esign_adm',TOK);}catch(e){} ['lgPass','btPass','btPass2','btPin','chOld','chNew','chNew2'].forEach(function(id){ $(id).value=''; }); if(d.user && d.user.mustChange){ mode('mChange'); return; } start(); }
+  $('loginBtn').onclick=function(){ $('loginErr').textContent=''; if(!saveApi()) return; Forms.call('adminLogin',$('lgUser').value,$('lgPass').value,navigator.userAgent).then(signedIn).catch(function(e){ $('loginErr').textContent=e.message; }); };
+  $('lgPass').addEventListener('keydown',function(e){ if(e.key==='Enter') $('loginBtn').click(); });
+  $('lgUser').addEventListener('keydown',function(e){ if(e.key==='Enter') $('lgPass').focus(); });
+  $('toBoot').onclick=function(){ $('loginErr').textContent=''; mode('mBoot'); };
+  $('toLogin').onclick=function(){ $('loginErr').textContent=''; mode('mLogin'); };
+  $('bootBtn').onclick=function(){ $('loginErr').textContent=''; if(!saveApi()) return;
+    if($('btPass').value!==$('btPass2').value){ $('loginErr').textContent='The two passwords do not match.'; return; }
+    Forms.call('adminBootstrap',$('btPin').value,{ name:$('btName').value, username:$('btUser').value, branch:$('btBranch').value, password:$('btPass').value, ua:navigator.userAgent }).then(signedIn).catch(function(e){ $('loginErr').textContent=e.message; }); };
+  $('changeBtn').onclick=function(){ $('loginErr').textContent='';
+    if($('chNew').value!==$('chNew2').value){ $('loginErr').textContent='The two new passwords do not match.'; return; }
+    Forms.call('adminChangePassword',TOK,$('chOld').value,$('chNew').value).then(signedIn).catch(function(e){ $('loginErr').textContent=e.message; if(/session ended/i.test(e.message)){ clearSession(); mode('mLogin'); } }); };
+  $('bLogout').onclick=function(){ var t=TOK; clearSession(); Forms.call('adminLogout',t).catch(function(){}).then(function(){ A.cfg=null; showLogin('Signed out.'); }); };
 
   /* ---------- config (templates + settings) ---------- */
-  function loadConfig(){ return guard(Forms.call('adminGetConfig',TOK)).then(function(c){ A.cfg=c; A.operator=c.operator||A.operator; $('opLabel').textContent=A.operator?'Operator: '+A.operator:''; if(!A.id){ Forms.S.settings=c.snapshot; Forms.S.templateStatus=tstatusFromCfg(); Forms.S.templates=versionsFromCfg(); } return c; }); }
+  function loadConfig(){ return guard(Forms.call('adminGetConfig',TOK)).then(function(c){ A.cfg=c; A.operator=c.operator||A.operator; applyRoleUi(); if(!A.id){ Forms.S.settings=c.snapshot; Forms.S.templateStatus=tstatusFromCfg(); Forms.S.templates=versionsFromCfg(); } return c; }); }
+  function applyRoleUi(){
+    var c=A.cfg, u=c.user||{};
+    $('opLabel').textContent=(u.name||A.operator)+' · '+(u.roles||[]).map(function(r){ return (c.roleNames||{})[r]||r; }).join(', ')+(u.branch?' · '+u.branch:'');
+    $('envBar').hidden = !c.env || c.env==='PRODUCTION'; $('envBar').textContent = c.env+' — test copy. Use made-up test data only; never real borrower information.';
+    ['bNew','bDemo','bSave'].forEach(function(id){ $(id).hidden=!CAN('prepare'); });
+    $('bUsers').hidden=!CAN('users');
+    $('cfgView').querySelector('[data-tab="usr"]').hidden=!CAN('users');
+    $('cfgView').querySelector('[data-tab="set"]').hidden=!CAN('settings');
+  }
   function versionsFromCfg(){ var v={}; (A.cfg?A.cfg.templates:[]).forEach(function(t){ if(t.current!==false) v[t.id]=t.version; }); return v; }
   function tstatusFromCfg(){ var s={}; (A.cfg?A.cfg.templates:[]).forEach(function(t){ if(t.current!==false) s[t.id]={version:t.version,legalStatus:t.legalStatus,reviewedBy:t.reviewedBy,reviewedAt:t.reviewedAt,title:t.title}; }); return s; }
 
@@ -1791,7 +1873,7 @@ var Forms = (function(){
     return guard(Forms.call('adminListPackages',TOK)).then(function(list){
       $('pkgList').innerHTML = list.length ? list.map(function(p){
         var sp=STATE_PILL[p.status]||['mute',p.status];
-        return '<button class="item'+(p.id===A.id?' cur':'')+'" type="button" data-pkg="'+Forms.esc(p.id)+'"><span><b>'+Forms.esc(p.loanId||'(no loan no.)')+' · '+Forms.esc(p.borrowerName||'(no name)')+'</b><small>'+Forms.esc(p.id)+(p.legacy?' · v1 forms':'')+'</small></span><span class="pill '+sp[0]+'">'+sp[1]+'</span></button>';
+        return '<button class="item'+(p.id===A.id?' cur':'')+'" type="button" data-pkg="'+Forms.esc(p.id)+'"><span><b>'+Forms.esc(p.loanId||'(no loan no.)')+' · '+Forms.esc(p.borrowerName||'(no name)')+'</b><small>'+Forms.esc(p.id)+(p.legacy?' · v1 forms':'')+(p.branch?' · '+Forms.esc(p.branch):'')+(p.status==='DRAFT'&&p.approved?' · approved':'')+'</small></span><span class="pill '+sp[0]+'">'+sp[1]+'</span></button>';
       }).join('') : '<small style="color:var(--muted)">No packages yet. Fill in a loan and press Save.</small>';
     }).catch(function(e){ $('pkgList').innerHTML='<small class="err">'+Forms.esc(e.message)+'</small>'; });
   }
@@ -1854,60 +1936,131 @@ var Forms = (function(){
     else Forms.docSet().forEach(function(code){ if(LIFE[code]) docSigners(code).forEach(function(k){ if(PARTY.indexOf(base(k))>=0 && !sig[k] && keys.indexOf(k)<0) keys.push(k); }); });
     return keys;
   }
+  var CH_LABEL={ remote:'Remote link', office:'In office', paper:'Wet ink' };
+  function sendCodeLabel(l){ return l.hasEmail ? 'Code emailed to '+Forms.esc(l.emailMasked)+(l.codeSends>1?' ('+l.codeSends+' sends)':'') : (l.codeSends ? 'Code sent by SMS to '+Forms.esc(l.mobile)+' ('+l.codeSends+'×)' : 'Code not sent yet — press Send code by SMS'); }
+  function approvalHtml(){
+    var ap=A.server&&A.server.approval, h='';
+    if(ap){
+      h+='<div class="apprbox"><span><span class="pill ok">Approved for signing</span> by <b>'+Forms.esc(ap.name)+'</b> · ref '+Forms.esc(ap.ref)+' · '+Forms.esc(Forms.fmtManila(ap.at))+'</span>'+(!locked()&&CAN('approve')?'<span><button class="btn sm danger" type="button" id="bUnapprove">Withdraw approval</button></span>':'')+'</div>';
+      return h;
+    }
+    if(locked()) return '';
+    h+='<div class="apprbox"><span><span class="pill no">Approval needed</span> Parties can sign only after an approver account approves these exact terms. Changing any term afterwards clears the approval.</span>';
+    var me=(A.cfg&&A.cfg.user)||{}, prep=A.server&&A.server.preparedBy;
+    if(!A.id || A.dirty) h+='<span style="color:var(--muted)">Save the package first.</span>';
+    else if(!CAN('approve')) h+='<span style="color:var(--muted)">Waiting for an approver'+(prep?' (prepared by '+Forms.esc(prep.name)+')':'')+'.</span>';
+    else if(prep && prep.userId===me.id) h+='<span style="color:var(--muted)">You prepared these terms, so another approver must approve them.</span>';
+    else h+='<div class="fld"><label for="apprRef">Credit approval reference (CRAAS no.)</label><input id="apprRef" placeholder="e.g. CRAAS-2026-0001"></div><span><button class="btn sm royal" type="button" id="bApprove">Approve for signing</button></span>';
+    return h+'</div>';
+  }
   function renderShare(){
     var el=$('share'), f=Forms.S.f, sig=Forms.S.sig;
     var h='';
-    if(A.lastOtp){ var lo=A.lastOtp; h+='<div class="otpbox"><b>Verification code for '+Forms.esc(lo.who)+'</b> — send this by SMS to '+Forms.esc(lo.mobile)+' and the link by a different channel. It is shown only now.<b class="code">'+Forms.esc(lo.otp)+'</b><div style="display:flex;gap:6px;flex-wrap:wrap"><button class="btn sm" type="button" data-copy="'+Forms.esc(lo.otp)+'">Copy code</button><button class="btn sm" type="button" data-copysms="'+Forms.esc(lo.token)+'">Copy SMS text</button><button class="btn sm" type="button" id="bOtpHide">Hide</button></div></div>'; }
+    if(A.lastOtp){ var lo=A.lastOtp; h+='<div class="otpbox"><b>Code for '+Forms.esc(lo.who)+'</b> — text it now to '+Forms.esc(lo.mobile)+'. It is shown only this once and the relay is logged under your account. Sending again issues a new code.<b class="code">'+Forms.esc(lo.otp)+'</b><div style="display:flex;gap:6px;flex-wrap:wrap"><button class="btn sm" type="button" data-copysms="1">Copy SMS text</button><button class="btn sm" type="button" id="bOtpHide">Done, hide it</button></div></div>'; }
     A.links.slice(0,6).forEach(function(l){
       var lp=LINK_PILL[l.state]||['mute',l.state], live=(l.state==='PENDING'||l.state==='OPENED');
       h+='<div class="linkcard"><div style="display:flex;justify-content:space-between;gap:6px;align-items:center"><b style="font-size:13px">'+Forms.esc(l.roles.filter(function(r){ return r!=='pnFig'; }).map(keyLabel).join(' + '))+'</b><span class="pill '+lp[0]+'">'+lp[1]+'</span></div>'+
-        '<div class="kv"><span>Valid</span><span>'+l.hours+' h · expires '+Forms.esc(Forms.fmtManila(l.expiresAt))+'</span>'+(l.mobile?'<span>Mobile</span><span>'+Forms.esc(l.mobile)+(l.otpVerifiedAt?' · code verified '+Forms.esc(Forms.fmtManila(l.otpVerifiedAt)):(l.otpFails?' · '+l.otpFails+' wrong code(s)':''))+'</span>':'')+(l.openedAt?'<span>Opened</span><span>'+Forms.esc(Forms.fmtManila(l.openedAt))+'</span>':'')+(l.submittedAt?'<span>Submitted</span><span>'+Forms.esc(Forms.fmtManila(l.submittedAt))+'</span>':'')+'</div>'+
-        (live?'<div class="linkbox"><input readonly value="'+Forms.esc(l.url)+'" aria-label="Signing link"><button class="btn sm" type="button" data-copy="'+Forms.esc(l.url)+'">Copy</button></div><div style="display:flex;gap:6px;flex-wrap:wrap"><button class="btn sm" type="button" data-copymsg="'+Forms.esc(l.token)+'">Copy message</button><button class="btn sm danger" type="button" data-revoke="'+Forms.esc(l.token)+'">Cancel link</button></div>':'')+'</div>';
+        '<div class="kv"><span>Channel</span><span>'+Forms.esc(CH_LABEL[l.channel]||l.channel)+(l.witness?' · witness '+Forms.esc(l.witness):'')+'</span><span>Valid</span><span>'+l.hours+' h · expires '+Forms.esc(Forms.fmtManila(l.expiresAt))+'</span>'+(l.mobile?'<span>Mobile</span><span>'+Forms.esc(l.mobile)+'</span>':'')+'<span>Code</span><span>'+sendCodeLabel(l)+(l.otpVerifiedAt?' · verified '+Forms.esc(Forms.fmtManila(l.otpVerifiedAt)):(l.otpFails?' · '+l.otpFails+' wrong':''))+'</span>'+(l.openedAt?'<span>Opened</span><span>'+Forms.esc(Forms.fmtManila(l.openedAt))+'</span>':'')+(l.submittedAt?'<span>Submitted</span><span>'+Forms.esc(Forms.fmtManila(l.submittedAt))+'</span>':'')+'</div>'+
+        (live&&CAN('prepare')?'<div class="linkbox"><input readonly value="'+Forms.esc(l.url)+'" aria-label="Signing link"><button class="btn sm" type="button" data-copy="'+Forms.esc(l.url)+'">Copy</button></div><div style="display:flex;gap:6px;flex-wrap:wrap">'+
+          (l.channel==='office'?'<a class="btn sm" href="'+Forms.esc(l.url)+'" target="_blank" rel="noopener">Open signing page on this device</a>':'<button class="btn sm" type="button" data-copymsg="'+Forms.esc(l.token)+'">Copy message</button>')+
+          (l.hasEmail?'<button class="btn sm" type="button" data-code="email" data-tok="'+Forms.esc(l.token)+'">Resend code by email</button>':'<button class="btn sm royal" type="button" data-code="sms" data-tok="'+Forms.esc(l.token)+'">'+(l.codeSends?'Send a new code by SMS':'Send code by SMS')+'</button>')+
+          '<button class="btn sm danger" type="button" data-revoke="'+Forms.esc(l.token)+'">Cancel link</button></div>':'')+'</div>';
     });
     var pending=pendingKeys().filter(function(r){ return r!=='pnFig'; });
+    var lifePending=pending.length && docOf(pending[0]);
     if(archived()){ h+='<div class="banner lock" style="margin:0">Finalized and archived. Executed copy SHA-256 '+Forms.esc((A.server.archive||{}).sha256||'').slice(0,16)+'…</div>'; }
     else if(!pending.length && A.status==='SIGNED'){ h+='<div class="banner lock" style="margin:0">All parties have signed. Add the office signatures, Save, then Finalize &amp; archive. Post-execution documents can be enabled below and shared from here.</div>'; }
-    else if(!pending.length && A.id){ h+='<div class="banner info" style="margin:0">Every party has already signed (office). Save to lock the package.</div>'; }
-    else if(!pending.length){ h+='<div class="banner info" style="margin:0">Save the package first.</div>'; }
+    else if(!A.id){ h+='<div class="banner info" style="margin:0">Save the package first.</div>'; }
+    else if(!pending.length){ h+='<div class="banner info" style="margin:0">Every party has signed. Save to lock the package.</div>'; }
+    else if(!CAN('prepare')){ h+=lifePending?'':approvalHtml(); h+='<div class="banner info" style="margin:0">Waiting for: '+Forms.esc(pending.map(keyLabel).join(', '))+'.</div>'; }
     else {
-      h+='<div style="font-size:12.5px;color:var(--muted)">Each link opens only the documents its signers must sign, lasts 24 or 48 hours, needs the 6-digit code you send to the signer\'s mobile, and accepts one submission. The link is tied to these exact terms; changing them cancels it.</div>'+
-         '<div style="display:flex;flex-direction:column;gap:6px">'+pending.map(function(k){ var w=whoOf(k); return '<label class="chk"><input type="checkbox" data-role="'+Forms.esc(k)+'"'+(A.roles[k]!==false?' checked':'')+'> '+Forms.esc(w.label)+' '+Forms.esc(w.name||'')+(k==='borrower'?' (signature + amount in handwriting)':k==='comaker'||(k==='surety'&&f.suType!=='guaranty')?' (with solidary consent)':'')+'</label>'; }).join('')+'</div>'+
-         '<div class="fld"><label for="shareMobile">Signer\'s mobile number (for the verification code)</label><input id="shareMobile" inputmode="tel" placeholder="09xx xxx xxxx" value="'+Forms.esc(A.mobile||f.contact||'')+'"></div>'+
-         '<div class="seg" role="radiogroup" aria-label="Link valid for"><label><input type="radio" name="hrs" value="24"'+(A.hours===24?' checked':'')+'><span>24 hours</span></label><label><input type="radio" name="hrs" value="48"'+(A.hours===48?' checked':'')+'><span>48 hours</span></label></div>'+
-         '<button class="btn royal" type="button" id="bShare">Save &amp; create signing link</button>';
+      if(!lifePending) h+=approvalHtml();
+      var ready = lifePending || (A.server && A.server.approval);
+      if(ready){
+        var ch=A.channel;
+        h+='<div class="seg" role="radiogroup" aria-label="How they sign"><label><input type="radio" name="chan" value="remote"'+(ch==='remote'?' checked':'')+'><span>Remote link</span></label><label><input type="radio" name="chan" value="office"'+(ch==='office'?' checked':'')+'><span>In office</span></label><label><input type="radio" name="chan" value="paper"'+(ch==='paper'?' checked':'')+'><span>Wet ink</span></label></div>';
+        h+='<div style="font-size:12.5px;color:var(--muted)">'+(ch==='remote'?'The signer opens the link on their own phone and types the 6-digit code. The code is emailed by the system; with no email, you text a fresh code with Send code by SMS. The link lasts 24 or 48 hours, accepts one submission and is tied to these exact terms.':ch==='office'?'The signer signs on an office device, but the code still goes to their own phone or email and they type it themselves. Record the ID you checked; you are recorded as the witness.':'Print the documents, have them signed in ink, then upload one scan of the signed pages. The scan\'s SHA-256 is recorded and the boxes show "Signed on paper".')+'</div>';
+        h+='<div style="display:flex;flex-direction:column;gap:6px">'+pending.map(function(k){ var w=whoOf(k); return '<label class="chk"><input type="checkbox" data-role="'+Forms.esc(k)+'"'+(A.roles[k]!==false?' checked':'')+'> '+Forms.esc(w.label)+' '+Forms.esc(w.name||'')+(k==='borrower'?' (signature + amount in handwriting)':k==='comaker'||(k==='surety'&&f.suType!=='guaranty')?' (with solidary consent)':'')+'</label>'; }).join('')+'</div>';
+        var borrowerTicked = pending.indexOf('borrower')>=0 && A.roles.borrower!==false;
+        var idT = A.idType || (borrowerTicked?f.idType:''), id4 = A.idLast4 || (borrowerTicked?f.idLast4:'');
+        if(ch!=='paper'){
+          var em = A.email!=null ? A.email : (borrowerTicked?(f.email||''):'');
+          h+='<div class="fld"><label for="shareMobile">Signer\'s own mobile number</label><input id="shareMobile" inputmode="tel" placeholder="09xx xxx xxxx" value="'+Forms.esc(A.mobile||(borrowerTicked?f.contact:'')||'')+'"></div>'+
+             '<div class="fld"><label for="shareEmail">Signer\'s email (the code is sent here; blank = you relay it by SMS)</label><input id="shareEmail" type="email" inputmode="email" value="'+Forms.esc(em)+'"></div>';
+          if(ch==='office') h+='<div class="sgrid"><div class="fld"><label for="shareIdType">ID checked — type</label><input id="shareIdType" value="'+Forms.esc(idT||'')+'"></div><div class="fld"><label for="shareIdLast4">ID — last 4 digits</label><input id="shareIdLast4" maxlength="4" inputmode="numeric" value="'+Forms.esc(id4||'')+'"></div></div>';
+          h+='<div class="seg" role="radiogroup" aria-label="Link valid for"><label><input type="radio" name="hrs" value="24"'+(A.hours===24?' checked':'')+'><span>24 hours</span></label><label><input type="radio" name="hrs" value="48"'+(A.hours===48?' checked':'')+'><span>48 hours</span></label></div>'+
+             '<button class="btn royal" type="button" id="bShare">'+(ch==='office'?'Create in-office signing link':'Save &amp; create signing link')+'</button>';
+        } else {
+          h+='<div class="sgrid"><div class="fld"><label for="wetDate">Date signed</label><input id="wetDate" type="date" value="'+Forms.esc(A.wet.date||Forms.todayISO())+'"></div><div class="fld"><label for="wetIdType">ID checked — type</label><input id="wetIdType" value="'+Forms.esc(A.wet.idType||idT||'')+'"></div><div class="fld"><label for="wetIdLast4">ID — last 4 digits</label><input id="wetIdLast4" maxlength="4" inputmode="numeric" value="'+Forms.esc(A.wet.idLast4||id4||'')+'"></div><div class="fld"><label for="wetNote">Note (optional)</label><input id="wetNote" value="'+Forms.esc(A.wet.note||'')+'"></div>'+
+             '<div class="fld full"><label for="wetFile">Scan of the signed pages (one PDF, JPG or PNG, up to 10 MB)</label><input id="wetFile" type="file" accept="application/pdf,image/jpeg,image/png"></div></div>'+
+             '<div style="display:flex;gap:6px;flex-wrap:wrap"><button class="btn" type="button" id="bWetPrint">Print documents for signing</button><button class="btn royal" type="button" id="bWet">Record wet-ink signatures</button></div>';
+        }
+      }
     }
     el.innerHTML=h;
   }
-  $('share').addEventListener('change',function(e){ if(e.target.name==='hrs') A.hours=Number(e.target.value); if(e.target.dataset.role) A.roles[e.target.dataset.role]=e.target.checked; });
-  $('share').addEventListener('input',function(e){ if(e.target.id==='shareMobile') A.mobile=e.target.value; });
+  $('share').addEventListener('change',function(e){ var t=e.target; if(t.name==='hrs') A.hours=Number(t.value); if(t.name==='chan'){ A.channel=t.value; renderShare(); } if(t.dataset.role){ A.roles[t.dataset.role]=t.checked; renderShare(); } });
+  $('share').addEventListener('input',function(e){ var t=e.target, m={shareMobile:'mobile',shareEmail:'email',shareIdType:'idType',shareIdLast4:'idLast4'}; if(m[t.id]) A[m[t.id]]=t.value;
+    var w={wetDate:'date',wetIdType:'idType',wetIdLast4:'idLast4',wetNote:'note'}; if(w[t.id]) A.wet[w[t.id]]=t.value; });
   function copyText(t,okMsg){
     var done=function(){ Forms.toast(okMsg); };
-    function fallback(){ var ta=document.createElement('textarea'); ta.value=t; document.body.appendChild(ta); ta.select(); try{ document.execCommand('copy'); done(); }catch(e){ Forms.toast('Copy failed. Select the link and copy it manually.'); } ta.remove(); }
+    function fallback(){ var ta=document.createElement('textarea'); ta.value=t; document.body.appendChild(ta); ta.select(); try{ document.execCommand('copy'); done(); }catch(e){ Forms.toast('Copy failed. Select the text and copy it manually.'); } ta.remove(); }
     if(navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(t).then(done,fallback); else fallback();
   }
+  function reload(msg){ return guard(Forms.call('adminGetPackage',TOK,A.id)).then(function(p){ applyServer(p); loadFields(); renderEditors(); renderAll(); loadList(); if(msg) Forms.toast(msg); }); }
+  function tickedRoles(){ var roles=[]; $('share').querySelectorAll('[data-role]').forEach(function(cb){ if(cb.checked) roles.push(cb.dataset.role); }); return roles; }
+  function readFile(file){ return new Promise(function(ok,no){ var r=new FileReader(); r.onload=function(){ ok(r.result); }; r.onerror=function(){ no(new Error('Could not read the file.')); }; r.readAsDataURL(file); }); }
   $('share').addEventListener('click',function(e){
     var t=e.target;
+    if(t.id==='bApprove'){
+      if(A.dirty){ Forms.toast('Save first.'); return; }
+      t.disabled=true; guard(Forms.call('adminApprovePackage',TOK,A.id,($('apprRef')||{}).value||'')).then(function(){ return reload('Approved for signing.'); }).catch(function(err){ Forms.toast(err.message); t.disabled=false; });
+    }
+    if(t.id==='bUnapprove'){
+      if(t.dataset.armed!=='1'){ t.dataset.armed='1'; t.textContent='Click again to withdraw'; setTimeout(function(){ t.dataset.armed=''; t.textContent='Withdraw approval'; },4000); return; }
+      guard(Forms.call('adminRevokeApproval',TOK,A.id,'withdrawn by approver')).then(function(){ return reload('Approval withdrawn. Active links were cancelled.'); }).catch(function(err){ Forms.toast(err.message); });
+    }
     if(t.id==='bShare'){
-      var roles=[]; $('share').querySelectorAll('[data-role]').forEach(function(cb){ if(cb.checked) roles.push(cb.dataset.role); });
+      var roles=tickedRoles();
       if(!roles.length){ Forms.toast('Tick who signs on this link.'); return; }
       var docs={}; roles.forEach(function(r){ docs[docOf(r)]=true; }); if(Object.keys(docs).length>1){ Forms.toast('One link covers either the loan documents or one post-execution document. Untick the others.'); return; }
+      var opts={ channel:A.channel, email:($('shareEmail')||{}).value||'', idType:($('shareIdType')||{}).value||'', idLast4:($('shareIdLast4')||{}).value||'' };
       var mobile=($('shareMobile')||{}).value||'';
       t.disabled=true; t.textContent='Creating link…';
-      save().then(function(){ return guard(Forms.call('adminCreateLink',TOK,A.id,A.hours,roles,mobile)); })
-        .then(function(l){ var names=[]; roles.forEach(function(r){ var n=whoOf(r).name; if(n&&names.indexOf(n)<0) names.push(n); }); A.lastOtp={otp:l.otp, token:l.token, mobile:l.mobile, who:names.join(' / ')||roles.map(keyLabel).join(' + '), url:l.url, expiresAt:l.expiresAt}; return guard(Forms.call('adminGetPackage',TOK,A.id)).then(function(p){ applyServer(p); loadFields(); renderEditors(); renderAll(); loadList(); Forms.toast('Link created for '+l.roles.filter(function(r){return r!=='pnFig';}).map(keyLabel).join(' + ')+'. Valid until '+Forms.fmtManila(l.expiresAt)+'. Send the code by SMS.'); }); })
+      (A.dirty?save():Promise.resolve()).then(function(){ return guard(Forms.call('adminCreateLink',TOK,A.id,A.hours,roles,mobile,opts)); })
+        .then(function(l){ A.email=null; A.idType=''; A.idLast4=''; return reload('Link created for '+l.roles.filter(function(r){return r!=='pnFig';}).map(keyLabel).join(' + ')+'. '+(l.hasEmail?'The code was emailed to '+l.emailMasked+'.':'Now press Send code by SMS.')); })
         .catch(function(err){ if(err.message!=='Busy') Forms.toast(err.message); renderShare(); });
     }
+    if(t.id==='bWetPrint'){ window.print(); }
+    if(t.id==='bWet'){
+      var wroles=tickedRoles(), file=($('wetFile')&&$('wetFile').files[0])||null;
+      if(!wroles.length){ Forms.toast('Tick who signed on paper.'); return; }
+      if(!file){ Forms.toast('Choose the scan of the signed pages.'); return; }
+      if(file.size>10*1024*1024){ Forms.toast('The scan is larger than 10 MB.'); return; }
+      t.disabled=true; t.textContent='Uploading…';
+      var info={ signedOn:($('wetDate')||{}).value||'', idType:($('wetIdType')||{}).value||'', idLast4:($('wetIdLast4')||{}).value||'', note:($('wetNote')||{}).value||'' };
+      (A.dirty?save():Promise.resolve()).then(function(){ return readFile(file); }).then(function(url){ return guard(Forms.call('adminRecordWetInk',TOK,A.id,wroles,{ dataUrl:url, name:file.name },info)); })
+        .then(function(r){ A.wet={}; return reload('Wet-ink signatures recorded. Scan SHA-256 '+r.sha256.slice(0,16)+'…'); })
+        .catch(function(err){ Forms.toast(err.message); renderShare(); });
+    }
+    if(t.dataset.code){
+      var tok=t.dataset.tok, via=t.dataset.code; t.disabled=true;
+      guard(Forms.call('adminSendCode',TOK,tok,via)).then(function(r){
+        if(via==='sms'){ var names=[]; r.link.roles.forEach(function(x){ var n=whoOf(x).name; if(n&&names.indexOf(n)<0) names.push(n); }); A.lastOtp={ otp:r.otp, smsText:r.smsText, mobile:r.mobile, who:names.join(' / ')||r.link.roles.map(keyLabel).join(' + ') }; }
+        return reload(via==='email'?'A new code was emailed to '+r.to+'.':'New code issued. Text it now.');
+      }).catch(function(err){ Forms.toast(err.message); t.disabled=false; });
+    }
     if(t.id==='bOtpHide'){ A.lastOtp=null; renderShare(); }
-    if(t.dataset.copy){ copyText(t.dataset.copy, t.dataset.copy.length<10?'Code copied':'Link copied'); }
-    if(t.dataset.copysms && A.lastOtp){ copyText('ERMANO Lending: your e-signing verification code is '+A.lastOtp.otp+'. Enter it on the signing page. Do not share it. Valid until '+Forms.fmtManila(A.lastOtp.expiresAt)+'.','SMS text copied'); }
+    if(t.dataset.copy){ copyText(t.dataset.copy,'Link copied'); }
+    if(t.dataset.copysms && A.lastOtp){ copyText(A.lastOtp.smsText,'SMS text copied'); }
     if(t.dataset.copymsg){
       var l=A.links.filter(function(x){ return x.token===t.dataset.copymsg; })[0], f=Forms.S.f;
       var names=[]; l.roles.forEach(function(r){ var n=whoOf(r).name; if(n&&names.indexOf(n)<0) names.push(n); });
-      copyText('Good day '+(names.join(' / ')||'')+'. Please review and e-sign your ERMANO Lending loan documents (Loan '+(f.loanId||'')+') here: '+l.url+'\nYou will need the 6-digit verification code sent to your mobile number. This link expires '+Forms.fmtManila(l.expiresAt)+'. You can submit only once.','Message copied');
+      copyText('Good day '+(names.join(' / ')||'')+'. Please review and e-sign your ERMANO Lending loan documents (Loan '+(f.loanId||'')+') here: '+l.url+'\nYou will need the 6-digit code '+(l.hasEmail?'we emailed to you':'we will text to your mobile')+'. Type it yourself and do not give it to anyone. This link expires '+Forms.fmtManila(l.expiresAt)+'. You can submit only once.','Message copied');
     }
     if(t.dataset.revoke){
       if(t.dataset.armed!=='1'){ t.dataset.armed='1'; t.textContent='Click again to cancel'; setTimeout(function(){ t.dataset.armed=''; t.textContent='Cancel link'; },4000); return; }
-      guard(Forms.call('adminRevokeLink',TOK,t.dataset.revoke)).then(function(){ return guard(Forms.call('adminGetPackage',TOK,A.id)); }).then(function(p){ applyServer(p); loadFields(); renderEditors(); renderAll(); loadList(); Forms.toast('Link cancelled.'); }).catch(function(err){ Forms.toast(err.message); });
+      guard(Forms.call('adminRevokeLink',TOK,t.dataset.revoke)).then(function(){ return reload('Link cancelled.'); }).catch(function(err){ Forms.toast(err.message); });
     }
   });
 
@@ -2009,10 +2162,10 @@ var Forms = (function(){
     var keys=PARTY.concat(OFFICE).filter(function(k){ return k!=='approver' && partyOk(k); });
     Forms.docSet().forEach(function(code){ if(LIFE[code]) docSigners(code).forEach(function(k){ if(keys.indexOf(k)<0) keys.push(k); }); });
     $('signers').innerHTML=keys.map(function(k){
-      var sg=Forms.S.sig[k], w=whoOf(k), can=Forms.canSign(k), by=sg?(sg.by==='link'?'via link':'in office'+(sg.operator?' by '+sg.operator:'')):'', d=docOf(k);
+      var sg=Forms.S.sig[k], w=whoOf(k), can=Forms.canSign(k), by=sg?(sg.by==='paper'?'on paper (scan '+String(sg.scanSha256||'').slice(0,8)+'…)':sg.by==='link'?(sg.channel==='office'?'in office with code, witness '+(sg.witness||''):'via link'):'in office'+(sg.operator?' by '+sg.operator:'')):'', d=docOf(k);
       return '<div class="signer"><span><b>'+Forms.esc(Forms.ROLE_LABELS[base(k)]||k)+(d?' <small>('+Forms.esc(Forms.DOC_TITLES[d]||d)+')</small>':'')+'</b><span class="n">'+Forms.esc((k==='pnFig'?'Amount in figures':w.name)||'name not set')+(sg?' · '+Forms.esc(Forms.stampTime(sg.at))+(by?' · '+by:''):'')+'</span></span>'+
         '<span style="display:flex;gap:6px;align-items:center"><span class="pill '+(sg?'ok':'no')+'">'+(sg?'Done':'Missing')+'</span>'+(can?'<button class="btn sm" type="button" data-open="'+k+'">'+(sg?'Redo':'Sign here')+'</button>':'')+'</span></div>';
-    }).join('')+(A.status==='SIGNED'&&!archived()&&!Object.keys(Forms.S.sig).some(function(r){ return Forms.S.sig[r].by==='link'; })?'<button class="btn sm danger" type="button" id="bReopen">Unlock for correction (removes office party signatures)</button>':'');
+    }).join('')+(A.status==='SIGNED'&&!archived()&&CAN('prepare')&&!Object.keys(Forms.S.sig).some(function(r){ return Forms.S.sig[r].by==='link'||Forms.S.sig[r].by==='paper'; })?'<button class="btn sm danger" type="button" id="bReopen">Unlock for correction (removes office party signatures)</button>':'');
   }
   function renderRecords(){
     var h='';
@@ -2037,22 +2190,22 @@ var Forms = (function(){
   }
   function renderSignDate(){
     var d=Forms.S.f.signDate, b=Forms.S.sig.borrower;
-    $('signDateView').textContent = d ? Forms.mdy(Forms.parseISO(d))+' · stamped when the borrower signed '+(b&&b.by==='link'?'via the link':'in the office') : 'Not signed yet · stamped automatically on the day the borrower signs';
+    $('signDateView').textContent = d ? Forms.mdy(Forms.parseISO(d))+' · '+(b&&b.by==='paper'?'date the borrower signed on paper':'stamped when the borrower signed '+(b&&b.by==='link'?'with the code':'in the office')) : 'Not signed yet · stamped automatically on the day the borrower signs';
   }
   function renderAll(skipShare){
     var lk=locked(), f=Forms.S.f;
     var ar=archived();
     document.querySelectorAll('#fs [data-f]').forEach(function(el){ var k=el.dataset.f; var lifeD=Object.keys(LIFE).filter(function(d){ return LIFE[d].test(k); })[0];
-      el.disabled = ar || (lifeD ? (A.status!=='SIGNED' || lifeLocked(lifeD)) : (lk && OFFICE_KEYS.indexOf(k)<0)); });
+      el.disabled = ar || !CAN('prepare') || k==='approvalRef' || k==='approvedBy' || (lifeD ? (A.status!=='SIGNED' || lifeLocked(lifeD)) : (lk && OFFICE_KEYS.indexOf(k)<0)); });
     document.querySelectorAll('#checksEd input,#chargesEd input,#assetsEd input,#assetsEd select,#assetsEd button').forEach(function(el){ el.disabled=lk||ar; });
-    $('bRegen').disabled=lk||ar; $('bAddAsset').disabled=lk||ar; $('bSave').disabled=ar; $('bArchive').hidden=!(A.status==='SIGNED'&&!ar&&A.id); $('bAudit').hidden=!A.id;
+    $('bRegen').disabled=lk||ar; $('bAddAsset').disabled=lk||ar; $('bSave').disabled=ar; $('bArchive').hidden=!(A.status==='SIGNED'&&!ar&&A.id&&CAN('archive')); $('bAudit').hidden=!A.id;
     $('dCollateral').hidden=!f.secCollateral; $('dDeposit').hidden=!f.secDeposit; $('dSurety').hidden=!f.secSurety; $('dPDC').hidden=!(f.incPDC||Forms.S.legacy); $('dLife').hidden=!(isV3() && A.status==='SIGNED');
     ['f_purposeOther'].forEach(function(id){ $(id).parentElement.hidden = f.purposeClass!=='specific'; }); $('f_spouseName').parentElement.hidden = f.civilStatus!=='Married'; $('f_grSpouseName').parentElement.hidden = f.grCivilStatus!=='Married' || !!f.borrowerIsGrantor; $('f_suSpouseName').parentElement.hidden = f.suCivilStatus!=='Married';
     document.querySelectorAll('.lifegrp').forEach(function(g){ g.hidden = !f['inc'+g.dataset.life]; });
     ['f_grName','f_grAddress','f_grId','f_grCivilStatus','f_grSpouseName'].forEach(function(id){ $(id).disabled = lk || ar || !!f.borrowerIsGrantor; });
     var cust=Forms.custodyAny(); ['f_cuItems','f_cuAccessories','f_cuCondition','f_cuReceivedAt','f_cuReceivedPlace'].forEach(function(id){ $(id).parentElement.hidden=!cust; }); $('custNote').hidden=cust;
     $('f_custodianName').parentElement.hidden=!cust;
-    $('lockBanner').innerHTML = ar ? '<div class="banner lock">Finalized and archived '+Forms.esc(Forms.fmtManila(A.server.archive.at))+'. Executed copy SHA-256 '+Forms.esc(A.server.archive.sha256)+'. Nothing can be changed.</div>' : lk ? '<div class="banner lock">'+(A.status==='SIGNED'?'All parties signed':'A party has signed through a link')+'. Loan terms are locked; office details, post-execution documents and office signatures can still be added.</div>' : (liveLinks().length&&A.dirty ? '<div class="banner warn">Saving changed terms cancels the active signing links.</div>' : '');
+    $('lockBanner').innerHTML = ar ? '<div class="banner lock">Finalized and archived '+Forms.esc(Forms.fmtManila(A.server.archive.at))+'. Executed copy SHA-256 '+Forms.esc(A.server.archive.sha256)+'. Nothing can be changed.</div>' : lk ? '<div class="banner lock">'+(A.status==='SIGNED'?'All parties signed':'A party has signed')+'. Loan terms are locked; office details, post-execution documents and office signatures can still be added.</div>' : (liveLinks().length&&A.dirty ? '<div class="banner warn">Saving changed terms cancels the active signing links.</div>' : '');
     $('pkgLabel').textContent = (A.id ? A.id : (Forms.S.meta&&Forms.S.meta.demo?'DEMO loan':'New package'))+(A.dirty?' · unsaved':'');
     renderCalc(); renderSigners(); renderSignDate(); renderChecklist(); renderRecords(); if(!skipShare) renderShare();
     Forms.S.docSet=null; Forms.render($('pages'));
@@ -2070,7 +2223,7 @@ var Forms = (function(){
     var css=''; document.querySelectorAll('style').forEach(function(st){ css+=st.textContent+'\n'; });
     Forms.S.docSet=null; Forms.render($('pages'));
     return '<!DOCTYPE html><html><head><meta charset="utf-8"><style>'+css+'</style></head><body class="archive"><div class="pages" style="zoom:1">'+$('pages').innerHTML+'</div>'+
-      '<div class="no-print" style="font:11px monospace;padding:12px">Package '+Forms.esc(A.id)+' · docHash '+Forms.esc(Forms.S.docHash)+' · archived by '+Forms.esc(A.operator)+' · '+new Date().toISOString()+'</div></body></html>';
+      '<div class="no-print" style="font:11px monospace;padding:12px">Package '+Forms.esc(A.id)+' · docHash '+Forms.esc(Forms.S.docHash)+' · archived by '+Forms.esc(A.operator)+(A.server&&A.server.approval?' · approved by '+Forms.esc(A.server.approval.name)+' ref '+Forms.esc(A.server.approval.ref):'')+' · '+new Date().toISOString()+'</div></body></html>';
   }
   $('bArchive').onclick=function(){
     var b=$('bArchive'); if(A.dirty){ Forms.toast('Save first.'); return; }
@@ -2085,7 +2238,46 @@ var Forms = (function(){
   /* ---------- Settings & Templates overlay ---------- */
   $('bConfig').onclick=function(){ $('cfgView').hidden=false; loadConfig().then(renderCfg).catch(function(e){ Forms.toast(e.message); }); };
   $('bCfgClose').onclick=function(){ $('cfgView').hidden=true; if(!A.id){ Forms.S.settings=A.cfg.snapshot; Forms.S.templateStatus=tstatusFromCfg(); } else if(A.server && !A.server.pinned){ Forms.S.settings=A.cfg.snapshot; Forms.S.templateStatus=tstatusFromCfg(); } renderAll(); };
-  $('cfgView').querySelector('.tabs').addEventListener('click',function(e){ var b=e.target.closest('[data-tab]'); if(!b) return; $('cfgView').querySelectorAll('.tabs button').forEach(function(x){ x.classList.toggle('on',x===b); }); $('tabTpl').hidden=b.dataset.tab!=='tpl'; $('tabSet').hidden=b.dataset.tab!=='set'; $('tabAud').hidden=b.dataset.tab!=='aud'; });
+  $('cfgView').querySelector('.tabs').addEventListener('click',function(e){ var b=e.target.closest('[data-tab]'); if(!b) return; $('cfgView').querySelectorAll('.tabs button').forEach(function(x){ x.classList.toggle('on',x===b); }); $('tabTpl').hidden=b.dataset.tab!=='tpl'; $('tabSet').hidden=b.dataset.tab!=='set'; $('tabAud').hidden=b.dataset.tab!=='aud'; $('tabUsr').hidden=b.dataset.tab!=='usr'; $('tabMe').hidden=b.dataset.tab!=='me';
+    if(b.dataset.tab==='usr') loadUsers(); if(b.dataset.tab==='me') renderMe(); });
+  $('bUsers').onclick=function(){ $('cfgView').hidden=false; loadConfig().then(function(){ renderCfg(); $('cfgView').querySelector('[data-tab="usr"]').click(); }).catch(function(e){ Forms.toast(e.message); }); };
+  var NEW_TEMP=null;
+  function loadUsers(){ $('tabUsr').innerHTML='<small>Loading…</small>'; guard(Forms.call('adminListUsers',TOK)).then(renderUsers).catch(function(e){ $('tabUsr').innerHTML='<small class="err">'+Forms.esc(e.message)+'</small>'; }); }
+  function roleBoxes(prefix, have, names){ return Object.keys(names).map(function(r){ return '<label class="chk"><input type="checkbox" data-'+prefix+'="'+r+'"'+(have.indexOf(r)>=0?' checked':'')+'> '+Forms.esc(names[r])+'</label>'; }).join(''); }
+  function renderUsers(d){
+    var names=d.roles, me=(A.cfg&&A.cfg.user)||{};
+    var h=(NEW_TEMP?'<div class="otpbox"><b>Temporary password for '+Forms.esc(NEW_TEMP.who)+'</b> — give it to them in person. They must change it at first sign-in. Shown only now.<b class="code" style="letter-spacing:.08em">'+Forms.esc(NEW_TEMP.pw)+'</b><button class="btn sm" type="button" id="bTempHide">Done, hide it</button></div>':'')+
+      '<div class="banner info" style="margin:0">Each person signs in with their own account. Roles decide what they can do; a branch limits them to that branch\'s packages (System Administrator, Auditor and Legal Reviewer see all branches). Five wrong passwords lock an account for 15 minutes.</div>'+
+      '<div class="urow" id="uNew"><div class="hd"><b>Add a user</b></div><div class="fld"><label>Full name</label><input data-nu="name"></div><div class="fld"><label>Username</label><input data-nu="username" autocapitalize="none"></div><div class="fld"><label>Email</label><input data-nu="email" type="email"></div><div class="fld"><label>Mobile</label><input data-nu="mobile" inputmode="tel"></div><div class="fld"><label>Branch</label><input data-nu="branch" placeholder="e.g. CEBU"></div><div class="roles">'+roleBoxes('nr',[],names)+'</div><div class="act"><button class="btn sm royal" type="button" id="bUserAdd">Add user</button></div></div>'+
+      '<div class="users">'+d.users.map(function(u){ var locked=u.lockedUntil && new Date(u.lockedUntil).getTime()>Date.now();
+        return '<div class="urow" data-uid="'+Forms.esc(u.id)+'"><div class="hd"><span><b>'+Forms.esc(u.name)+'</b> <small style="color:var(--muted)">'+Forms.esc(u.username)+(u.id===me.id?' · you':'')+(u.lastLoginAt?' · last sign-in '+Forms.esc(Forms.fmtManila(u.lastLoginAt)):'')+'</small></span><span><span class="pill '+(u.status==='ACTIVE'?(locked?'no':'ok'):'mute')+'">'+(u.status==='ACTIVE'?(locked?'Locked':'Active'):'Disabled')+'</span>'+(u.mustChange?' <span class="pill info">Temporary password</span>':'')+'</span></div>'+
+          '<div class="fld"><label>Full name</label><input data-uf="name" value="'+Forms.esc(u.name)+'"></div><div class="fld"><label>Branch</label><input data-uf="branch" value="'+Forms.esc(u.branch)+'"></div><div class="fld"><label>Email</label><input data-uf="email" value="'+Forms.esc(u.email)+'"></div><div class="fld"><label>Mobile</label><input data-uf="mobile" value="'+Forms.esc(u.mobile)+'"></div>'+
+          '<div class="roles">'+roleBoxes('ur',u.roles,names)+'</div>'+
+          '<div class="act"><button class="btn sm royal" type="button" data-usave="1">Save changes</button>'+(locked?'<button class="btn sm" type="button" data-uunlock="1">Unlock</button>':'')+'<button class="btn sm" type="button" data-ureset="1">Reset password</button><button class="btn sm" type="button" data-uout="1">Sign out everywhere</button>'+(u.id!==me.id?'<button class="btn sm '+(u.status==='ACTIVE'?'danger':'')+'" type="button" data-ustatus="'+(u.status==='ACTIVE'?'DISABLED':'ACTIVE')+'">'+(u.status==='ACTIVE'?'Disable':'Enable')+'</button>':'')+'</div></div>'; }).join('')+'</div>';
+    $('tabUsr').innerHTML=h; A.usersCache=d.users;
+  }
+  function userPayload(row, extra){ var u=(A.usersCache||[]).filter(function(x){ return x.id===row.dataset.uid; })[0]||{}, d={ id:u.id, status:u.status, roles:[] };
+    row.querySelectorAll('[data-uf]').forEach(function(i){ d[i.dataset.uf]=i.value; }); row.querySelectorAll('[data-ur]').forEach(function(i){ if(i.checked) d.roles.push(i.dataset.ur); }); return Object.assign(d, extra||{}); }
+  $('tabUsr').addEventListener('click',function(e){
+    var t=e.target, row=t.closest('[data-uid]');
+    if(t.id==='bTempHide'){ NEW_TEMP=null; loadUsers(); return; }
+    if(t.id==='bUserAdd'){ var box=$('uNew'), d={ roles:[] }; box.querySelectorAll('[data-nu]').forEach(function(i){ d[i.dataset.nu]=i.value; }); box.querySelectorAll('[data-nr]').forEach(function(i){ if(i.checked) d.roles.push(i.dataset.nr); });
+      guard(Forms.call('adminSaveUser',TOK,d)).then(function(r){ NEW_TEMP={ who:r.user.name+' ('+r.user.username+')', pw:r.tempPassword }; loadUsers(); }).catch(function(err){ Forms.toast(err.message); }); return; }
+    if(!row) return;
+    if(t.dataset.usave) guard(Forms.call('adminSaveUser',TOK,userPayload(row))).then(function(){ Forms.toast('Saved.'); loadUsers(); }).catch(function(err){ Forms.toast(err.message); });
+    if(t.dataset.uunlock) guard(Forms.call('adminSaveUser',TOK,userPayload(row,{unlock:true}))).then(function(){ Forms.toast('Unlocked.'); loadUsers(); }).catch(function(err){ Forms.toast(err.message); });
+    if(t.dataset.ustatus) guard(Forms.call('adminSaveUser',TOK,userPayload(row,{status:t.dataset.ustatus}))).then(function(){ Forms.toast(t.dataset.ustatus==='DISABLED'?'Disabled and signed out.':'Enabled.'); loadUsers(); }).catch(function(err){ Forms.toast(err.message); });
+    if(t.dataset.ureset){ if(t.dataset.armed!=='1'){ t.dataset.armed='1'; t.textContent='Click again to reset'; setTimeout(function(){ t.dataset.armed=''; t.textContent='Reset password'; },4000); return; }
+      var u=(A.usersCache||[]).filter(function(x){ return x.id===row.dataset.uid; })[0];
+      guard(Forms.call('adminResetPassword',TOK,row.dataset.uid)).then(function(r){ NEW_TEMP={ who:u.name+' ('+u.username+')', pw:r.tempPassword }; loadUsers(); }).catch(function(err){ Forms.toast(err.message); }); }
+    if(t.dataset.uout) guard(Forms.call('adminRevokeSessions',TOK,row.dataset.uid)).then(function(r){ Forms.toast(r.revoked+' session(s) signed out.'); }).catch(function(err){ Forms.toast(err.message); });
+  });
+  function renderMe(){ var u=(A.cfg&&A.cfg.user)||{};
+    $('tabMe').innerHTML='<div class="sgrid"><div class="fld full"><label>Signed in as</label><div class="ro">'+Forms.esc(u.name||'')+' · '+Forms.esc(u.username||'')+' · '+Forms.esc((u.roles||[]).map(function(r){ return (A.cfg.roleNames||{})[r]||r; }).join(', '))+(u.branch?' · '+Forms.esc(u.branch):'')+'</div></div>'+
+      '<div class="fld"><label for="meOld">Current password</label><input id="meOld" type="password" autocomplete="current-password"></div><div class="fld"><label for="meNew">New password (at least 8 characters)</label><input id="meNew" type="password" autocomplete="new-password"></div><div class="fld"><label for="meNew2">Repeat new password</label><input id="meNew2" type="password" autocomplete="new-password"></div>'+
+      '<div class="full"><button class="btn royal" type="button" id="bMePw">Change password</button> <small style="color:var(--muted)">Your other sessions are signed out.</small></div></div>'; }
+  $('tabMe').addEventListener('click',function(e){ if(e.target.id!=='bMePw') return; if($('meNew').value!==$('meNew2').value){ Forms.toast('The two new passwords do not match.'); return; }
+    guard(Forms.call('adminChangePassword',TOK,$('meOld').value,$('meNew').value)).then(function(d){ TOK=d.token; try{sessionStorage.setItem('esign_adm',TOK);}catch(x){} renderMe(); Forms.toast('Password changed.'); }).catch(function(err){ Forms.toast(err.message); }); });
   var SET_FIELDS=[
     {h:'Company'},{k:'company.name',l:'Company name'},{k:'company.address',l:'Company address'},{k:'payment.channels',l:'Payment place / channels (printed on the Disclosure)',full:true},
     {h:'Delinquency charge (DS §D, PN §2) — counsel to set the rate; ≤ 5 % per month for covered small loans'},
@@ -2104,7 +2296,7 @@ var Forms = (function(){
     var c=A.cfg;
     $('tabTpl').innerHTML='<div class="banner info" style="margin:0 0 4px">Every v3 draft is READY FOR PHILIPPINE COUNSEL REVIEW and not for execution. Record counsel\'s written approval here; until every template in a package is Approved, no party can sign it. Legal status is pinned into each package when it is first shared or signed. Earlier versions stay available for packages pinned to them and can be marked Superseded.</div>'+
       c.templates.map(function(t){ var key=t.id+'|'+t.version; return '<div class="tpl"><span><b>'+Forms.esc(t.title)+'</b><small>'+t.id+' '+t.version+(t.current===false?' · previous version':' · current')+(t.reviewedBy?' · approved by '+Forms.esc(t.reviewedBy)+' on '+Forms.esc(Forms.fmtManila(t.reviewedAt)):'')+(t.note?' · '+Forms.esc(t.note):'')+'</small></span>'+
-        '<span class="act"><span class="pill '+(t.legalStatus==='APPROVED'?'ok':t.legalStatus==='SUPERSEDED'?'mute':'crit')+'">'+t.legalStatus+'</span>'+(t.legalStatus==='APPROVED'?'<button class="btn sm" type="button" data-tpl="'+key+'" data-st="PENDING">Set pending</button>':'<input placeholder="Reviewer / counsel name" data-tplname="'+key+'" style="width:170px"><button class="btn sm royal" type="button" data-tpl="'+key+'" data-st="APPROVED">Mark approved</button>')+(t.current===false&&t.legalStatus!=='SUPERSEDED'?'<button class="btn sm" type="button" data-tpl="'+key+'" data-st="SUPERSEDED">Mark superseded</button>':'')+'</span></div>'; }).join('');
+        '<span class="act"><span class="pill '+(t.legalStatus==='APPROVED'?'ok':t.legalStatus==='SUPERSEDED'?'mute':'crit')+'">'+t.legalStatus+'</span>'+(!CAN('templates')?'':t.legalStatus==='APPROVED'?'<button class="btn sm" type="button" data-tpl="'+key+'" data-st="PENDING">Set pending</button>':CAN('legal')?'<input placeholder="Counsel who approved in writing" data-tplname="'+key+'" style="width:190px"><button class="btn sm royal" type="button" data-tpl="'+key+'" data-st="APPROVED">Mark approved</button>':'<small style="color:var(--muted)">Legal Reviewer records approval</small>')+(CAN('templates')&&t.current===false&&t.legalStatus!=='SUPERSEDED'?'<button class="btn sm" type="button" data-tpl="'+key+'" data-st="SUPERSEDED">Mark superseded</button>':'')+'</span></div>'; }).join('');
     var cls=JSON.parse(c.settings['charges.classes']||'{}');
     $('tabSet').innerHTML='<div class="sgrid">'+SET_FIELDS.map(function(s){ if(s.h) return '<div class="full note" style="margin-top:6px"><b>'+Forms.esc(s.h)+'</b></div>'; var v=c.settings[s.k]||''; var ctl = s.type==='bool' ? '<label class="chk" style="margin-top:22px"><input type="checkbox" data-set="'+s.k+'"'+(v==='true'?' checked':'')+'> Yes</label>' : s.type==='sel' ? '<select data-set="'+s.k+'">'+s.opts.map(function(o){ return '<option'+(v===o?' selected':'')+'>'+o+'</option>'; }).join('')+'</select>' : '<input data-set="'+s.k+'" value="'+Forms.esc(v)+'">'; return '<div class="fld'+(s.full?' full':'')+'"><label>'+Forms.esc(s.l)+'</label>'+ctl+'</div>'; }).join('')+
       '<div class="full note"><b>Charge classes</b> — which rows count as finance charges (management decision: processing and credit investigation are finance charges; counsel to confirm):</div>'+Forms.CHARGE_DEFS.map(function(d){ return '<div class="fld"><label>'+Forms.esc(d.label)+'</label><select data-cls="'+d.key+'"><option value="other"'+(cls[d.key]!=='finance'?' selected':'')+'>Non-finance charge</option><option value="finance"'+(cls[d.key]==='finance'?' selected':'')+'>Finance charge</option></select></div>'; }).join('')+
@@ -2127,10 +2319,10 @@ var Forms = (function(){
     $('loginView').hidden=true; $('appView').hidden=false; $('dPkgs').open=true;
     var hash=(location.hash||'').slice(1); if(hash==='new'){ setTimeout(function(){ try{ $('bNew').click(); }catch(e){} },300); } if(hash==='packages'){ setTimeout(function(){ try{ $('dPkgs').open=true; $('dPkgs').scrollIntoView(); }catch(e){} },300); } $('bArchive').hidden=true; $('bAudit').hidden=true;
     loadConfig().then(function(){ newPkg(); return guard(Forms.call('adminListPackages',TOK)); })
-      .then(function(list){ if(!list.length) return loadDemo(); })
+      .then(function(list){ if(!list.length && CAN('prepare')) return loadDemo(); })
       .catch(function(e){ Forms.toast(e.message); if(!A.cfg) newPkg(); });
   }
-  if(TOK){ guard(Forms.call('adminListPackages',TOK)).then(start).catch(function(){ showLogin(''); }); } else showLogin('');
+  if(TOK){ Forms.call('adminGetConfig',TOK).then(start).catch(function(e){ if(/temporary password/i.test(e.message)){ $('loginView').hidden=false; mode('mChange'); } else { clearSession(); showLogin(''); } }); } else showLogin('');
 })();
 </script>
 <script>if("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(function(){});</script>
