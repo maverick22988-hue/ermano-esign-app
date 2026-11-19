@@ -886,10 +886,11 @@ details[open] summary::after{content:"–"}
 <div class="overlay no-print" id="cfgView" hidden>
   <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="cfgTitle">
     <h2 id="cfgTitle">Settings &amp; Templates <button class="btn sm" id="bCfgClose" type="button">Close</button></h2>
-    <div class="tabs"><button type="button" class="on" data-tab="tpl">Templates &amp; legal review</button><button type="button" data-tab="set">Settings</button><button type="button" data-tab="aud">Audit log</button><button type="button" data-tab="usr">Users</button><button type="button" data-tab="me">My account</button></div>
+    <div class="tabs"><button type="button" class="on" data-tab="tpl">Templates &amp; legal review</button><button type="button" data-tab="set">Settings</button><button type="button" data-tab="aud">Audit log</button><button type="button" data-tab="api">ELMS connection</button><button type="button" data-tab="usr">Users</button><button type="button" data-tab="me">My account</button></div>
     <div id="tabTpl"></div>
     <div id="tabSet" hidden></div>
     <div id="tabAud" hidden></div>
+    <div id="tabApi" hidden></div>
     <div id="tabUsr" hidden></div>
     <div id="tabMe" hidden></div>
   </div>
@@ -2238,7 +2239,7 @@ var Forms = (function(){
     $('bUsers').hidden=!CAN('users'); $('navSettings').hidden=!CAN('settings');
     $('sideBranch').textContent=u.branch?u.branch+' branch':'All branches';
     $('cfgView').querySelector('[data-tab="usr"]').hidden=!CAN('users');
-    $('cfgView').querySelector('[data-tab="set"]').hidden=!CAN('settings');
+    $('cfgView').querySelector('[data-tab="set"]').hidden=!CAN('settings'); $('cfgView').querySelector('[data-tab="api"]').hidden=!CAN('settings');
   }
   function versionsFromCfg(){ var v={}; (A.cfg?A.cfg.templates:[]).forEach(function(t){ if(t.current!==false) v[t.id]=t.version; }); return v; }
   function tstatusFromCfg(){ var s={}; (A.cfg?A.cfg.templates:[]).forEach(function(t){ if(t.current!==false) s[t.id]={version:t.version,legalStatus:t.legalStatus,reviewedBy:t.reviewedBy,reviewedAt:t.reviewedAt,title:t.title}; }); return s; }
@@ -2401,7 +2402,7 @@ var Forms = (function(){
         '<div class="kv"><span>Channel</span><span>'+Forms.esc(CH_LABEL[l.channel]||l.channel)+(l.witness?' · witness '+Forms.esc(l.witness):'')+'</span><span>Valid</span><span>'+l.hours+' h · expires '+Forms.esc(Forms.fmtManila(l.expiresAt))+'</span>'+(l.mobile?'<span>Mobile</span><span>'+Forms.esc(l.mobile)+'</span>':'')+'<span>Code</span><span>'+sendCodeLabel(l)+(l.otpVerifiedAt?' · verified '+Forms.esc(Forms.fmtManila(l.otpVerifiedAt)):(l.otpFails?' · '+l.otpFails+' wrong':''))+'</span>'+(l.openedAt?'<span>Opened</span><span>'+Forms.esc(Forms.fmtManila(l.openedAt))+'</span>':'')+(l.submittedAt?'<span>Submitted</span><span>'+Forms.esc(Forms.fmtManila(l.submittedAt))+'</span>':'')+'</div>'+
         (live&&CAN('prepare')?'<div class="linkbox"><input readonly value="'+Forms.esc(l.url)+'" aria-label="Signing link"><button class="btn sm" type="button" data-copy="'+Forms.esc(l.url)+'">Copy</button></div><div style="display:flex;gap:6px;flex-wrap:wrap">'+
           (l.channel==='office'?'<a class="btn sm" href="'+Forms.esc(l.url)+'" target="_blank" rel="noopener">Open signing page on this device</a>':'<button class="btn sm" type="button" data-copymsg="'+Forms.esc(l.token)+'">Copy message</button>')+
-          (l.hasEmail?'<button class="btn sm" type="button" data-code="email" data-tok="'+Forms.esc(l.token)+'">Resend code by email</button>':'<button class="btn sm royal" type="button" data-code="sms" data-tok="'+Forms.esc(l.token)+'">'+(l.codeSends?'Send a new code by SMS':'Send code by SMS')+'</button>')+
+          (l.hasEmail?'<button class="btn sm" type="button" data-code="email" data-tok="'+Forms.esc(l.token)+'">Resend code by email</button>':(l.smsGateway?'<button class="btn sm royal" type="button" data-code="sms" data-tok="'+Forms.esc(l.token)+'">'+(l.codeSends?'Text a new code (SMS gateway)':'Text the code (SMS gateway)')+'</button><button class="btn sm" type="button" data-code="relay" data-tok="'+Forms.esc(l.token)+'">Text it myself</button>':'<button class="btn sm royal" type="button" data-code="sms" data-tok="'+Forms.esc(l.token)+'">'+(l.codeSends?'Send a new code by SMS':'Send code by SMS')+'</button>'))+
           '<button class="btn sm danger" type="button" data-revoke="'+Forms.esc(l.token)+'">Cancel link</button></div>':'')+'</div>';
     });
     var pending=pendingKeys().filter(function(r){ return r!=='pnFig'; });
@@ -2488,7 +2489,7 @@ var Forms = (function(){
       var mobile=($('shareMobile')||{}).value||'';
       t.disabled=true; t.textContent='Creating link…';
       (A.dirty?save():Promise.resolve()).then(function(){ return guard(Forms.call('adminCreateLink',TOK,A.id,A.hours,roles,mobile,opts)); })
-        .then(function(l){ A.email=null; A.idType=''; A.idLast4=''; return reload('Link created for '+l.roles.filter(function(r){return r!=='pnFig';}).map(keyLabel).join(' + ')+'. '+(l.hasEmail?'The code was emailed to '+l.emailMasked+'.':'Now press Send code by SMS.')); })
+        .then(function(l){ A.email=null; A.idType=''; A.idLast4=''; return reload('Link created for '+l.roles.filter(function(r){return r!=='pnFig';}).map(keyLabel).join(' + ')+'. '+(l.hasEmail?'The code was emailed to '+l.emailMasked+'.':l.smsGateway==='sent'?'The code was texted by the SMS gateway.':l.smsGateway==='failed'?'The SMS gateway did not send the code ('+l.smsError+'). Press Text it myself.':'Now press Send code by SMS.')); })
         .catch(function(err){ if(err.message!=='Busy') Forms.toast(err.message); renderShare(); });
     }
     if(t.id==='bWetPrint'){ window.print(); }
@@ -2506,8 +2507,8 @@ var Forms = (function(){
     if(t.dataset.code){
       var tok=t.dataset.tok, via=t.dataset.code; t.disabled=true;
       guard(Forms.call('adminSendCode',TOK,tok,via)).then(function(r){
-        if(via==='sms'){ var names=[]; r.link.roles.forEach(function(x){ var n=whoOf(x).name; if(n&&names.indexOf(n)<0) names.push(n); }); A.lastOtp={ otp:r.otp, smsText:r.smsText, mobile:r.mobile, who:names.join(' / ')||r.link.roles.map(keyLabel).join(' + ') }; }
-        return reload(via==='email'?'A new code was emailed to '+r.to+'.':'New code issued. Text it now.');
+        if(r.sent==='sms'){ var names=[]; r.link.roles.forEach(function(x){ var n=whoOf(x).name; if(n&&names.indexOf(n)<0) names.push(n); }); A.lastOtp={ otp:r.otp, smsText:r.smsText, mobile:r.mobile, who:names.join(' / ')||r.link.roles.map(keyLabel).join(' + ') }; }
+        return reload(r.sent==='email'?'A new code was emailed to '+r.to+'.':r.sent==='gateway'?'A new code was texted to '+r.to+' by the SMS gateway. Nobody here sees it.':'New code issued. Text it now.');
       }).catch(function(err){ Forms.toast(err.message); t.disabled=false; });
     }
     if(t.id==='bOtpHide'){ A.lastOtp=null; renderShare(); }
@@ -2815,8 +2816,8 @@ var Forms = (function(){
 
   $('bConfig').onclick=function(){ $('cfgView').hidden=false; loadConfig().then(renderCfg).catch(function(e){ Forms.toast(e.message); }); };
   $('bCfgClose').onclick=function(){ $('cfgView').hidden=true; if(!A.id){ Forms.S.settings=A.cfg.snapshot; Forms.S.templateStatus=tstatusFromCfg(); } else if(A.server && !A.server.pinned){ Forms.S.settings=A.cfg.snapshot; Forms.S.templateStatus=tstatusFromCfg(); } renderAll(); };
-  $('cfgView').querySelector('.tabs').addEventListener('click',function(e){ var b=e.target.closest('[data-tab]'); if(!b) return; $('cfgView').querySelectorAll('.tabs button').forEach(function(x){ x.classList.toggle('on',x===b); }); $('tabTpl').hidden=b.dataset.tab!=='tpl'; $('tabSet').hidden=b.dataset.tab!=='set'; $('tabAud').hidden=b.dataset.tab!=='aud'; $('tabUsr').hidden=b.dataset.tab!=='usr'; $('tabMe').hidden=b.dataset.tab!=='me';
-    if(b.dataset.tab==='usr') loadUsers(); if(b.dataset.tab==='me') renderMe(); });
+  $('cfgView').querySelector('.tabs').addEventListener('click',function(e){ var b=e.target.closest('[data-tab]'); if(!b) return; $('cfgView').querySelectorAll('.tabs button').forEach(function(x){ x.classList.toggle('on',x===b); }); $('tabTpl').hidden=b.dataset.tab!=='tpl'; $('tabSet').hidden=b.dataset.tab!=='set'; $('tabAud').hidden=b.dataset.tab!=='aud'; $('tabUsr').hidden=b.dataset.tab!=='usr'; $('tabMe').hidden=b.dataset.tab!=='me'; $('tabApi').hidden=b.dataset.tab!=='api';
+    if(b.dataset.tab==='usr') loadUsers(); if(b.dataset.tab==='me') renderMe(); if(b.dataset.tab==='api') loadApi(); if(b.dataset.tab==='set'){ if(!$('smsBox') && A.cfg) renderCfg(); loadSms(); } if(b.dataset.tab==='aud' && !AUD.loaded) loadAudit(); });
   $('bUsers').onclick=function(){ $('cfgView').hidden=false; loadConfig().then(function(){ renderCfg(); $('cfgView').querySelector('[data-tab="usr"]').click(); }).catch(function(e){ Forms.toast(e.message); }); };
   var NEW_TEMP=null;
   function loadUsers(){ $('tabUsr').innerHTML='<small>Loading…</small>'; guard(Forms.call('adminListUsers',TOK)).then(renderUsers).catch(function(e){ $('tabUsr').innerHTML='<small class="err">'+Forms.esc(e.message)+'</small>'; }); }
@@ -2864,6 +2865,9 @@ var Forms = (function(){
     {h:'Collateral (MCSA §8, Release)'},{k:'ppsr.terminationDays',l:'Register PPSR termination within ___ working days'},
     {h:'Reminders to signers (sent by the system every hour, 8 AM to 8 PM; never include the link or the code)'},
     {k:'reminders.enabled',l:'Send reminders',type:'bool'},{k:'reminders.afterHours',l:'Hours after the link (and between reminders)'},{k:'reminders.max',l:'Most reminders per link (0 to 5)'},
+    {h:'Signer\'s own copy (step 5 of the signer page)'},{k:'signer.copyDays',l:'Days the signer can download their PDF copy after finalizing (0 = not offered)'},
+    {h:'SMS gateway (optional). Off: codes go by email, and staff text the code for signers without email. On: the server texts codes and reminders itself.'},
+    {k:'sms.provider',l:'Provider',type:'sel',opts:[{v:'',t:'Off'},{v:'semaphore',t:'Semaphore (Philippines)'},{v:'generic',t:'Other gateway (HTTPS, JSON)'}]},{k:'sms.sender',l:'Sender name registered with the provider (up to 11 letters)'},{k:'sms.url',l:'Gateway address, only for "Other gateway" (https://…)',full:true},
     {h:'Verification QR code'},{k:'verify.url',l:'Address the QR codes open (blank = this web app; set once, before documents are signed)',full:true},
     {h:'Installable app'},{k:'app.signBase',l:'Signer page URL of the installed app (blank = links open on this web app)',full:true},
     {h:'Data privacy (DS §G, Sign page)'},{k:'privacy.contact',l:'Where data subjects write (DS §G)',full:true},{k:'privacy.dpo',l:'Data Protection Officer (name / contact)'},{k:'retention.years',l:'Retention after full settlement (words)'},
@@ -2878,9 +2882,9 @@ var Forms = (function(){
       c.templates.map(function(t){ var key=t.id+'|'+t.version; return '<div class="tpl"><span><b>'+Forms.esc(t.title)+'</b><small>'+t.id+' '+t.version+(t.current===false?' · previous version':' · current')+(t.reviewedBy?' · approved by '+Forms.esc(t.reviewedBy)+' on '+Forms.esc(Forms.fmtManila(t.reviewedAt)):'')+(t.note?' · '+Forms.esc(t.note):'')+'</small></span>'+
         '<span class="act"><span class="pill '+(t.legalStatus==='APPROVED'?'ok':t.legalStatus==='SUPERSEDED'?'mute':'crit')+'">'+t.legalStatus+'</span>'+(!CAN('templates')?'':t.legalStatus==='APPROVED'?'<button class="btn sm" type="button" data-tpl="'+key+'" data-st="PENDING">Set pending</button>':CAN('legal')?'<input placeholder="Counsel who approved in writing" data-tplname="'+key+'" style="width:190px"><button class="btn sm royal" type="button" data-tpl="'+key+'" data-st="APPROVED">Mark approved</button>':'<small style="color:var(--muted)">Legal Reviewer records approval</small>')+(CAN('templates')&&t.current===false&&t.legalStatus!=='SUPERSEDED'?'<button class="btn sm" type="button" data-tpl="'+key+'" data-st="SUPERSEDED">Mark superseded</button>':'')+'</span></div>'; }).join('');
     var cls=JSON.parse(c.settings['charges.classes']||'{}');
-    $('tabSet').innerHTML='<div class="sgrid">'+SET_FIELDS.map(function(s){ if(s.h) return '<div class="full note" style="margin-top:6px"><b>'+Forms.esc(s.h)+'</b></div>'; var v=c.settings[s.k]||''; var ctl = s.type==='bool' ? '<label class="chk" style="margin-top:22px"><input type="checkbox" data-set="'+s.k+'"'+(v==='true'?' checked':'')+'> Yes</label>' : s.type==='sel' ? '<select data-set="'+s.k+'">'+s.opts.map(function(o){ return '<option'+(v===o?' selected':'')+'>'+o+'</option>'; }).join('')+'</select>' : '<input data-set="'+s.k+'" value="'+Forms.esc(v)+'">'; return '<div class="fld'+(s.full?' full':'')+'"><label>'+Forms.esc(s.l)+'</label>'+ctl+'</div>'; }).join('')+
+    $('tabSet').innerHTML='<div class="sgrid">'+SET_FIELDS.map(function(s){ if(s.h) return '<div class="full note" style="margin-top:6px"><b>'+Forms.esc(s.h)+'</b></div>'; var v=c.settings[s.k]||''; var ctl = s.type==='bool' ? '<label class="chk" style="margin-top:22px"><input type="checkbox" data-set="'+s.k+'"'+(v==='true'?' checked':'')+'> Yes</label>' : s.type==='sel' ? '<select data-set="'+s.k+'">'+s.opts.map(function(o){ var ov=typeof o==='string'?o:o.v, ot=typeof o==='string'?o:o.t; return '<option value="'+Forms.esc(ov)+'"'+(v===ov?' selected':'')+'>'+Forms.esc(ot)+'</option>'; }).join('')+'</select>' : '<input data-set="'+s.k+'" value="'+Forms.esc(v)+'">'; return '<div class="fld'+(s.full?' full':'')+'"><label>'+Forms.esc(s.l)+'</label>'+ctl+'</div>'; }).join('')+
       '<div class="full note"><b>Charge classes</b> — which rows count as finance charges (management decision: processing and credit investigation are finance charges; counsel to confirm):</div>'+Forms.CHARGE_DEFS.map(function(d){ return '<div class="fld"><label>'+Forms.esc(d.label)+'</label><select data-cls="'+d.key+'"><option value="other"'+(cls[d.key]!=='finance'?' selected':'')+'>Non-finance charge</option><option value="finance"'+(cls[d.key]==='finance'?' selected':'')+'>Finance charge</option></select></div>'; }).join('')+
-      '<div class="full"><button class="btn royal" type="button" id="bSetSave">Save settings</button></div></div>';
+      '<div class="full" id="smsBox"></div><div class="full"><button class="btn royal" type="button" id="bSetSave">Save settings</button></div></div>';
   }
   $('cfgView').addEventListener('click',function(e){
     var t=e.target;
@@ -2975,8 +2979,7 @@ var Forms = (function(){
   $('bBack').onclick=function(){ showView('list'); loadList(); };
   $('navVault').onclick=function(){ $('dcView').hidden=false; $('dcView').querySelector('[data-dctab="vault"]').click(); };
   $('navSettings').onclick=function(){ $('cfgView').hidden=false; loadConfig().then(function(){ renderCfg(); $('cfgView').querySelector('[data-tab="set"]').click(); }).catch(function(e){ Forms.toast(e.message); }); };
-  $('navAudit').onclick=function(){ $('cfgView').hidden=false; $('cfgView').querySelector('[data-tab="aud"]').click(); $('tabAud').innerHTML='<small>Loading…</small>';
-    guard(Forms.call('adminDashboard',TOK)).then(function(d){ $('tabAud').innerHTML='<div class="banner info" style="margin:0 0 8px">The last '+d.activity.length+' actions on the packages you can see. Open a package and its Activity tab for its whole history; the Audit sheet is the full record.</div><table class="audit">'+d.activity.map(function(a){ return '<tr><td style="white-space:nowrap">'+Forms.esc(Forms.fmtManila(a.ts))+'</td><td>'+Forms.esc(a.actor)+'</td><td><b>'+Forms.esc(a.words)+'</b></td><td>'+Forms.esc(a.loan)+'</td></tr>'; }).join('')+'</table>'; }).catch(function(e){ $('tabAud').innerHTML='<small class="err">'+Forms.esc(e.message)+'</small>'; }); };
+  $('navAudit').onclick=function(){ $('cfgView').hidden=false; $('cfgView').querySelector('[data-tab="aud"]').click(); if(AUD.loaded) loadAudit(); };
 
   /* ---------- package header, "Who has signed", "Before release" ---------- */
   function renderHead(){
@@ -3037,6 +3040,98 @@ var Forms = (function(){
     el.innerHTML=h;
   }
 
+
+  /* ---------- Phase 9: SMS gateway status, ELMS connection, audit search and export ---------- */
+  function loadSms(){
+    if(!$('smsBox') || !CAN('settings')) return;
+    guard(Forms.call('adminSmsStatus',TOK)).then(function(st){
+      var state = st.ready ? '<span class="pill ok">On — the server texts codes and reminders</span>' : st.provider ? '<span class="pill crit">Not ready</span> '+Forms.esc(st.problem) : '<span class="pill mute">Off</span>';
+      $('smsBox').innerHTML='<div class="banner info" style="margin:0;display:flex;flex-direction:column;gap:8px"><span><b>SMS gateway:</b> '+state+'</span>'+
+        '<span>The provider\'s API key is never typed here. The owner of this Apps Script project adds it under <b>Project Settings → Script properties</b> as <code>SMS_API_KEY</code> ('+(st.hasKey?'set':'not set yet')+'). Clear the provider above and save to switch the gateway off; email codes and staff texting keep working.</span>'+
+        (st.ready?'<span style="display:flex;gap:8px;flex-wrap:wrap;align-items:center"><label for="smsTestNo">Send a test text to</label><input id="smsTestNo" inputmode="tel" placeholder="09XXXXXXXXX" style="width:150px"><button class="btn sm" type="button" id="bSmsTest">Send test</button><small id="smsTestMsg"></small></span>':'')+'</div>';
+    }).catch(function(e){ $('smsBox').innerHTML='<small class="err">'+Forms.esc(e.message)+'</small>'; });
+  }
+  $('tabSet').addEventListener('click',function(e){
+    if(e.target.id!=='bSmsTest') return;
+    var b=e.target; b.disabled=true; $('smsTestMsg').textContent='Sending…';
+    guard(Forms.call('adminSmsTest',TOK,$('smsTestNo').value)).then(function(r){ $('smsTestMsg').textContent='Sent to '+r.to+(r.providerId?' (provider id '+r.providerId+')':'')+'. Check the phone.'; })
+      .catch(function(err){ $('smsTestMsg').textContent=err.message; }).then(function(){ b.disabled=false; });
+  });
+
+  var API={ key:null };
+  function loadApi(){
+    $('tabApi').innerHTML='<small>Loading…</small>';
+    guard(Forms.call('adminApiClients',TOK)).then(function(d){ API.d=d; renderApi(); }).catch(function(e){ $('tabApi').innerHTML='<small class="err">'+Forms.esc(e.message)+'</small>'; });
+  }
+  function renderApi(){
+    var d=API.d, h='<div class="banner info" style="margin:0 0 10px">ELMS calls e-Sign server to server with a signed request (client id, time, one-time nonce, HMAC-SHA256 signature). It can start a Draft package from an approved ELMS loan, read a loan\'s document status, ask whether a loan may be released, and read the executed documents\' references. It never approves, shares or signs anything, and never receives files, signatures or contact details. Address for ELMS: <code>'+Forms.esc(d.url||'(open the web app once to record it)')+'</code> · API version '+Forms.esc(d.version)+'. Developer notes: docs/ELMS_API.md in the repository.</div>';
+    if(API.key) h+='<div class="banner warn" style="margin:0 0 10px;display:flex;flex-direction:column;gap:6px"><b>Copy this key now — it is shown only once.</b><span>Client id <code>'+Forms.esc(API.key.client.id)+'</code></span><code style="word-break:break-all;font-size:12px" id="apiKeyTxt">'+Forms.esc(API.key.key)+'</code><span style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn sm royal" type="button" id="bApiCopy">Copy key</button><button class="btn sm" type="button" id="bApiDone">I have stored it</button></span><small>Put it in the ELMS project\'s Script properties, not in its code. If it is lost, revoke this client and create a new one.</small></div>';
+    h+='<table class="audit"><tr><th>Client</th><th>May call</th><th>Branch</th><th>Status</th><th>Last used</th><th></th></tr>'+(d.clients.length?d.clients.map(function(c){
+      return '<tr><td><b>'+Forms.esc(c.name)+'</b><br><small>'+Forms.esc(c.id)+' · key '+Forms.esc(c.keyFingerprint)+'… · by '+Forms.esc(c.createdBy)+'</small></td><td>'+c.functions.map(function(f){ return Forms.esc(f.replace('elms.','')); }).join(', ')+'</td><td>'+Forms.esc(c.branch||'All')+'</td><td><span class="pill '+(c.status==='ACTIVE'?'ok':'mute')+'">'+(c.status==='ACTIVE'?'Active':'Revoked')+'</span></td><td>'+(c.lastUsedAt?Forms.esc(Forms.fmtManila(c.lastUsedAt))+'<br><small>'+c.calls+' calls</small>':'—')+'</td><td>'+(c.status==='ACTIVE'?'<button class="btn sm" type="button" data-apirevoke="'+Forms.esc(c.id)+'">Revoke</button>':'')+'</td></tr>'; }).join(''):'<tr><td colspan="6"><small>No ELMS connection yet.</small></td></tr>')+'</table>';
+    h+='<div class="sgrid" style="margin-top:12px"><div class="full note"><b>New connection</b></div><div class="fld"><label for="apiName">Name</label><input id="apiName" placeholder="ELMS Cebu"></div><div class="fld"><label for="apiBranch">Branch (blank = all branches)</label><input id="apiBranch" placeholder="CEBU"></div>'+
+      '<div class="full" style="display:flex;flex-direction:column;gap:4px">'+d.functions.map(function(f){ return '<label class="chk"><input type="checkbox" data-apifn="'+f.fn+'"'+(f.fn==='elms.createPackage'?'':' checked')+'> '+Forms.esc(f.label)+' <small>('+f.fn+')</small></label>'; }).join('')+'</div>'+
+      '<div class="full"><button class="btn royal" type="button" id="bApiCreate">Create connection and show its key</button></div></div>';
+    $('tabApi').innerHTML=h;
+  }
+  $('tabApi').addEventListener('click',function(e){
+    var t=e.target.closest('button'); if(!t) return;
+    if(t.id==='bApiCopy'){ copyText(API.key.key,'Key copied'); return; }
+    if(t.id==='bApiDone'){ API.key=null; renderApi(); return; }
+    if(t.id==='bApiCreate'){
+      var fns=[].slice.call($('tabApi').querySelectorAll('[data-apifn]')).filter(function(x){ return x.checked; }).map(function(x){ return x.dataset.apifn; });
+      t.disabled=true;
+      guard(Forms.call('adminCreateApiClient',TOK,{ name:$('apiName').value, branch:$('apiBranch').value, functions:fns })).then(function(r){ API.key=r; return guard(Forms.call('adminApiClients',TOK)); }).then(function(d){ API.d=d; renderApi(); })
+        .catch(function(err){ Forms.toast(err.message); t.disabled=false; });
+      return;
+    }
+    if(t.dataset.apirevoke){
+      if(t.dataset.sure!=='1'){ t.dataset.sure='1'; t.textContent='Press again to revoke'; return; }
+      guard(Forms.call('adminRevokeApiClient',TOK,t.dataset.apirevoke)).then(function(){ Forms.toast('Revoked. That ELMS key stops working now.'); loadApi(); }).catch(function(err){ Forms.toast(err.message); });
+    }
+  });
+
+  var AUD={ q:{ text:'', action:'', actor:'', loan:'', from:'', to:'', page:1 }, loaded:false };
+  function loadAudit(){
+    AUD.loaded=true;
+    if(!$('audForm')) renderAuditForm();
+    $('audRes').innerHTML='<small>Loading…</small>';
+    guard(Forms.call('adminAuditSearch',TOK,AUD.q)).then(function(d){ AUD.d=d; renderAudit(); }).catch(function(e){ $('audRes').innerHTML='<small class="err">'+Forms.esc(e.message)+'</small>'; });
+  }
+  function renderAuditForm(){
+    var q=AUD.q;
+    $('tabAud').innerHTML='<form id="audForm" class="sgrid" style="margin-bottom:8px">'+
+      '<div class="fld"><label for="audText">Words in the record</label><input id="audText" value="'+Forms.esc(q.text)+'" placeholder="name, code, detail"></div>'+
+      '<div class="fld"><label for="audLoan">Loan no. or package id</label><input id="audLoan" value="'+Forms.esc(q.loan)+'"></div>'+
+      '<div class="fld"><label for="audActor">Who</label><input id="audActor" value="'+Forms.esc(q.actor)+'" placeholder="username, Signer, system, api"></div>'+
+      '<div class="fld"><label for="audAction">Action</label><select id="audAction"><option value="">Any action</option></select></div>'+
+      '<div class="fld"><label for="audFrom">From (Manila date)</label><input id="audFrom" type="date" value="'+Forms.esc(q.from)+'"></div>'+
+      '<div class="fld"><label for="audTo">To</label><input id="audTo" type="date" value="'+Forms.esc(q.to)+'"></div>'+
+      '<div class="full" style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn royal" type="submit" id="bAudSearch">Search</button><button class="btn" type="button" id="bAudClear">Clear</button><button class="btn" type="button" id="bAudExport" hidden>Export CSV</button><small id="audExpMsg"></small></div></form><div id="audRes"></div>';
+  }
+  function renderAudit(){
+    var d=AUD.d, sel=$('audAction'), cur=AUD.q.action;
+    sel.innerHTML='<option value="">Any action</option>'+d.actions.map(function(a){ return '<option value="'+Forms.esc(a.action)+'"'+(a.action===cur?' selected':'')+'>'+Forms.esc(a.words||a.action)+' ('+a.n+')</option>'; }).join('')+(cur&&!d.actions.some(function(a){ return a.action===cur; })?'<option selected value="'+Forms.esc(cur)+'">'+Forms.esc(cur)+'</option>':'');
+    $('bAudExport').hidden=!d.canExport;
+    $('audRes').innerHTML='<div style="display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;align-items:center;margin:4px 0 6px"><small>'+d.total+' record'+(d.total===1?'':'s')+' · newest first · page '+d.page+' of '+d.pages+'</small><span style="display:flex;gap:6px"><button class="btn sm" type="button" data-audpage="'+(d.page-1)+'"'+(d.page<=1?' disabled':'')+'>Newer</button><button class="btn sm" type="button" data-audpage="'+(d.page+1)+'"'+(d.page>=d.pages?' disabled':'')+'>Older</button></span></div>'+
+      '<div style="overflow-x:auto"><table class="audit"><tr><th>When (Manila)</th><th>Who</th><th>What</th><th>Loan</th><th>Detail</th></tr>'+d.rows.map(function(r){ return '<tr><td style="white-space:nowrap">'+Forms.esc(Forms.fmtManila(r.ts))+'</td><td>'+Forms.esc(r.actor)+'</td><td><b>'+Forms.esc(r.words||r.action)+'</b><br><small>'+Forms.esc(r.action)+'</small></td><td style="white-space:nowrap">'+(r.packageId?'<button class="btn sm" type="button" data-audpkg="'+Forms.esc(r.packageId)+'">'+Forms.esc(r.loanId||r.packageId)+'</button>':'<small>system</small>')+'</td><td style="overflow-wrap:anywhere">'+Forms.esc(r.detail)+'</td></tr>'; }).join('')+'</table></div>'+
+      '<small style="display:block;margin-top:6px">The audit record is kept by the server and is never edited from here. Exports mask mobile numbers and email addresses, and each export is itself recorded.</small>';
+  }
+  function audFromForm(){ AUD.q={ text:$('audText').value, loan:$('audLoan').value, actor:$('audActor').value, action:$('audAction').value, from:$('audFrom').value, to:$('audTo').value, page:1 }; }
+  $('tabAud').addEventListener('submit',function(e){ e.preventDefault(); audFromForm(); loadAudit(); });
+  $('tabAud').addEventListener('click',function(e){
+    var t=e.target.closest('button'); if(!t) return;
+    if(t.id==='bAudClear'){ AUD.q={ text:'', action:'', actor:'', loan:'', from:'', to:'', page:1 }; $('tabAud').innerHTML=''; loadAudit(); return; }
+    if(t.dataset.audpage){ AUD.q.page=+t.dataset.audpage; loadAudit(); return; }
+    if(t.dataset.audpkg){ $('cfgView').hidden=true; openPkg(t.dataset.audpkg,'act'); return; }
+    if(t.id==='bAudExport'){
+      audFromForm(); t.disabled=true; $('audExpMsg').textContent='Preparing…';
+      guard(Forms.call('adminAuditExport',TOK,AUD.q)).then(function(r){
+        var url=URL.createObjectURL(new Blob([r.csv],{type:'text/csv;charset=utf-8'})), a=document.createElement('a');
+        a.href=url; a.download=r.name; a.target='_blank'; a.rel='noopener'; document.body.appendChild(a); a.click(); a.remove(); setTimeout(function(){ URL.revokeObjectURL(url); },60000);
+        $('audExpMsg').textContent=r.rows+' records exported.';
+      }).catch(function(err){ $('audExpMsg').textContent=err.message; }).then(function(){ t.disabled=false; });
+    }
+  });
   function start(){
     $('loginView').hidden=true; $('appView').hidden=false;
     var hash=(location.hash||'').slice(1); if(hash==='new'){ setTimeout(function(){ try{ $('bNew').click(); }catch(e){} },300); } $('bArchive').hidden=true;

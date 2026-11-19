@@ -1888,7 +1888,7 @@ var Forms = (function(){
   $('otp').addEventListener('keydown',function(e){ if(e.key==='Enter') openDocs(); });
   $('resend').addEventListener('click',function(){
     var b=$('resend'); b.disabled=true; $('resendMsg').textContent=''; $('verifyErr').textContent='';
-    Forms.call('borrowerResendCode', TOKEN).then(function(r){ $('resendMsg').textContent='A new code was emailed to '+r.to+'. The earlier code no longer works.'; $('otp').value=''; $('otp').focus(); })
+    Forms.call('borrowerResendCode', TOKEN).then(function(r){ $('resendMsg').textContent='A new code was '+(r.sent==='sms'?'texted to your mobile number ending '+String(r.to).replace('•••• ',''):'emailed to '+r.to)+'. The earlier code no longer works.'; $('otp').value=''; $('otp').focus(); })
       .catch(function(e){ $('verifyErr').textContent=e.message; }).then(function(){ b.disabled=false; });
   });
 
@@ -1899,7 +1899,7 @@ var Forms = (function(){
     $('loading').hidden=true;
     if(!d.needsOtp){ Forms.call('borrowerOpen', TOKEN, '').then(opened).catch(function(e){ block(friendly(e)); }); return; }
     $('verifyMsg').textContent=(d.channel==='office'?'You are signing on an ERMANO office device. ':'')+'We '+(d.emailHint?'emailed a code to '+d.emailHint:'sent a code by text to your mobile number'+(d.mobileHint?' ending '+d.mobileHint.replace('•••• ',''):''))+'. Signing as: '+d.roleLabels.filter(function(x){ return !/handwriting/.test(x); }).join(', ')+'.';
-    $('resend').hidden=!d.emailHint;
+    $('resend').hidden=!(d.emailHint||d.canResend);
     go(1, false); $('otp').focus(); tick();
   }).catch(function(e){ block(friendly(e)); });
 })();
