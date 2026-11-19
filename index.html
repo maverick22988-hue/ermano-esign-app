@@ -131,6 +131,12 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
 .sg3 .cell .c{font-size:7.4pt;color:#222;padding-top:1px}
 .sigsec{margin-top:6px}
 .sigsec .sh{font-weight:700;font-size:8.6pt;margin-top:4px}
+/* Signature sections are slightly tighter so a full set of parties (spouse, co-maker, witnesses) plus the DRAFT banner still fits the 13in page. */
+.sigsec .sg3 .cell .v{min-height:.46in}
+.sigsec .sg3 .cell .sig{height:.46in}
+.sigsec .sig img{max-height:.44in}
+.sigsec .two .sig{height:.42in}
+.sigsec .two .sig img{max-height:.4in}
 .line2{margin:3px 0 0;font-size:8.4pt}
 .two{display:grid;grid-template-columns:1fr 1fr;gap:.5in;margin-top:8px}
 .wit2{display:grid;grid-template-columns:1fr 1fr;gap:.5in;margin-top:4px}
@@ -270,6 +276,57 @@ details[open] summary::after{content:"–"}
 .urow .roles{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:6px 14px}
 .urow .act{grid-column:1/-1;display:flex;gap:6px;flex-wrap:wrap}
 @media (max-width:640px){.urow{grid-template-columns:1fr}}
+.mon .chips{display:flex;flex-wrap:wrap;gap:6px}
+.mon .chip{border:1px solid var(--line);background:#fff;border-radius:99px;padding:4px 10px;font-size:12.5px;font-weight:600;color:var(--ink);cursor:pointer}
+.mon .chip b{color:var(--royal)}
+.mon .chip.on{background:var(--royal);color:#fff;border-color:var(--royal)}
+.mon .chip.on b{color:#fff}
+.mon .bar{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.mon .bar input{flex:1;min-width:180px;border:1px solid var(--line);border-radius:6px;padding:7px 9px;font:inherit}
+.mrow{border:1px solid var(--line);border-radius:8px;padding:10px;display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,2fr) auto;gap:8px 14px;align-items:start}
+.mrow.ready{border-left:4px solid var(--ok)}
+.mrow.wait{border-left:4px solid var(--warn)}
+.mrow .who b{display:block;font-size:14px}
+.mrow .who small,.mrow .what small{color:var(--muted)}
+.mrow .dchips{display:flex;flex-wrap:wrap;gap:4px;margin:4px 0}
+.dchip{font-size:10.5px;font-weight:700;border-radius:4px;padding:1px 6px;border:1px solid transparent}
+.dchip.done{background:#e1f3e9;color:var(--ok)}
+.dchip.office{background:#e4eafa;color:var(--royal)}
+.dchip.party{background:#fbe9e1;color:var(--warn)}
+.dchip.legal{background:#f9e3e3;color:var(--crit)}
+.dchip.post{border-style:dashed;border-color:currentColor}
+.mrow ul{margin:4px 0 0;padding-left:16px;font-size:12.5px}
+.mrow .nx{font-size:12.5px;margin-top:4px}
+.mon .legend{font-size:11.5px;color:var(--muted);display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+@media (max-width:700px){.mrow{grid-template-columns:1fr}}
+.dc .tools{display:grid;grid-template-columns:minmax(0,2fr) repeat(4,minmax(0,1fr));gap:8px;align-items:end}
+.dc .tools input,.dc .tools select{width:100%;box-sizing:border-box;border:1px solid var(--line);border-radius:6px;padding:7px 9px;font:inherit;background:#fff}
+.dc .tools label{font-size:11.5px;color:var(--muted);display:block;margin-bottom:2px}
+.dc .chips{display:flex;flex-wrap:wrap;gap:6px}
+.dc .chip{border:1px solid var(--line);background:#fff;border-radius:99px;padding:4px 10px;font-size:12.5px;font-weight:600;color:var(--ink);cursor:pointer}
+.dc .chip b{color:var(--royal)}
+.dc .chip.on{background:var(--royal);color:#fff;border-color:var(--royal)}
+.dc .chip.on b{color:#fff}
+.dc .chip[disabled]{opacity:.45;cursor:default}
+.drow{border:1px solid var(--line);border-radius:8px;padding:9px 10px;display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr) auto;gap:6px 12px;align-items:center}
+.drow b{font-size:14px}
+.drow small{color:var(--muted)}
+.drow .card{grid-column:1/-1;border-top:1px solid var(--line);padding-top:8px;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px;font-size:12.5px}
+.drow .card h4{margin:0 0 4px;font-size:12px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted)}
+.drow .card .full{grid-column:1/-1}
+.chain{display:flex;flex-direction:column;gap:3px}
+.chain span{padding-left:10px;border-left:3px solid var(--line)}
+.chain span.cur{border-left-color:var(--royal);font-weight:700}
+.act{max-height:170px;overflow:auto;display:flex;flex-direction:column;gap:3px}
+.pager{display:flex;gap:8px;align-items:center;justify-content:center;font-size:13px}
+.lcbox{border:1px solid var(--line);border-radius:8px;padding:8px 10px;display:flex;flex-direction:column;gap:6px;font-size:12.5px}
+.lcbox .row{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.lcbox input,.lcbox select{border:1px solid var(--line);border-radius:6px;padding:6px 8px;font:inherit;flex:1;min-width:150px}
+.banner.cancel{background:#f9e3e3;color:var(--crit)}
+@media (max-width:760px){.dc .tools{grid-template-columns:1fr 1fr}.dc .tools .wide{grid-column:1/-1}.drow{grid-template-columns:1fr}.drow .card{grid-template-columns:1fr}}
+.pdfbox{border:1px solid var(--line);border-radius:8px;padding:8px 10px;display:flex;flex-direction:column;gap:6px;font-size:12.5px}
+.pdfrow{display:flex;justify-content:space-between;gap:8px;align-items:center;border-top:1px solid var(--line);padding-top:5px}
+.pdfrow small{color:var(--muted);display:block;word-break:break-all}
 .apprbox{border:1px solid var(--line);border-radius:8px;padding:8px 10px;display:flex;flex-direction:column;gap:6px;font-size:12.5px}
 .login #apiBox{display:flex;flex-direction:column;gap:6px}
 .login #apiBox[hidden]{display:none}
@@ -343,6 +400,8 @@ details[open] summary::after{content:"–"}
     <button class="btn ghost" id="bNew" type="button">New package</button>
     <button class="btn ghost" id="bDemo" type="button">Load demo</button>
     <button class="btn ghost" id="bSave" type="button">Save</button>
+    <button class="btn ghost" id="bCenter" type="button">Documents</button>
+    <button class="btn ghost" id="bMonitor" type="button">Monitor</button>
     <button class="btn ghost" id="bConfig" type="button">Settings &amp; Templates</button>
     <button class="btn ghost" id="bUsers" type="button" hidden>Users</button>
     <button class="btn ghost" id="bLogout" type="button">Sign out</button>
@@ -619,6 +678,22 @@ details[open] summary::after{content:"–"}
 
   <section class="preview"><div class="pages" id="pages"></div></section>
 </main>
+</div>
+
+<div class="overlay no-print" id="dcView" hidden>
+  <div class="sheet dc" role="dialog" aria-modal="true" aria-labelledby="dcTitle" style="width:min(1100px,100%)">
+    <h2 id="dcTitle">Document Center <span><button class="btn sm" id="bDcClose" type="button">Close</button></span></h2>
+    <div class="tabs"><button type="button" class="on" data-dctab="pk">Packages</button><button type="button" data-dctab="vault">Vault (by borrower)</button></div>
+    <div id="dcPk"></div>
+    <div id="dcVault" hidden></div>
+  </div>
+</div>
+
+<div class="overlay no-print" id="monView" hidden>
+  <div class="sheet mon" role="dialog" aria-modal="true" aria-labelledby="monTitle" style="width:min(1100px,100%)">
+    <h2 id="monTitle">Loan Document Completeness Monitor <span><button class="btn sm" id="bMonRefresh" type="button">Refresh</button> <button class="btn sm" id="bMonClose" type="button">Close</button></span></h2>
+    <div id="monBody"><small>Loading…</small></div>
+  </div>
 </div>
 
 <div class="overlay no-print" id="cfgView" hidden>
@@ -1665,7 +1740,8 @@ var Forms = (function(){
   F.CURRENT = CURRENT;
 
   /* ---------- render ---------- */
-  F.render = function(el){
+  /** Every page of the document set, footer included: [{code, ver, html}]. Used by the pages and by the server (PDF copies). */
+  F.pages = function(){
     var set = F.S.docSet || F.docSet(), versions=F.S.templates||{};
     var pages=[];
     set.forEach(function(code){
@@ -1683,10 +1759,13 @@ var Forms = (function(){
     });
     var f=F.S.f, signed=Object.keys(F.S.sig).map(function(k){ return (ROLE_LABELS[k]||k)+' '+stampTime(F.S.sig[k].at); });
     var N=pages.length;
-    el.innerHTML = pages.map(function(p, i){
+    return pages.map(function(p, i){
       var foot='<div class="pfoot"><span>Loan '+esc(f.loanId||'')+' · Borrower '+esc(f.borrowerId||'')+(F.S.docHash?' · Doc '+esc(F.S.docHash.slice(0,12)):'')+' · '+p.code+' '+p.ver+(signed.length?' · E-signed: '+esc(signed.join('; ')):'')+'</span><span>Page '+(i+1)+' of '+N+'</span></div>';
-      return p.html.replace(/<\/div>\s*$/, foot+'</div>');
-    }).join('');
+      return { code:p.code, ver:p.ver, html:p.html.replace(/<\/div>\s*$/, foot+'</div>') };
+    });
+  };
+  F.render = function(el){
+    el.innerHTML = F.pages().map(function(p){ return p.html; }).join('');
     F.fit(el);
   };
   F.fit = function(el){ var w=el.parentElement.clientWidth, z=Math.min(1,w/816); el.style.zoom = z<1 ? z.toFixed(3) : ''; };
@@ -1795,7 +1874,11 @@ var Forms = (function(){
   var A = { id:'', status:'DRAFT', links:[], dirty:false, busy:false, hours:24, roles:{}, mobile:'', email:null, channel:'remote', idType:'', idLast4:'', wet:{}, cfg:null, collateral:[], deposit:null, server:null, operator:'', lastOtp:null };
   var CAN = function(p){ return !!(A.cfg && A.cfg.can && A.cfg.can[p]); };
   var locked = function(){ return A.status==='PARTIAL' || A.status==='SIGNED'; };
-  var archived = function(){ return !!(A.server && A.server.archived); };
+  var cancelled = function(){ return !!(A.server && A.server.cancelled); };
+  // Read-only on screen: finalized (executed copy archived) or cancelled.
+  var archived = function(){ return !!(A.server && (A.server.archived || A.server.cancelled)); };
+  var LC_PILL = { 'Draft':'mute', 'Pending Review':'no', 'Approved for Signing':'info', 'Pending Signature':'info', 'Partially Signed':'no', 'Fully Signed':'info', 'Completed':'ok', 'Archived':'ok', 'Cancelled':'crit', 'Superseded':'mute' };
+  function lcPill(st){ return '<span class="pill '+(LC_PILL[st]||'mute')+'">'+Forms.esc(st||'')+'</span>'; }
   var lifeLocked = function(d){ return Object.keys(Forms.S.sig).some(function(k){ return docOf(k)===d; }); };
   var isV2 = function(){ return !Forms.S.legacy; };
   var isV3 = function(){ return isV2() && (Forms.S.templates||{}).DS!=='v2'; };
@@ -1872,9 +1955,8 @@ var Forms = (function(){
   function loadList(){
     return guard(Forms.call('adminListPackages',TOK)).then(function(list){
       $('pkgList').innerHTML = list.length ? list.map(function(p){
-        var sp=STATE_PILL[p.status]||['mute',p.status];
-        return '<button class="item'+(p.id===A.id?' cur':'')+'" type="button" data-pkg="'+Forms.esc(p.id)+'"><span><b>'+Forms.esc(p.loanId||'(no loan no.)')+' · '+Forms.esc(p.borrowerName||'(no name)')+'</b><small>'+Forms.esc(p.id)+(p.legacy?' · v1 forms':'')+(p.branch?' · '+Forms.esc(p.branch):'')+(p.status==='DRAFT'&&p.approved?' · approved':'')+'</small></span><span class="pill '+sp[0]+'">'+sp[1]+'</span></button>';
-      }).join('') : '<small style="color:var(--muted)">No packages yet. Fill in a loan and press Save.</small>';
+        return '<button class="item'+(p.id===A.id?' cur':'')+'" type="button" data-pkg="'+Forms.esc(p.id)+'"><span><b>'+Forms.esc(p.loanId||'(no loan no.)')+' · '+Forms.esc(p.borrowerName||'(no name)')+'</b><small>'+Forms.esc(p.id)+(p.legacy?' · v1 forms':'')+(p.branch?' · '+Forms.esc(p.branch):'')+'</small></span>'+lcPill(p.lifecycle)+'</button>';
+      }).join('')+(list[0].more?'<button class="btn sm" type="button" id="bListMore" style="margin-top:6px">'+list[0].more+' older package'+(list[0].more===1?'':'s')+' — open Documents</button>':'') : '<small style="color:var(--muted)">No packages yet. Fill in a loan and press Save.</small>';
     }).catch(function(e){ $('pkgList').innerHTML='<small class="err">'+Forms.esc(e.message)+'</small>'; });
   }
   function applyServer(p){
@@ -1889,7 +1971,7 @@ var Forms = (function(){
   }
   var leaveArmed=0;
   function confirmLeave(){ if(Date.now()-leaveArmed<5000) return true; leaveArmed=Date.now(); Forms.toast('You have unsaved changes. Click again to discard them.'); return false; }
-  $('pkgList').addEventListener('click',function(e){ var b=e.target.closest('[data-pkg]'); if(b) openPkg(b.dataset.pkg); });
+  $('pkgList').addEventListener('click',function(e){ if(e.target.id==='bListMore'){ $('bCenter').click(); return; } var b=e.target.closest('[data-pkg]'); if(b) openPkg(b.dataset.pkg); });
   $('bRefresh').addEventListener('click',function(e){ e.preventDefault(); loadList(); if(A.id) openPkg(A.id); });
   function newPkg(){
     if(A.dirty && !confirmLeave()) return;
@@ -1953,6 +2035,46 @@ var Forms = (function(){
     else h+='<div class="fld"><label for="apprRef">Credit approval reference (CRAAS no.)</label><input id="apprRef" placeholder="e.g. CRAAS-2026-0001"></div><span><button class="btn sm royal" type="button" id="bApprove">Approve for signing</button></span>';
     return h+'</div>';
   }
+  function lifecycleBoxHtml(){
+    var sv=A.server||{}, st=sv.lifecycle||'Draft', kinds=(A.cfg&&A.cfg.amendKinds)||{};
+    var h='<div class="lcbox"><div class="row"><b>Status</b> '+lcPill(st)+(sv.retentionUntil?'<small style="color:var(--muted)">retention review '+Forms.esc(sv.retentionUntil)+'</small>':'')+'</div>';
+    if(A.dirty){ return h+'</div>'; }
+    if(st==='Draft' && CAN('prepare') && !CAN('approve')) h+='<div class="row"><button class="btn sm royal" type="button" id="bSubmitReview">Submit for approval</button><small style="color:var(--muted)">Tells the approver these terms are ready.</small></div>';
+    if((st==='Completed'||st==='Archived') && CAN('prepare')) h+='<div class="row"><select id="amKind" aria-label="Kind of amendment"><option value="">Amend this package…</option>'+Object.keys(kinds).map(function(k){ return '<option value="'+k+'">'+Forms.esc(kinds[k])+'</option>'; }).join('')+'</select><input id="amReason" placeholder="Reason (kept in the record)"><button class="btn sm" type="button" id="bAmend">Create amendment</button></div><small style="color:var(--muted)">Creates a new Draft with these loan details and no signatures. This package is not changed. Whether a restructuring needs fresh consent of sureties or grantors is a question for your lawyer.</small>';
+    if(st==='Completed' && CAN('archive')) h+='<div class="row"><button class="btn sm" type="button" id="bVault">Move to archive (loan closed)</button></div>';
+    var canCancel = !sv.archived && !sv.cancelled && ((st==='Partially Signed'||st==='Fully Signed') ? CAN('approve') : (CAN('prepare')||CAN('approve')));
+    if(canCancel) h+='<div class="row"><input id="cxReason" placeholder="Reason for cancelling (kept in the record)"><button class="btn sm danger" type="button" id="bCancelPkg">Cancel package</button></div>';
+    return h+'</div>';
+  }
+  var PDF_PILL={ DONE:['ok','Ready'], PENDING:['info','In queue'], FAILED:['crit','Failed'] };
+  function pdfBoxHtml(){
+    var docs=(A.server&&A.server.documents)||[], pdf=(A.server&&A.server.pdf)||{}, canRun=CAN('prepare')||CAN('archive');
+    var pdfs=docs.filter(function(d){ return d.kind==='pdf'; });
+    var h='<div class="pdfbox"><span><b>PDF copies</b> '+(!pdfs.length?'<span class="pill mute">Not created</span>':pdf.done===pdf.total?'<span class="pill ok">All '+pdf.total+' created and verified</span>':pdf.failed?'<span class="pill crit">'+pdf.failed+' failed</span>':'<span class="pill info">'+pdf.done+' of '+pdf.total+' created</span>')+'</span>';
+    if(!pdfs.length) h+='<span style="color:var(--muted)">This package was finalized before PDF copies existed.</span>';
+    else if(pdf.done<pdf.total && !pdf.failed) h+='<span style="color:var(--muted)">The system creates them one by one, usually within 5 minutes. The package becomes Completed when every copy is created and checked.</span>';
+    docs.forEach(function(d){ var pp=PDF_PILL[d.status]||['mute',d.status];
+      h+='<div class="pdfrow"><span><b>'+Forms.esc(d.kind==='scan'?'Scan':d.code)+'</b> '+Forms.esc(d.title)+(d.pages?' · '+d.pages+' page'+(d.pages>1?'s':''):'')+
+        (d.sha256?'<small>SHA-256 '+Forms.esc(d.sha256)+'</small>':'')+(d.status!=='DONE'&&d.lastError?'<small style="color:var(--crit)">'+(d.status==='FAILED'?'Failed after '+d.attempts+' tries: ':'Try '+d.attempts+' did not work, will retry: ')+Forms.esc(d.lastError)+'</small>':'')+'</span>'+
+        '<span style="white-space:nowrap">'+(d.ready?'<button class="btn sm" type="button" data-docget="'+Forms.esc(d.id)+'">Open</button>':'<span class="pill '+pp[0]+'">'+pp[1]+'</span>')+'</span></div>'; });
+    if(canRun && (!pdfs.length || pdf.done<pdf.total)) h+='<div style="display:flex;gap:6px;flex-wrap:wrap">'+(pdf.failed?'<button class="btn sm royal" type="button" id="bPdfRetry">Retry failed</button>':'<button class="btn sm royal" type="button" id="bPdfRun">Create PDF copies now</button>')+'<button class="btn sm" type="button" id="bPdfRefresh">Refresh</button></div>';
+    return h+'</div>';
+  }
+  function openDoc(id, btn){
+    btn.disabled=true; var old=btn.textContent; btn.textContent='Opening…';
+    guard(Forms.call('adminDownloadDocument',TOK,id)).then(function(d){
+      var bin=atob(d.base64), arr=new Uint8Array(bin.length); for(var i=0;i<bin.length;i++) arr[i]=bin.charCodeAt(i);
+      var url=URL.createObjectURL(new Blob([arr],{type:d.mime})), a=document.createElement('a');
+      a.href=url; a.target='_blank'; a.rel='noopener'; if(!/pdf|image/.test(d.mime)) a.download=d.name;
+      document.body.appendChild(a); a.click(); a.remove(); setTimeout(function(){ URL.revokeObjectURL(url); },60000);
+      Forms.toast('Opened '+d.name+' · SHA-256 '+d.sha256.slice(0,16)+'… checked');
+    }).catch(function(err){ Forms.toast(err.message); }).then(function(){ btn.disabled=false; btn.textContent=old; });
+  }
+  function runPdf(btn, retry){
+    btn.disabled=true; btn.textContent='Creating PDF copies… this can take a minute';
+    guard(Forms.call('adminRunPdf',TOK,A.id,!!retry)).then(function(r){ return reload(r.pdf.done===r.pdf.total?'All '+r.pdf.total+' PDF copies created and verified.':r.failed?r.failed+' PDF cop'+(r.failed===1?'y':'ies')+' did not work. See the reason on each line.':r.pdf.done+' of '+r.pdf.total+' created. The rest follow automatically.'); })
+      .catch(function(err){ Forms.toast(err.message); renderShare(); });
+  }
   function renderShare(){
     var el=$('share'), f=Forms.S.f, sig=Forms.S.sig;
     var h='';
@@ -1968,7 +2090,9 @@ var Forms = (function(){
     });
     var pending=pendingKeys().filter(function(r){ return r!=='pnFig'; });
     var lifePending=pending.length && docOf(pending[0]);
-    if(archived()){ h+='<div class="banner lock" style="margin:0">Finalized and archived. Executed copy SHA-256 '+Forms.esc((A.server.archive||{}).sha256||'').slice(0,16)+'…</div>'; }
+    if(A.id) h+=lifecycleBoxHtml();
+    if(cancelled()){ h+='<div class="banner cancel" style="margin:0">This package was cancelled. It is kept for the record.</div>'; }
+    else if(archived()){ h+='<div class="banner lock" style="margin:0">Finalized and archived. Executed copy SHA-256 '+Forms.esc((A.server.archive||{}).sha256||'').slice(0,16)+'…</div>'+pdfBoxHtml(); }
     else if(!pending.length && A.status==='SIGNED'){ h+='<div class="banner lock" style="margin:0">All parties have signed. Add the office signatures, Save, then Finalize &amp; archive. Post-execution documents can be enabled below and shared from here.</div>'; }
     else if(!A.id){ h+='<div class="banner info" style="margin:0">Save the package first.</div>'; }
     else if(!pending.length){ h+='<div class="banner info" style="margin:0">Every party has signed. Save to lock the package.</div>'; }
@@ -2012,6 +2136,18 @@ var Forms = (function(){
   function readFile(file){ return new Promise(function(ok,no){ var r=new FileReader(); r.onload=function(){ ok(r.result); }; r.onerror=function(){ no(new Error('Could not read the file.')); }; r.readAsDataURL(file); }); }
   $('share').addEventListener('click',function(e){
     var t=e.target;
+    if(t.dataset.docget){ openDoc(t.dataset.docget,t); return; }
+    if(t.id==='bSubmitReview'){ t.disabled=true; guard(Forms.call('adminSubmitForReview',TOK,A.id,'')).then(function(){ return reload('Submitted for approval.'); }).catch(function(err){ Forms.toast(err.message); t.disabled=false; }); return; }
+    if(t.id==='bVault'){ if(t.dataset.armed!=='1'){ t.dataset.armed='1'; t.textContent='Click again to move to archive'; setTimeout(function(){ t.dataset.armed=''; t.textContent='Move to archive (loan closed)'; },4000); return; }
+      guard(Forms.call('adminMoveToArchive',TOK,A.id,'')).then(function(r){ return reload('Moved to the archive.'+(r.retentionUntil?' Retention review date '+r.retentionUntil+'.':'')); }).catch(function(err){ Forms.toast(err.message); }); return; }
+    if(t.id==='bCancelPkg'){ var why=($('cxReason')||{}).value||''; if(why.trim().length<5){ Forms.toast('Type the reason for cancelling first.'); return; }
+      if(t.dataset.armed!=='1'){ t.dataset.armed='1'; t.textContent='Click again to cancel the package'; setTimeout(function(){ t.dataset.armed=''; t.textContent='Cancel package'; },5000); return; }
+      guard(Forms.call('adminCancelPackage',TOK,A.id,why)).then(function(){ return reload('Package cancelled. Nothing was deleted.'); }).catch(function(err){ Forms.toast(err.message); }); return; }
+    if(t.id==='bAmend'){ var kind=($('amKind')||{}).value||'', rs=($('amReason')||{}).value||''; if(!kind){ Forms.toast('Choose the kind of amendment.'); return; } if(rs.trim().length<5){ Forms.toast('Type the reason for the amendment.'); return; }
+      t.disabled=true; guard(Forms.call('adminCreateAmendment',TOK,A.id,kind,rs)).then(function(r){ Forms.toast('Amendment created as a new Draft. The original is unchanged.'); A.dirty=false; openPkg(r.id); }).catch(function(err){ Forms.toast(err.message); t.disabled=false; }); return; }
+    if(t.id==='bPdfRun'){ runPdf(t,false); return; }
+    if(t.id==='bPdfRetry'){ runPdf(t,true); return; }
+    if(t.id==='bPdfRefresh'){ reload('Refreshed.'); return; }
     if(t.id==='bApprove'){
       if(A.dirty){ Forms.toast('Save first.'); return; }
       t.disabled=true; guard(Forms.call('adminApprovePackage',TOK,A.id,($('apprRef')||{}).value||'')).then(function(){ return reload('Approved for signing.'); }).catch(function(err){ Forms.toast(err.message); t.disabled=false; });
@@ -2205,7 +2341,10 @@ var Forms = (function(){
     ['f_grName','f_grAddress','f_grId','f_grCivilStatus','f_grSpouseName'].forEach(function(id){ $(id).disabled = lk || ar || !!f.borrowerIsGrantor; });
     var cust=Forms.custodyAny(); ['f_cuItems','f_cuAccessories','f_cuCondition','f_cuReceivedAt','f_cuReceivedPlace'].forEach(function(id){ $(id).parentElement.hidden=!cust; }); $('custNote').hidden=cust;
     $('f_custodianName').parentElement.hidden=!cust;
-    $('lockBanner').innerHTML = ar ? '<div class="banner lock">Finalized and archived '+Forms.esc(Forms.fmtManila(A.server.archive.at))+'. Executed copy SHA-256 '+Forms.esc(A.server.archive.sha256)+'. Nothing can be changed.</div>' : lk ? '<div class="banner lock">'+(A.status==='SIGNED'?'All parties signed':'A party has signed')+'. Loan terms are locked; office details, post-execution documents and office signatures can still be added.</div>' : (liveLinks().length&&A.dirty ? '<div class="banner warn">Saving changed terms cancels the active signing links.</div>' : '');
+    var sv=A.server||{};
+    var extra=(sv.amendment?'<div class="banner info">'+Forms.esc((A.cfg&&A.cfg.amendKinds||{})[sv.amendment.kind]||sv.amendment.kind)+' of package '+Forms.esc(sv.amendment.of)+': '+Forms.esc(sv.amendment.reason)+'. The original stays as it is and becomes Superseded only when this package is Completed.</div>':'')+
+      (sv.supersededBy?'<div class="banner info">Superseded by package '+Forms.esc(sv.supersededBy)+'. The documents and signatures of this package are unchanged and remain in the vault.</div>':'');
+    $('lockBanner').innerHTML = extra + (cancelled() ? '<div class="banner cancel">Cancelled '+Forms.esc(Forms.fmtManila(sv.cancelled.at))+' by '+Forms.esc(sv.cancelled.by)+': '+Forms.esc(sv.cancelled.reason)+'. Nothing was deleted; the package can no longer be changed.</div>' : ar ? '<div class="banner lock">Finalized and archived '+Forms.esc(Forms.fmtManila(A.server.archive.at))+'. Executed copy SHA-256 '+Forms.esc(A.server.archive.sha256)+'. Nothing can be changed.</div>' : lk ? '<div class="banner lock">'+(A.status==='SIGNED'?'All parties signed':'A party has signed')+'. Loan terms are locked; office details, post-execution documents and office signatures can still be added.</div>' : (liveLinks().length&&A.dirty ? '<div class="banner warn">Saving changed terms cancels the active signing links.</div>' : ''));
     $('pkgLabel').textContent = (A.id ? A.id : (Forms.S.meta&&Forms.S.meta.demo?'DEMO loan':'New package'))+(A.dirty?' · unsaved':'');
     renderCalc(); renderSigners(); renderSignDate(); renderChecklist(); renderRecords(); if(!skipShare) renderShare();
     Forms.S.docSet=null; Forms.render($('pages'));
@@ -2229,13 +2368,128 @@ var Forms = (function(){
     var b=$('bArchive'); if(A.dirty){ Forms.toast('Save first.'); return; }
     if(b.dataset.armed!=='1'){ b.dataset.armed='1'; b.textContent='Click again to finalize'; setTimeout(function(){ b.dataset.armed=''; b.textContent='Finalize & archive'; },5000); return; }
     b.disabled=true; b.textContent='Archiving…';
-    guard(Forms.call('adminArchive',TOK,A.id,executedHtml())).then(function(r){ Forms.toast('Archived. SHA-256 '+r.sha256.slice(0,16)+'…'); return guard(Forms.call('adminGetPackage',TOK,A.id)); }).then(function(p){ applyServer(p); loadFields(); renderEditors(); renderAll(); loadList(); })
+    guard(Forms.call('adminArchive',TOK,A.id,executedHtml())).then(function(r){ Forms.toast('Archived. SHA-256 '+r.sha256.slice(0,16)+'…'+(r.pdfQueued?' · '+r.pdfQueued+' PDF copies are being created':'')); return guard(Forms.call('adminGetPackage',TOK,A.id)); }).then(function(p){ applyServer(p); loadFields(); renderEditors(); renderAll(); loadList(); })
       .catch(function(e){ Forms.toast(e.message); }).finally(function(){ b.disabled=false; b.dataset.armed=''; b.textContent='Finalize & archive'; });
   };
   $('bAudit').onclick=function(){ $('cfgView').hidden=false; $('cfgView').querySelector('[data-tab="aud"]').click(); $('tabAud').innerHTML='<small>Loading…</small>';
     guard(Forms.call('adminAudit',TOK,A.id)).then(function(rows){ $('tabAud').innerHTML='<div class="banner info" style="margin:0 0 8px">Package '+Forms.esc(A.id)+' — every action with its operator. The Audit sheet is the full record.</div><table class="audit">'+rows.map(function(r){ return '<tr><td style="white-space:nowrap">'+Forms.esc(Forms.fmtManila(r.ts))+'</td><td>'+Forms.esc(r.actor)+'</td><td><b>'+Forms.esc(r.action)+'</b></td><td>'+Forms.esc(r.detail)+'</td></tr>'; }).join('')+'</table>'; }).catch(function(e){ $('tabAud').innerHTML='<small class="err">'+Forms.esc(e.message)+'</small>'; }); };
 
   /* ---------- Settings & Templates overlay ---------- */
+  /* ---------- Document Center (packages) and Vault (by borrower) ---------- */
+  var DC={ q:{ text:'', status:[], branch:'', from:'', to:'', sort:'updated', page:1 }, data:null, open:'', card:null, timer:0, v:{ text:'', page:1, data:null, key:'', detail:null } };
+  var SORTS={ updated:'Last updated', created:'Date created', loan:'Loan number', borrower:'Borrower name' };
+  var DSTATE2={ done:'complete', office:'office signatures pending', party:'waiting for a party', legal:'template not approved by counsel' };
+  function fileBtn(d){ return d.ready?'<button class="btn sm" type="button" data-docget="'+Forms.esc(d.id)+'">Open</button>':'<span class="pill '+(d.status==='FAILED'?'crit':'info')+'">'+(d.status==='FAILED'?'Failed':'In queue')+'</span>'; }
+  function filesHtml(docs, pid, hasExecuted){
+    var h=docs.map(function(d){ return '<div class="pdfrow"><span><b>'+Forms.esc(d.kind==='scan'?'Scan':d.code)+'</b> '+Forms.esc(d.title)+(d.pages?' · '+d.pages+' page'+(d.pages>1?'s':''):'')+(d.sha256?'<small>SHA-256 '+Forms.esc(d.sha256.slice(0,24))+'…</small>':'')+'</span><span>'+fileBtn(d)+'</span></div>'; }).join('');
+    if(hasExecuted) h+='<div class="pdfrow"><span><b>Executed copy</b> all pages as signed (HTML)</span><span><button class="btn sm" type="button" data-execget="'+Forms.esc(pid)+'">Open</button></span></div>';
+    return h||'<small style="color:var(--muted)">No files yet. PDF copies are created after the package is finalized.</small>';
+  }
+  function loadCenter(){ guard(Forms.call('adminSearchPackages',TOK,DC.q)).then(function(d){ DC.data=d; DC.q.page=d.page; renderCenter(); }).catch(function(e){ $('dcPk').innerHTML='<small class="err">'+Forms.esc(e.message)+'</small>'; }); }
+  function cardHtml(c){
+    var kinds=(A.cfg&&A.cfg.amendKinds)||{};
+    return '<div class="card">'+
+      '<div><h4>Documents</h4><div class="dchips">'+c.docs.map(function(x){ return '<span class="dchip '+x.state+(x.post?' post':'')+'" title="'+Forms.esc(x.title+' — '+DSTATE2[x.state])+'">'+Forms.esc(x.code)+' '+x.signed+'/'+x.needed+'</span>'; }).join('')+'</div>'+
+        (c.cancelled?'<div style="color:var(--crit)">Cancelled '+Forms.esc(Forms.fmtManila(c.cancelled.at))+' by '+Forms.esc(c.cancelled.by)+': '+Forms.esc(c.cancelled.reason)+'</div>':'')+
+        (c.retentionUntil?'<div>Retention review date: '+Forms.esc(c.retentionUntil)+'</div>':'')+
+        (c.chain.length?'<h4 style="margin-top:8px">Versions of this loan\'s documents</h4><div class="chain">'+c.chain.map(function(x,i){ return '<span class="'+(x.current?'cur':'')+'">'+(i?Forms.esc(kinds[x.kind]||x.kind||'Amendment')+' — ':'Original — ')+Forms.esc(x.id)+' '+lcPill(x.lifecycle)+(x.reason?'<br><small>'+Forms.esc(x.reason)+'</small>':'')+(x.current?'':' <button class="btn sm" type="button" data-dcjump="'+Forms.esc(x.id)+'">Show</button>')+'</span>'; }).join('')+'</div>':'')+'</div>'+
+      '<div><h4>Files</h4>'+filesHtml(c.documents,c.id,!!c.executed)+'</div>'+
+      '<div class="full"><h4>Recent activity</h4><div class="act">'+(c.activity.length?c.activity.map(function(a){ return '<span><small>'+Forms.esc(Forms.fmtManila(a.ts))+' · '+Forms.esc(a.actor)+'</small> <b>'+Forms.esc(a.action)+'</b> '+Forms.esc(a.detail)+'</span>'; }).join(''):'<small>None.</small>')+'</div></div>'+
+      '<div class="full"><button class="btn sm royal" type="button" data-dcopen="'+Forms.esc(c.id)+'">Open package</button></div></div>';
+  }
+  function centerListHtml(){ var d=DC.data;
+    if(!d.rows.length) return '<div class="banner info" style="margin:0">No package matches. Clear a filter or change the search.</div>';
+    return d.rows.map(function(r){
+      return '<div class="drow" data-dcrow="'+Forms.esc(r.id)+'"><div><b>'+Forms.esc(r.borrowerName||'(no name)')+'</b><br><small>Loan '+Forms.esc(r.loanId||'—')+(r.borrowerId?' · ID '+Forms.esc(r.borrowerId):'')+(r.branch?' · '+Forms.esc(r.branch):'')+(r.legacy?' · v1 forms':'')+(r.parentId?' · amends '+Forms.esc(r.parentId):'')+'</small></div>'+
+        '<div>'+lcPill(r.lifecycle)+'<br><small>'+(r.amount?'₱ '+Forms.esc(Forms.money(r.amount))+' · ':'')+'updated '+Forms.esc(Forms.fmtManila(r.updatedAt))+'</small></div>'+
+        '<div><button class="btn sm" type="button" data-dcdetail="'+Forms.esc(r.id)+'">'+(DC.open===r.id?'Hide':'Details')+'</button></div>'+
+        (DC.open===r.id?(DC.card?cardHtml(DC.card):'<div class="card"><small>Loading…</small></div>'):'')+'</div>';
+    }).join('');
+  }
+  function renderCenter(){ var d=DC.data, q=DC.q;
+    var chips=d.statuses.map(function(st){ var n=d.counts[st]||0, on=q.status.indexOf(st)>=0; return '<button type="button" class="chip'+(on?' on':'')+'" data-dcstatus="'+Forms.esc(st)+'"'+(n||on?'':' disabled')+'>'+Forms.esc(st)+' <b>'+n+'</b></button>'; }).join('');
+    $('dcPk').innerHTML='<div style="display:flex;flex-direction:column;gap:10px">'+
+      '<div class="tools"><div class="wide"><label for="dcQ">Search</label><input id="dcQ" placeholder="Loan number, borrower, co-maker, surety, borrower ID, approval reference" value="'+Forms.esc(q.text)+'"></div>'+
+        '<div><label for="dcFrom">Updated from</label><input id="dcFrom" type="date" value="'+Forms.esc(q.from)+'"></div><div><label for="dcTo">to</label><input id="dcTo" type="date" value="'+Forms.esc(q.to)+'"></div>'+
+        '<div><label for="dcSort">Sort by</label><select id="dcSort">'+Object.keys(SORTS).map(function(k){ return '<option value="'+k+'"'+(q.sort===k?' selected':'')+'>'+SORTS[k]+'</option>'; }).join('')+'</select></div>'+
+        (d.branches.length?'<div><label for="dcBranch">Branch</label><select id="dcBranch"><option value="">All branches</option>'+d.branches.map(function(b){ return '<option'+(q.branch===b?' selected':'')+'>'+Forms.esc(b)+'</option>'; }).join('')+'</select></div>':'<div></div>')+'</div>'+
+      '<div class="chips"><button type="button" class="chip'+(q.status.length?'':' on')+'" data-dcstatus="">All <b>'+d.all+'</b></button>'+chips+'</div>'+
+      '<div id="dcList" style="display:flex;flex-direction:column;gap:8px">'+centerListHtml()+'</div>'+
+      '<div class="pager"><button class="btn sm" type="button" data-dcpage="'+(d.page-1)+'"'+(d.page<=1?' disabled':'')+'>Previous</button><span>Page '+d.page+' of '+d.pages+' · '+d.total+' package'+(d.total===1?'':'s')+'</span><button class="btn sm" type="button" data-dcpage="'+(d.page+1)+'"'+(d.page>=d.pages?' disabled':'')+'>Next</button></div></div>';
+  }
+  function centerSoon(){ clearTimeout(DC.timer); DC.timer=setTimeout(function(){ DC.q.page=1; DC.open=''; DC.card=null; loadCenterKeepFocus(); },350); }
+  function loadCenterKeepFocus(){ guard(Forms.call('adminSearchPackages',TOK,DC.q)).then(function(d){ DC.data=d; DC.q.page=d.page; var el=$('dcQ'), had=document.activeElement===el, pos=el?el.selectionStart:0; renderCenter(); if(had){ el=$('dcQ'); el.focus(); try{ el.setSelectionRange(pos,pos); }catch(x){} } }).catch(function(e){ Forms.toast(e.message); }); }
+  $('bCenter').onclick=function(){ $('dcView').hidden=false; $('dcPk').innerHTML='<small>Loading…</small>'; loadCenter(); };
+  $('bDcClose').onclick=function(){ $('dcView').hidden=true; };
+  $('dcView').querySelector('.tabs').addEventListener('click',function(e){ var b=e.target.closest('[data-dctab]'); if(!b) return; $('dcView').querySelectorAll('.tabs button').forEach(function(x){ x.classList.toggle('on',x===b); }); $('dcPk').hidden=b.dataset.dctab!=='pk'; $('dcVault').hidden=b.dataset.dctab!=='vault'; if(b.dataset.dctab==='vault') loadVault(); });
+  $('dcPk').addEventListener('input',function(e){ if(e.target.id==='dcQ'){ DC.q.text=e.target.value; centerSoon(); } });
+  $('dcPk').addEventListener('change',function(e){ var t=e.target, m={dcFrom:'from',dcTo:'to',dcSort:'sort',dcBranch:'branch'}; if(m[t.id]){ DC.q[m[t.id]]=t.value; DC.q.page=1; DC.open=''; loadCenter(); } });
+  function openExec(pid, btn){ btn.disabled=true; guard(Forms.call('adminDownloadExecuted',TOK,pid)).then(function(d){ var bin=atob(d.base64), arr=new Uint8Array(bin.length); for(var i=0;i<bin.length;i++) arr[i]=bin.charCodeAt(i); var url=URL.createObjectURL(new Blob([arr],{type:'text/html'})), a=document.createElement('a'); a.href=url; a.target='_blank'; a.rel='noopener'; document.body.appendChild(a); a.click(); a.remove(); setTimeout(function(){ URL.revokeObjectURL(url); },60000); Forms.toast('Opened the executed copy · SHA-256 '+d.sha256.slice(0,16)+'… checked'); }).catch(function(err){ Forms.toast(err.message); }).then(function(){ btn.disabled=false; }); }
+  function showCard(id){ DC.open=id; DC.card=null; $('dcList').innerHTML=centerListHtml(); guard(Forms.call('adminPackageCard',TOK,id)).then(function(c){ if(DC.open!==id) return; DC.card=c; $('dcList').innerHTML=centerListHtml(); }).catch(function(e){ Forms.toast(e.message); }); }
+  $('dcView').addEventListener('click',function(e){ var t=e.target.closest('button'); if(!t) return;
+    if(t.dataset.docget){ openDoc(t.dataset.docget,t); }
+    else if(t.dataset.execget){ openExec(t.dataset.execget,t); }
+    else if(t.dataset.dcstatus!==undefined){ var st=t.dataset.dcstatus, i=DC.q.status.indexOf(st); if(!st) DC.q.status=[]; else if(i>=0) DC.q.status.splice(i,1); else DC.q.status.push(st); DC.q.page=1; DC.open=''; loadCenter(); }
+    else if(t.dataset.dcpage){ DC.q.page=Number(t.dataset.dcpage); DC.open=''; loadCenter(); }
+    else if(t.dataset.dcdetail){ if(DC.open===t.dataset.dcdetail){ DC.open=''; DC.card=null; $('dcList').innerHTML=centerListHtml(); } else showCard(t.dataset.dcdetail); }
+    else if(t.dataset.dcjump){ DC.q={ text:t.dataset.dcjump, status:[], branch:'', from:'', to:'', sort:'updated', page:1 }; DC.open=t.dataset.dcjump; DC.card=null; guard(Forms.call('adminSearchPackages',TOK,DC.q)).then(function(d){ DC.data=d; renderCenter(); showCard(DC.open); }).catch(function(err){ Forms.toast(err.message); }); }
+    else if(t.dataset.dcopen){ if(A.dirty && !confirmLeave()) return; $('dcView').hidden=true; A.dirty=false; openPkg(t.dataset.dcopen); }
+    else if(t.dataset.vkey){ DC.v.key=t.dataset.vkey; DC.v.detail=null; renderVault(); guard(Forms.call('adminVaultBorrower',TOK,DC.v.key)).then(function(d){ DC.v.detail=d; renderVault(); }).catch(function(err){ Forms.toast(err.message); DC.v.key=''; renderVault(); }); }
+    else if(t.id==='bVaultBack'){ DC.v.key=''; DC.v.detail=null; renderVault(); }
+    else if(t.dataset.vpage){ DC.v.page=Number(t.dataset.vpage); loadVault(); }
+  });
+  function loadVault(){ guard(Forms.call('adminVault',TOK,{ text:DC.v.text, page:DC.v.page })).then(function(d){ DC.v.data=d; DC.v.page=d.page; renderVault(); }).catch(function(e){ $('dcVault').innerHTML='<small class="err">'+Forms.esc(e.message)+'</small>'; }); }
+  function renderVault(){ var v=DC.v, d=v.data; if(!d) return;
+    if(v.key){ var b=v.detail;
+      $('dcVault').innerHTML='<div style="display:flex;flex-direction:column;gap:10px"><div><button class="btn sm" type="button" id="bVaultBack">Back to borrowers</button></div>'+(!b?'<small>Loading…</small>':
+        '<div><b style="font-size:15px">'+Forms.esc(b.name)+'</b>'+(b.borrowerId?' <small style="color:var(--muted)">ID '+Forms.esc(b.borrowerId)+'</small>':'')+'</div>'+
+        b.packages.map(function(p){ return '<div class="drow" style="grid-template-columns:1fr"><div><b>Loan '+Forms.esc(p.loanId||'—')+'</b> '+lcPill(p.lifecycle)+'<br><small>'+Forms.esc(p.id)+(p.branch?' · '+Forms.esc(p.branch):'')+' · finalized '+Forms.esc(Forms.fmtManila(p.archivedAt))+(p.parentId?' · amends '+Forms.esc(p.parentId):'')+(p.supersededBy?' · superseded by '+Forms.esc(p.supersededBy):'')+(p.retentionUntil?' · retention review '+Forms.esc(p.retentionUntil):'')+'</small></div><div>'+filesHtml(p.documents,p.id,p.hasExecuted)+'</div></div>'; }).join(''))+
+        '<small style="color:var(--muted)">Every file is checked against its recorded SHA-256 when opened, and each opening is written to the audit log.</small></div>';
+      return; }
+    $('dcVault').innerHTML='<div style="display:flex;flex-direction:column;gap:10px"><div class="banner info" style="margin:0">The vault holds finalized packages only (Completed, Archived, Superseded), grouped by borrower across all their loans.</div>'+
+      '<div class="tools" style="grid-template-columns:1fr"><div><label for="vQ">Find a borrower</label><input id="vQ" placeholder="Borrower name, borrower ID or loan number" value="'+Forms.esc(v.text)+'"></div></div>'+
+      '<div id="vList" style="display:flex;flex-direction:column;gap:8px">'+(d.borrowers.length?d.borrowers.map(function(b){ return '<div class="drow"><div><b>'+Forms.esc(b.name||'(no name)')+'</b>'+(b.borrowerId?'<br><small>ID '+Forms.esc(b.borrowerId)+'</small>':'')+'</div><div><small>'+b.loans+' finalized package'+(b.loans===1?'':'s')+' · latest '+Forms.esc(Forms.fmtManila(b.lastAt))+'</small></div><div><button class="btn sm royal" type="button" data-vkey="'+Forms.esc(b.key)+'">Open vault</button></div></div>'; }).join(''):'<div class="banner info" style="margin:0">No finalized package matches.</div>')+'</div>'+
+      '<div class="pager"><button class="btn sm" type="button" data-vpage="'+(d.page-1)+'"'+(d.page<=1?' disabled':'')+'>Previous</button><span>Page '+d.page+' of '+d.pages+' · '+d.total+' borrower'+(d.total===1?'':'s')+'</span><button class="btn sm" type="button" data-vpage="'+(d.page+1)+'"'+(d.page>=d.pages?' disabled':'')+'>Next</button></div></div>';
+  }
+  var vTimer=0;
+  $('dcVault').addEventListener('input',function(e){ if(e.target.id!=='vQ') return; DC.v.text=e.target.value; clearTimeout(vTimer); vTimer=setTimeout(function(){ DC.v.page=1; guard(Forms.call('adminVault',TOK,{ text:DC.v.text, page:1 })).then(function(d){ DC.v.data=d; var pos=$('vQ').selectionStart; renderVault(); var el=$('vQ'); if(el){ el.focus(); try{ el.setSelectionRange(pos,pos); }catch(x){} } }).catch(function(err){ Forms.toast(err.message); }); },350); });
+
+  /* ---------- Loan Document Completeness Monitor ---------- */
+  var MON={ data:null, stage:'', q:'', only:'' };
+  var STAGE_PILL={ 'Awaiting approval':'no', 'Approved, not shared':'info', 'Out for signature':'info', 'Partially signed':'no', 'Office signatures pending':'no', 'Ready to archive':'ok', 'Creating PDF copies':'info', 'Completed':'ok' };
+  var DSTATE={ done:'complete', office:'office signatures pending', party:'waiting for a party', legal:'template not approved by counsel' };
+  function loadMonitor(){ $('monBody').innerHTML='<small>Loading…</small>'; guard(Forms.call('adminMonitor',TOK)).then(function(d){ MON.data=d; renderMonitor(); }).catch(function(e){ $('monBody').innerHTML='<small class="err">'+Forms.esc(e.message)+'</small>'; }); }
+  function monRows(){ var d=MON.data, q=MON.q.trim().toLowerCase();
+    return d.rows.filter(function(r){ return (!MON.stage||r.stage===MON.stage) && (MON.only!=='ready'||r.ready) && (MON.only!=='wait'||r.waiting) && (!q||(r.loanId+' '+r.borrowerName+' '+r.branch+' '+r.id).toLowerCase().indexOf(q)>=0); }); }
+  function monListHtml(){ var rows=monRows();
+    if(!rows.length) return '<div class="banner info" style="margin:0">No package matches.</div>';
+    return rows.map(function(r){
+      var chips=r.docs.map(function(x){ return '<span class="dchip '+x.state+(x.post?' post':'')+'" title="'+Forms.esc(x.title+' — '+DSTATE[x.state]+(x.missing.length?': '+x.missing.join(', '):'')+(x.paper?' · '+x.paper+' signed on paper':'')+(x.post?' · post-execution document':''))+'">'+Forms.esc(x.code)+' '+x.signed+'/'+x.needed+'</span>'; }).join('');
+      return '<div class="mrow'+(r.ready?' ready':r.waiting?' wait':'')+'"><div class="who"><b>'+Forms.esc(r.borrowerName||'(no name)')+'</b><small>Loan '+Forms.esc(r.loanId||'—')+(r.branch?' · '+Forms.esc(r.branch):'')+(r.legacy?' · v1 forms':'')+'</small><div style="margin-top:4px"><span class="pill '+(STAGE_PILL[r.stage]||'mute')+'">'+Forms.esc(r.stage)+'</span>'+(r.waiting?' <span class="pill crit">'+r.days+' days no activity</span>':'')+'</div></div>'+
+        '<div class="what"><small>Loan documents complete: <b>'+r.docsDone+' of '+r.docsTotal+'</b></small><div class="dchips">'+chips+'</div>'+
+        (r.ready?'<span class="pill ok">Ready for release</span> <small>all documents signed, the executed copy is archived'+(r.pdf&&r.pdf.total?' and '+r.pdf.total+' PDF copies are verified':'')+'</small>':'<small><b>Before release:</b></small><ul>'+r.blockers.map(function(b){ return '<li>'+Forms.esc(b)+'</li>'; }).join('')+'</ul>'+(r.next?'<div class="nx"><b>Next:</b> '+Forms.esc(r.next)+'</div>':''))+'</div>'+
+        '<div style="text-align:right"><small style="color:var(--muted);display:block;margin-bottom:6px">'+Forms.esc(Forms.fmtManila(r.updatedAt))+'</small><button class="btn sm royal" type="button" data-monopen="'+Forms.esc(r.id)+'">Open</button></div></div>';
+    }).join('');
+  }
+  function renderMonitor(){ var d=MON.data;
+    var chip=function(label,n,key,kind){ var on=kind==='stage'?MON.stage===key:MON.only===key; return '<button type="button" class="chip'+(on?' on':'')+'" data-mon'+kind+'="'+Forms.esc(key)+'">'+Forms.esc(label)+' <b>'+n+'</b></button>'; };
+    $('monBody').innerHTML='<div style="display:flex;flex-direction:column;gap:10px">'+
+      '<div class="chips">'+chip('All',d.rows.length,'','stage')+d.stages.map(function(st){ return chip(st,d.summary[st]||0,st,'stage'); }).join('')+'</div>'+
+      '<div class="bar"><input id="monQ" placeholder="Search loan number, borrower'+(d.allBranches?', branch':'')+'" value="'+Forms.esc(MON.q)+'">'+chip('Ready for release',d.ready,'ready','only')+chip('No activity '+d.staleDays+'+ days',d.waiting,'wait','only')+'</div>'+
+      '<div class="legend"><span>Each document shows signatures collected / needed:</span><span class="dchip done">complete</span><span class="dchip office">office signatures pending</span><span class="dchip party">waiting for a party</span><span class="dchip legal">template not approved</span><span class="dchip party post">post-execution (does not block release)</span></div>'+
+      '<div id="monList" style="display:flex;flex-direction:column;gap:8px">'+monListHtml()+'</div>'+
+      '<small style="color:var(--muted)">As of '+Forms.esc(Forms.fmtManila(d.generatedAt))+(d.allBranches?' · all branches':' · your branch')+'. "Ready for release" means: approved, every loan document signed by all parties and the office, the executed copy archived, and every PDF copy created and verified. This screen changes nothing.</small></div>';
+  }
+  $('bMonitor').onclick=function(){ $('monView').hidden=false; loadMonitor(); };
+  $('bMonRefresh').onclick=loadMonitor;
+  $('bMonClose').onclick=function(){ $('monView').hidden=true; };
+  $('monBody').addEventListener('input',function(e){ if(e.target.id==='monQ'){ MON.q=e.target.value; $('monList').innerHTML=monListHtml(); } });
+  $('monBody').addEventListener('click',function(e){ var t=e.target.closest('button'); if(!t) return;
+    if(t.dataset.monstage!==undefined){ MON.stage=t.dataset.monstage; renderMonitor(); }
+    else if(t.dataset.mononly!==undefined){ MON.only = MON.only===t.dataset.mononly ? '' : t.dataset.mononly; renderMonitor(); }
+    else if(t.dataset.monopen){ if(A.dirty && !confirmLeave()) return; $('monView').hidden=true; A.dirty=false; openPkg(t.dataset.monopen); }
+  });
+
   $('bConfig').onclick=function(){ $('cfgView').hidden=false; loadConfig().then(renderCfg).catch(function(e){ Forms.toast(e.message); }); };
   $('bCfgClose').onclick=function(){ $('cfgView').hidden=true; if(!A.id){ Forms.S.settings=A.cfg.snapshot; Forms.S.templateStatus=tstatusFromCfg(); } else if(A.server && !A.server.pinned){ Forms.S.settings=A.cfg.snapshot; Forms.S.templateStatus=tstatusFromCfg(); } renderAll(); };
   $('cfgView').querySelector('.tabs').addEventListener('click',function(e){ var b=e.target.closest('[data-tab]'); if(!b) return; $('cfgView').querySelectorAll('.tabs button').forEach(function(x){ x.classList.toggle('on',x===b); }); $('tabTpl').hidden=b.dataset.tab!=='tpl'; $('tabSet').hidden=b.dataset.tab!=='set'; $('tabAud').hidden=b.dataset.tab!=='aud'; $('tabUsr').hidden=b.dataset.tab!=='usr'; $('tabMe').hidden=b.dataset.tab!=='me';

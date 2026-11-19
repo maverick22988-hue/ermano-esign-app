@@ -131,6 +131,12 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
 .sg3 .cell .c{font-size:7.4pt;color:#222;padding-top:1px}
 .sigsec{margin-top:6px}
 .sigsec .sh{font-weight:700;font-size:8.6pt;margin-top:4px}
+/* Signature sections are slightly tighter so a full set of parties (spouse, co-maker, witnesses) plus the DRAFT banner still fits the 13in page. */
+.sigsec .sg3 .cell .v{min-height:.46in}
+.sigsec .sg3 .cell .sig{height:.46in}
+.sigsec .sig img{max-height:.44in}
+.sigsec .two .sig{height:.42in}
+.sigsec .two .sig img{max-height:.4in}
 .line2{margin:3px 0 0;font-size:8.4pt}
 .two{display:grid;grid-template-columns:1fr 1fr;gap:.5in;margin-top:8px}
 .wit2{display:grid;grid-template-columns:1fr 1fr;gap:.5in;margin-top:4px}
@@ -1294,7 +1300,8 @@ var Forms = (function(){
   F.CURRENT = CURRENT;
 
   /* ---------- render ---------- */
-  F.render = function(el){
+  /** Every page of the document set, footer included: [{code, ver, html}]. Used by the pages and by the server (PDF copies). */
+  F.pages = function(){
     var set = F.S.docSet || F.docSet(), versions=F.S.templates||{};
     var pages=[];
     set.forEach(function(code){
@@ -1312,10 +1319,13 @@ var Forms = (function(){
     });
     var f=F.S.f, signed=Object.keys(F.S.sig).map(function(k){ return (ROLE_LABELS[k]||k)+' '+stampTime(F.S.sig[k].at); });
     var N=pages.length;
-    el.innerHTML = pages.map(function(p, i){
+    return pages.map(function(p, i){
       var foot='<div class="pfoot"><span>Loan '+esc(f.loanId||'')+' · Borrower '+esc(f.borrowerId||'')+(F.S.docHash?' · Doc '+esc(F.S.docHash.slice(0,12)):'')+' · '+p.code+' '+p.ver+(signed.length?' · E-signed: '+esc(signed.join('; ')):'')+'</span><span>Page '+(i+1)+' of '+N+'</span></div>';
-      return p.html.replace(/<\/div>\s*$/, foot+'</div>');
-    }).join('');
+      return { code:p.code, ver:p.ver, html:p.html.replace(/<\/div>\s*$/, foot+'</div>') };
+    });
+  };
+  F.render = function(el){
+    el.innerHTML = F.pages().map(function(p){ return p.html; }).join('');
     F.fit(el);
   };
   F.fit = function(el){ var w=el.parentElement.clientWidth, z=Math.min(1,w/816); el.style.zoom = z<1 ? z.toFixed(3) : ''; };
