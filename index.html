@@ -161,6 +161,11 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
 .pnh{display:grid;grid-template-columns:1.3in 1fr 1.3in;align-items:center;text-align:center}
 .pnh img{height:.62in;width:auto;max-width:1.1in;object-fit:contain;justify-self:center}
 .pnh .s{font-weight:700;font-size:10.5pt}
+/* Verification QR code (Phase 7): sits in the empty right-hand header cell; same height as the logo. */
+.qrc{display:flex;justify-content:center;align-items:center}
+.qr{width:.62in;height:.62in;image-rendering:pixelated;image-rendering:crisp-edges}
+.qr-abs{position:absolute;top:.42in;right:.6in}
+.pfoot span:last-child{white-space:nowrap}
 .pntab{width:100%;border-collapse:collapse;margin-top:10px;font-size:9pt}
 .pntab td{border:1px solid #000;padding:2px 4px;font-weight:700}
 .pntab td.v{text-align:center}
@@ -324,6 +329,12 @@ details[open] summary::after{content:"–"}
 .lcbox input,.lcbox select{border:1px solid var(--line);border-radius:6px;padding:6px 8px;font:inherit;flex:1;min-width:150px}
 .banner.cancel{background:#f9e3e3;color:var(--crit)}
 @media (max-width:760px){.dc .tools{grid-template-columns:1fr 1fr}.dc .tools .wide{grid-column:1/-1}.drow{grid-template-columns:1fr}.drow .card{grid-template-columns:1fr}}
+.progbox{border:1px solid var(--line);border-radius:8px;padding:8px 10px;display:flex;flex-direction:column;gap:6px;font-size:12.5px}
+.prow{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:6px;align-items:center;border-top:1px solid var(--line);padding-top:5px}
+.prow small{color:var(--muted);display:block}
+.prow .acts{display:flex;gap:4px;flex-wrap:wrap;justify-content:flex-end}
+.progbox select{border:1px solid var(--line);border-radius:6px;padding:5px 7px;font:inherit;max-width:100%}
+.remind{background:#fdf1dc;border:1px solid #f0d8a8;border-radius:8px;padding:8px 10px;font-size:12.5px;display:flex;flex-direction:column;gap:6px}
 .pdfbox{border:1px solid var(--line);border-radius:8px;padding:8px 10px;display:flex;flex-direction:column;gap:6px;font-size:12.5px}
 .pdfrow{display:flex;justify-content:space-between;gap:8px;align-items:center;border-top:1px solid var(--line);padding-top:5px}
 .pdfrow small{color:var(--muted);display:block;word-break:break-all}
@@ -934,8 +945,14 @@ var Forms = (function(){
     if(t && (t.legalStatus==='APPROVED'||t.legalStatus==='SUPERSEDED')) return '';
     return '<div class="draftline">DRAFT — pending legal review · template '+code+' '+esc((F.S.templates||{})[code]||'')+' · not for execution until approved</div>';
   }
+  /* Verification QR (Phase 7): the empty right-hand cell of each document header carries a QR code with the package's
+     verification reference and the document code; every page footer prints the reference. Nothing is added to the wording. */
+  function vref(){ var v=F.S.verify; return v && v.ref ? String(v.ref).replace(/(.{5})(?=.)/g,'$1-') : ''; }
+  function vtext(code){ var v=F.S.verify; if(!v||!v.ref||!v.url) return ''; return v.url+(v.url.indexOf('?')>=0?'&':'?')+'v='+v.ref+'.'+code; }
+  function qrImg(cls){ var t=vtext(F.curCode||''), u=t?QR.dataUrl(t):''; return u?'<img class="qr'+(cls?' '+cls:'')+'" src="'+u+'" alt="Verification QR code">':''; }
+  function qrCell(){ return '<div class="qrc">'+qrImg('')+'</div>'; }
   function hdr(title, sub){
-    return '<div class="hdr"><img src="'+LOGO+'" alt=""><div class="t"><h1 class="co">'+esc(co())+'</h1><div class="addr">'+esc(coAddr())+'</div><div class="dt">'+title+'</div>'+(sub?'<div class="ds">'+sub+'</div>':'')+'</div><div></div></div>';
+    return '<div class="hdr"><img src="'+LOGO+'" alt=""><div class="t"><h1 class="co">'+esc(co())+'</h1><div class="addr">'+esc(coAddr())+'</div><div class="dt">'+title+'</div>'+(sub?'<div class="ds">'+sub+'</div>':'')+'</div>'+qrCell()+'</div>';
   }
   function delinq(){ var d=(F.S.settings&&F.S.settings.delinquency)||{}; return (d.reviewed && num(d.rate)>0) ? d : null; }
 
@@ -1230,7 +1247,7 @@ var Forms = (function(){
     if(!d) return '____ day of ______________ 20___';
     return '<span class="u" style="min-width:.55in">'+ord(d.getDate())+'</span> day of <span class="u" style="min-width:1.2in">'+MONTHS[d.getMonth()]+'</span> 20<span class="u" style="min-width:.35in">'+String(d.getFullYear()).slice(2)+'</span>';
   }
-  function hdr2(title){ return '<div class="hdr2"><img src="'+LOGO+'" alt=""><div><h1 class="co">'+esc(co())+'</h1><div class="addr">'+esc(coAddr())+'</div></div></div><div class="doc-title">'+title+'</div>'; }
+  function hdr2(title){ return qrImg('qr-abs')+'<div class="hdr2"><img src="'+LOGO+'" alt=""><div><h1 class="co">'+esc(co())+'</h1><div class="addr">'+esc(coAddr())+'</div></div></div><div class="doc-title">'+title+'</div>'; }
   function pdcV1(){
     var f=F.S.f, c=F.compute();
     var rows=F.S.checks.map(function(k){ return '<tr><td>'+esc(k.no)+'</td><td>'+esc(k.bank)+'</td><td>'+mdy(parseISO(k.date))+'</td><td class="a">'+money(num(k.amount))+'</td></tr>'; }).join('');
@@ -1276,7 +1293,7 @@ var Forms = (function(){
     function row(label,nd,d,cls){ return '<tr><td class="'+(cls||'')+'">'+label+'</td><td class="p">₱</td><td class="m">'+nd+'</td><td class="gap"></td><td class="p">₱</td><td class="m">'+d+'</td></tr>'; }
     var moneyOrBlank=function(n){ return n?money(n):''; };
     return ['<div class="page">'+
-    '<div class="hdr"><img src="'+LOGO+'" alt=""><div class="t"><h1 class="co">'+esc(co())+'</h1><div>DISCLOSURE STATEMENT ON LOAN/CREDIT TRANSACTION</div><div>(As Required under R.A. 3765, Truth in Lending Act)</div></div><div></div></div>'+
+    '<div class="hdr"><img src="'+LOGO+'" alt=""><div class="t"><h1 class="co">'+esc(co())+'</h1><div>DISCLOSURE STATEMENT ON LOAN/CREDIT TRANSACTION</div><div>(As Required under R.A. 3765, Truth in Lending Act)</div></div>'+qrCell()+'</div>'+
     '<div class="dshead"><div></div><div>Borrower ID: <span class="u l">'+esc(f.borrowerId)+'</span></div><div>Borrower Name: <span class="u l">'+esc(f.name)+'</span></div><div>Loan ID: <span class="u l">'+esc(f.loanId)+'</span></div><div style="grid-column:1/-1">Address: <span class="u l">'+esc(f.address)+'</span></div></div>'+
     '<table class="ds" style="margin-top:4px"><tr><td colspan="6" style="height:6px"></td></tr>'+
      '<tr><td>1. LOAN GRANTED (Amount to be financed):</td><td></td><td></td><td></td><td class="p">₱</td><td class="m"><b>'+money(c.P)+'</b></td></tr>'+
@@ -1318,7 +1335,7 @@ var Forms = (function(){
     var f=F.S.f, c=F.computeV1();
     function ln(l,v){ return '<div class="ln"><span>'+l+'</span><span>'+esc(v||'')+'</span></div>'; }
     return ['<div class="page pn">'+
-     '<div class="pnh"><img src="'+LOGO+'" alt=""><div><h1 class="co">'+esc(co())+'</h1><div class="s">E. SABELLANO ST. GREENBELT DR. QUIOT, CEBU CITY</div><div class="s">PROMISSORY NOTE</div></div><div></div></div>'+
+     '<div class="pnh"><img src="'+LOGO+'" alt=""><div><h1 class="co">'+esc(co())+'</h1><div class="s">E. SABELLANO ST. GREENBELT DR. QUIOT, CEBU CITY</div><div class="s">PROMISSORY NOTE</div></div>'+qrCell()+'</div>'+
      '<table class="pntab"><tr><td style="width:.9in">Borrower #:</td><td class="v" style="width:.9in">'+esc(f.borrowerId)+'</td><td style="border:0"></td><td style="border:0;padding:0;vertical-align:bottom;width:1.45in"><div class="pnfigsig">'+sigBox('borrower')+'</div></td><td colspan="4" style="border:0"></td></tr>'+
       '<tr><td>PN NO.:</td><td class="v">'+esc(f.loanId)+'</td><td style="width:.8in">AMOUNT:</td><td class="figcell'+(F.S.sig.pnFig?' done':'')+'">'+sigBox('pnFig')+'</td><td>VALUE DATE:</td><td class="v">'+mdy(c.vd)+'</td><td>DUE DATE:</td><td class="v">'+mdy(c.due)+'</td></tr>'+
       '<tr><td colspan="5" style="border:0"></td><td class="small" style="border:0;text-align:center;font-weight:400">(MM/DD/YYYY)</td><td style="border:0"></td><td class="small" style="border:0;text-align:center;font-weight:400">(MM/DD/YYYY)</td></tr></table>'+
@@ -1740,6 +1757,104 @@ var Forms = (function(){
   F.CURRENT = CURRENT;
 
   /* ---------- render ---------- */
+  /* ---------- QR code (byte mode, error correction L, versions 1-10) drawn as a 1-bit PNG data URL ----------
+     Self-contained so the same picture is produced in the browser and on the server (no library, no network). */
+  var QR = (function(){
+    var EXP=[], LOG=[], x=1, i;
+    for(i=0;i<255;i++){ EXP[i]=x; LOG[x]=i; x<<=1; if(x&256) x^=0x11d; }
+    for(i=255;i<512;i++) EXP[i]=EXP[i-255];
+    function mul(a,b){ return a&&b ? EXP[LOG[a]+LOG[b]] : 0; }
+    function ecBytes(data, n){
+      var g=[1], i, j;
+      for(i=0;i<n;i++){ var ng=[]; for(j=0;j<=g.length;j++) ng[j]=0; for(j=0;j<g.length;j++){ ng[j]^=g[j]; ng[j+1]^=mul(g[j],EXP[i]); } g=ng; }
+      var res=data.slice(); for(i=0;i<n;i++) res.push(0);
+      for(i=0;i<data.length;i++){ var c=res[i]; if(c) for(j=0;j<g.length;j++) res[i+j]^=mul(g[j],c); }
+      return res.slice(data.length);
+    }
+    // version -> [error-correction codewords per block, data codewords of each block]
+    var BLOCKS={1:[7,[19]],2:[10,[34]],3:[15,[55]],4:[20,[80]],5:[26,[108]],6:[18,[68,68]],7:[20,[78,78]],8:[24,[97,97]],9:[30,[116,116]],10:[18,[68,68,69,69]]};
+    var ALIGN={1:[],2:[6,18],3:[6,22],4:[6,26],5:[6,30],6:[6,34],7:[6,22,38],8:[6,24,42],9:[6,26,46],10:[6,28,50]};
+    function utf8(str){ var out=[], i, c; for(i=0;i<str.length;i++){ c=str.charCodeAt(i); if(c<128) out.push(c); else if(c<2048) out.push(192|c>>6,128|c&63); else out.push(224|c>>12,128|c>>6&63,128|c&63); } return out; }
+    function matrix(text){
+      var bytes=utf8(text), v, cap, k;
+      for(v=1;v<=10;v++){ cap=0; for(k=0;k<BLOCKS[v][1].length;k++) cap+=BLOCKS[v][1][k]; if(bytes.length <= cap-(v<10?2:3)) break; }
+      if(v>10) return null;
+      var bits=[], put=function(val,len){ for(var b=len-1;b>=0;b--) bits.push(val>>>b&1); };
+      put(4,4); put(bytes.length, v<10?8:16); for(k=0;k<bytes.length;k++) put(bytes[k],8);
+      for(k=0;k<4 && bits.length<cap*8;k++) bits.push(0);
+      while(bits.length%8) bits.push(0);
+      var cw=[]; for(k=0;k<bits.length;k+=8){ var b=0; for(var q=0;q<8;q++) b=b<<1|bits[k+q]; cw.push(b); }
+      for(k=0;cw.length<cap;k++) cw.push(k%2?0x11:0xEC);
+      var data=[], ec=[], pos=0, nec=BLOCKS[v][0], lens=BLOCKS[v][1], maxLen=0;
+      for(k=0;k<lens.length;k++){ var d=cw.slice(pos,pos+lens[k]); pos+=lens[k]; data.push(d); ec.push(ecBytes(d,nec)); if(lens[k]>maxLen) maxLen=lens[k]; }
+      var all=[]; for(i=0;i<maxLen;i++) for(k=0;k<data.length;k++) if(i<data[k].length) all.push(data[k][i]);
+      for(i=0;i<nec;i++) for(k=0;k<ec.length;k++) all.push(ec[k][i]);
+      var n=17+4*v, m=[], fn=[], y, xx;
+      for(y=0;y<n;y++){ m[y]=[]; fn[y]=[]; for(xx=0;xx<n;xx++){ m[y][xx]=0; fn[y][xx]=0; } }
+      var set=function(px,py,dark){ if(px<0||py<0||px>=n||py>=n) return; m[py][px]=dark?1:0; fn[py][px]=1; };
+      for(i=0;i<n;i++){ set(6,i,i%2===0); set(i,6,i%2===0); }
+      var finder=function(cx,cy){ for(var dy=-4;dy<=4;dy++) for(var dx=-4;dx<=4;dx++){ var dist=Math.max(Math.abs(dx),Math.abs(dy)); set(cx+dx,cy+dy,dist!==2&&dist!==4); } };
+      finder(3,3); finder(n-4,3); finder(3,n-4);
+      var al=ALIGN[v];
+      for(i=0;i<al.length;i++) for(k=0;k<al.length;k++){
+        if((i===0&&k===0)||(i===0&&k===al.length-1)||(i===al.length-1&&k===0)) continue;
+        for(var dy=-2;dy<=2;dy++) for(var dx=-2;dx<=2;dx++) set(al[i]+dx,al[k]+dy,Math.max(Math.abs(dx),Math.abs(dy))!==1);
+      }
+      var format=function(mask){
+        var dat=1<<3|mask, rem=dat, t; for(t=0;t<10;t++) rem=rem<<1^(rem>>>9)*0x537;
+        var fb=(dat<<10|rem)^0x5412, bit=function(t){ return fb>>>t&1; };
+        for(t=0;t<=5;t++) set(8,t,bit(t)); set(8,7,bit(6)); set(8,8,bit(7)); set(7,8,bit(8)); for(t=9;t<15;t++) set(14-t,8,bit(t));
+        for(t=0;t<8;t++) set(n-1-t,8,bit(t)); for(t=8;t<15;t++) set(8,n-15+t,bit(t)); set(8,n-8,1);
+      };
+      format(0);
+      if(v>=7){ var rem=v, t; for(t=0;t<12;t++) rem=rem<<1^(rem>>>11)*0x1F25; var vb=v<<12|rem; for(t=0;t<18;t++){ var a=n-11+t%3, bb=Math.floor(t/3), on=vb>>>t&1; set(a,bb,on); set(bb,a,on); } }
+      var idx=0, total=all.length*8;
+      for(var right=n-1;right>=1;right-=2){ if(right===6) right=5;
+        for(var vert=0;vert<n;vert++) for(var j=0;j<2;j++){ var px=right-j, up=((right+1)&2)===0, py=up?n-1-vert:vert;
+          if(!fn[py][px]){ m[py][px]= idx<total ? all[idx>>>3]>>>(7-(idx&7))&1 : 0; idx++; } } }
+      var cond=[function(x,y){return (x+y)%2===0;},function(x,y){return y%2===0;},function(x,y){return x%3===0;},function(x,y){return (x+y)%3===0;},
+        function(x,y){return (Math.floor(x/3)+Math.floor(y/2))%2===0;},function(x,y){return x*y%2+x*y%3===0;},function(x,y){return (x*y%2+x*y%3)%2===0;},function(x,y){return ((x+y)%2+x*y%3)%2===0;}];
+      var apply=function(mask){ for(var y=0;y<n;y++) for(var x=0;x<n;x++) if(!fn[y][x] && cond[mask](x,y)) m[y][x]^=1; };
+      var penalty=function(){ var p=0, x, y, run, dark=0;
+        for(y=0;y<n;y++){ run=1; for(x=1;x<n;x++){ if(m[y][x]===m[y][x-1]){ run++; if(run===5) p+=3; else if(run>5) p++; } else run=1; } }
+        for(x=0;x<n;x++){ run=1; for(y=1;y<n;y++){ if(m[y][x]===m[y-1][x]){ run++; if(run===5) p+=3; else if(run>5) p++; } else run=1; } }
+        for(y=0;y<n-1;y++) for(x=0;x<n-1;x++){ var c=m[y][x]; if(c===m[y][x+1]&&c===m[y+1][x]&&c===m[y+1][x+1]) p+=3; }
+        var pat=[1,0,1,1,1,0,1,0,0,0,0], hit=function(get){ for(var o=0;o<=n-11;o++){ var f1=1,f2=1; for(var z=0;z<11;z++){ if(get(o+z)!==pat[z]) f1=0; if(get(o+z)!==pat[10-z]) f2=0; } if(f1) p+=40; if(f2) p+=40; } };
+        for(y=0;y<n;y++) (function(y){ hit(function(q){ return m[y][q]; }); })(y);
+        for(x=0;x<n;x++) (function(x){ hit(function(q){ return m[q][x]; }); })(x);
+        for(y=0;y<n;y++) for(x=0;x<n;x++) dark+=m[y][x];
+        return p+Math.floor(Math.abs(dark*20-n*n*10)/(n*n))*10; };
+      var best=0, bestP=Infinity, mk;
+      for(mk=0;mk<8;mk++){ apply(mk); format(mk); var pp=penalty(); if(pp<bestP){ bestP=pp; best=mk; } apply(mk); }
+      apply(best); format(best);
+      return m;
+    }
+    var B64='ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
+    function b64(bytes){ var o='', i, a, b, c; for(i=0;i<bytes.length;i+=3){ a=bytes[i]; b=bytes[i+1]; c=bytes[i+2]; o+=B64[a>>2]+B64[(a&3)<<4|(b||0)>>4]+(i+1<bytes.length?B64[(b&15)<<2|(c||0)>>6]:'=')+(i+2<bytes.length?B64[c&63]:'='); } return o; }
+    var CRC=[]; (function(){ for(var n=0;n<256;n++){ var c=n; for(var k=0;k<8;k++) c=c&1?0xEDB88320^c>>>1:c>>>1; CRC[n]=c>>>0; } })();
+    function crc(bytes){ var c=0xFFFFFFFF; for(var i=0;i<bytes.length;i++) c=CRC[(c^bytes[i])&255]^c>>>8; return (c^0xFFFFFFFF)>>>0; }
+    function u32(v){ return [v>>>24&255,v>>>16&255,v>>>8&255,v&255]; }
+    function chunk(type, data){ var td=[type.charCodeAt(0),type.charCodeAt(1),type.charCodeAt(2),type.charCodeAt(3)].concat(data); return u32(data.length).concat(td,u32(crc(td))); }
+    /** PNG (1 bit per pixel, white background) of the matrix: scale = pixels per module, quiet = modules of white margin. */
+    function png(m, scale, quiet){
+      var n=m.length, side=(n+2*quiet)*scale, rowLen=Math.ceil(side/8), raw=[], y, x;
+      for(y=0;y<side;y++){ raw.push(0); var row=[]; for(x=0;x<rowLen;x++) row.push(255);
+        var my=Math.floor(y/scale)-quiet;
+        if(my>=0&&my<n) for(x=0;x<side;x++){ var mx=Math.floor(x/scale)-quiet; if(mx>=0&&mx<n&&m[my][mx]) row[x>>3]&=~(128>>(x&7)); }
+        if(side%8) row[rowLen-1]|=(1<<(8-side%8))-1;
+        for(x=0;x<rowLen;x++) raw.push(row[x]&255); }
+      var z=[0x78,0x01], a=1, b=0, i;
+      for(i=0;i<raw.length;i++){ a=(a+raw[i])%65521; b=(b+a)%65521; }
+      for(i=0;i<raw.length;i+=65535){ var len=Math.min(65535,raw.length-i), last=i+len>=raw.length?1:0; z.push(last,len&255,len>>>8,(~len)&255,(~len>>>8)&255); for(x=0;x<len;x++) z.push(raw[i+x]); }
+      z=z.concat(u32((b<<16|a)>>>0));
+      var bytes=[137,80,78,71,13,10,26,10].concat(chunk('IHDR',u32(side).concat(u32(side),[1,0,0,0,0])),chunk('IDAT',z),chunk('IEND',[]));
+      return 'data:image/png;base64,'+b64(bytes);
+    }
+    var cache={};
+    return { matrix:matrix, dataUrl:function(text){ if(cache[text]===undefined){ var m=matrix(text); cache[text]=m?png(m,8,2):''; /* 8 px per module: stays sharp when a PDF converter or printer resamples it */ } return cache[text]; } };
+  })();
+  F.QR = QR;
+
   /** Every page of the document set, footer included: [{code, ver, html}]. Used by the pages and by the server (PDF copies). */
   F.pages = function(){
     var set = F.S.docSet || F.docSet(), versions=F.S.templates||{};
@@ -1754,13 +1869,15 @@ var Forms = (function(){
         var v={}; Object.keys(saved).forEach(function(k){ var i=k.indexOf('@'); if(i>0 && k.slice(i+1)===code) v[k.slice(0,i)]=saved[k]; });
         F.S.sig=v; F.canSign=function(k){ return savedCan(k+'@'+code); }; F.curLife=code;
       }
+      F.curCode=code;
       try { fn().forEach(function(html, i){ pages.push({code:code, ver:ver, html:html}); }); }
-      finally { F.S.sig=saved; F.canSign=savedCan; F.curLife=''; }
+      finally { F.S.sig=saved; F.canSign=savedCan; F.curLife=''; F.curCode=''; }
     });
     var f=F.S.f, signed=Object.keys(F.S.sig).map(function(k){ return (ROLE_LABELS[k]||k)+' '+stampTime(F.S.sig[k].at); });
     var N=pages.length;
     return pages.map(function(p, i){
-      var foot='<div class="pfoot"><span>Loan '+esc(f.loanId||'')+' · Borrower '+esc(f.borrowerId||'')+(F.S.docHash?' · Doc '+esc(F.S.docHash.slice(0,12)):'')+' · '+p.code+' '+p.ver+(signed.length?' · E-signed: '+esc(signed.join('; ')):'')+'</span><span>Page '+(i+1)+' of '+N+'</span></div>';
+      var vr=vref();
+      var foot='<div class="pfoot"><span>Loan '+esc(f.loanId||'')+' · Borrower '+esc(f.borrowerId||'')+(F.S.docHash?' · Doc '+esc(F.S.docHash.slice(0,12)):'')+' · '+p.code+' '+p.ver+(signed.length?' · E-signed: '+esc(signed.join('; ')):'')+'</span><span>'+(vr?'Verify '+esc(vr)+'.'+p.code+' · ':'')+'Page '+(i+1)+' of '+N+'</span></div>';
       return { code:p.code, ver:p.ver, html:p.html.replace(/<\/div>\s*$/, foot+'</div>') };
     });
   };
@@ -1962,7 +2079,7 @@ var Forms = (function(){
   function applyServer(p){
     A.server=p; A.id=p.id; A.status=p.status; A.links=p.links||[]; A.collateral=p.collateral||[]; A.deposit=p.deposit||null; A.dirty=false; A.cmConsent=false; A.suConsent=false;
     Forms.S.f=Object.assign({}, p.legacy?{}:DEFAULTS, p.f); Forms.S.checks=p.checks||[]; Forms.S.sig=p.sig||{}; Forms.S.meta=p.meta||{}; Forms.S.docHash=p.docHash||'';
-    Forms.S.legacy=!!p.legacy; Forms.S.templates=p.templates||{}; Forms.S.templateStatus=p.templateStatus||{}; Forms.S.settings=p.settings||{};
+    Forms.S.legacy=!!p.legacy; Forms.S.templates=p.templates||{}; Forms.S.templateStatus=p.templateStatus||{}; Forms.S.settings=p.settings||{}; Forms.S.verify=p.verify||null;
     if(!Array.isArray(Forms.S.f.assets)) Forms.S.f.assets=[]; if(!Array.isArray(Forms.S.f.charges)) Forms.S.f.charges=[];
   }
   function openPkg(id){
@@ -1976,7 +2093,7 @@ var Forms = (function(){
   function newPkg(){
     if(A.dirty && !confirmLeave()) return;
     A.server=null; A.id=''; A.status='DRAFT'; A.links=[]; A.collateral=[]; A.deposit=null; A.dirty=false; A.cmConsent=false;
-    Forms.S.f=JSON.parse(JSON.stringify(DEFAULTS)); Forms.S.checks=[]; Forms.S.sig={}; Forms.S.meta={}; Forms.S.docHash=''; Forms.S.legacy=false;
+    Forms.S.f=JSON.parse(JSON.stringify(DEFAULTS)); Forms.S.checks=[]; Forms.S.sig={}; Forms.S.meta={}; Forms.S.docHash=''; Forms.S.legacy=false; Forms.S.verify=null;
     Forms.S.templates=versionsFromCfg(); Forms.S.templateStatus=tstatusFromCfg(); Forms.S.settings=A.cfg?A.cfg.snapshot:{};
     loadFields(); renderEditors(); renderAll(); loadList();
   }
@@ -2046,6 +2163,28 @@ var Forms = (function(){
     if(canCancel) h+='<div class="row"><input id="cxReason" placeholder="Reason for cancelling (kept in the record)"><button class="btn sm danger" type="button" id="bCancelPkg">Cancel package</button></div>';
     return h+'</div>';
   }
+  var PSTATE={ signed:['ok','Signed'], verified:['info','Code entered'], opened:['info','Opened'], sent:['info','Link sent'], expired:['crit','Link expired'], cancelled:['mute','Link cancelled'], waiting:['mute','Waiting for turn'], 'not-sent':['mute','Not sent yet'] };
+  function progressHtml(){
+    var sv=A.server||{}, rows=sv.progress||[]; if(!rows.length) return '';
+    var modes=sv.orderModes||{}, mode=sv.signOrder||'any', canEdit=CAN('prepare') && !locked() && !archived();
+    var h='<div class="progbox"><b>Signing progress</b>';
+    h+='<div><label for="ordMode" style="font-size:11.5px;color:var(--muted)">Signing order</label><br>'+(canEdit?'<select id="ordMode">'+Object.keys(modes).map(function(k){ return '<option value="'+k+'"'+(k===mode?' selected':'')+'>'+Forms.esc(modes[k])+'</option>'; }).join('')+'</select>':'<span>'+Forms.esc(modes[mode]||mode)+'</span>')+'</div>';
+    rows.forEach(function(r){ var ps=PSTATE[r.state]||['mute',r.state];
+      var sub = r.state==='signed' ? 'signed '+Forms.fmtManila(r.at)+' · '+r.how :
+        r.state==='sent'||r.state==='opened'||r.state==='verified' ? (r.state==='sent'?'sent ':r.state==='opened'?'opened ':'code entered ')+Forms.fmtManila(r.at)+' · expires '+Forms.fmtManila(r.expiresAt)+(r.reminders?' · '+r.reminders+' reminder'+(r.reminders>1?'s':''):'') :
+        r.state==='expired' ? 'expired '+Forms.fmtManila(r.at) : r.state==='cancelled' ? 'cancelled '+Forms.fmtManila(r.at) : '';
+      if(r.waitFor && r.waitFor.length) sub=(sub?sub+' · ':'')+'waits for '+r.waitFor.join(', ');
+      var acts='';
+      if(CAN('prepare') && !archived() && r.token && (r.state==='expired'||r.state==='cancelled'||r.state==='sent'||r.state==='opened')) acts+='<button class="btn sm" type="button" data-reissue="'+Forms.esc(r.token)+'">New link</button>';
+      h+='<div class="prow"><span><b>'+Forms.esc(r.label)+'</b> '+Forms.esc(r.name||'')+(r.doc?' <small style="display:inline">('+Forms.esc(r.doc)+')</small>':'')+(sub?'<small>'+Forms.esc(sub)+'</small>':'')+'</span><span class="acts"><span class="pill '+ps[0]+'">'+ps[1]+'</span>'+acts+'</span></div>';
+    });
+    if(canEdit && sv.templates && Object.keys(sv.templates).length && !Object.keys(Forms.S.sig||{}).length && !Forms.S.legacy) h+='<div style="border-top:1px solid var(--line);padding-top:6px"><button class="btn sm" type="button" id="bRefreshTpl">Use the latest approved templates</button> <small style="color:var(--muted)">Only before anyone signs. Active links are cancelled.</small></div>';
+    return h+'</div>';
+  }
+  function remindersHtml(){
+    var list=(A.server&&A.server.outbox)||[]; if(!list.length) return '';
+    return list.map(function(o){ return '<div class="remind"><span><b>Text a reminder</b> to '+Forms.esc(o.to)+' <small style="color:var(--muted)">(queued '+Forms.esc(Forms.fmtManila(o.createdAt))+')</small></span><span style="font-style:italic">'+Forms.esc(o.text)+'</span><span style="display:flex;gap:6px;flex-wrap:wrap"><button class="btn sm" type="button" data-copytext="'+Forms.esc(o.text)+'">Copy text</button>'+(CAN('prepare')?'<button class="btn sm royal" type="button" data-texted="'+Forms.esc(o.id)+'">Mark as texted</button><button class="btn sm" type="button" data-untexted="'+Forms.esc(o.id)+'">Dismiss</button>':'')+'</span></div>'; }).join('');
+  }
   var PDF_PILL={ DONE:['ok','Ready'], PENDING:['info','In queue'], FAILED:['crit','Failed'] };
   function pdfBoxHtml(){
     var docs=(A.server&&A.server.documents)||[], pdf=(A.server&&A.server.pdf)||{}, canRun=CAN('prepare')||CAN('archive');
@@ -2091,6 +2230,7 @@ var Forms = (function(){
     var pending=pendingKeys().filter(function(r){ return r!=='pnFig'; });
     var lifePending=pending.length && docOf(pending[0]);
     if(A.id) h+=lifecycleBoxHtml();
+    if(A.id && !cancelled()) h+=remindersHtml()+progressHtml();
     if(cancelled()){ h+='<div class="banner cancel" style="margin:0">This package was cancelled. It is kept for the record.</div>'; }
     else if(archived()){ h+='<div class="banner lock" style="margin:0">Finalized and archived. Executed copy SHA-256 '+Forms.esc((A.server.archive||{}).sha256||'').slice(0,16)+'…</div>'+pdfBoxHtml(); }
     else if(!pending.length && A.status==='SIGNED'){ h+='<div class="banner lock" style="margin:0">All parties have signed. Add the office signatures, Save, then Finalize &amp; archive. Post-execution documents can be enabled below and shared from here.</div>'; }
@@ -2123,7 +2263,8 @@ var Forms = (function(){
     }
     el.innerHTML=h;
   }
-  $('share').addEventListener('change',function(e){ var t=e.target; if(t.name==='hrs') A.hours=Number(t.value); if(t.name==='chan'){ A.channel=t.value; renderShare(); } if(t.dataset.role){ A.roles[t.dataset.role]=t.checked; renderShare(); } });
+  $('share').addEventListener('change',function(e){ var t=e.target;
+    if(t.id==='ordMode'){ guard(Forms.call('adminSetSigningOrder',TOK,A.id,t.value)).then(function(r){ return reload('Signing order saved.'+(r.waitingLinks?' '+r.waitingLinks+' active link(s) will open only when it is that signer\'s turn.':'')); }).catch(function(err){ Forms.toast(err.message); renderShare(); }); return; } if(t.name==='hrs') A.hours=Number(t.value); if(t.name==='chan'){ A.channel=t.value; renderShare(); } if(t.dataset.role){ A.roles[t.dataset.role]=t.checked; renderShare(); } });
   $('share').addEventListener('input',function(e){ var t=e.target, m={shareMobile:'mobile',shareEmail:'email',shareIdType:'idType',shareIdLast4:'idLast4'}; if(m[t.id]) A[m[t.id]]=t.value;
     var w={wetDate:'date',wetIdType:'idType',wetIdLast4:'idLast4',wetNote:'note'}; if(w[t.id]) A.wet[w[t.id]]=t.value; });
   function copyText(t,okMsg){
@@ -2137,6 +2278,11 @@ var Forms = (function(){
   $('share').addEventListener('click',function(e){
     var t=e.target;
     if(t.dataset.docget){ openDoc(t.dataset.docget,t); return; }
+    if(t.dataset.reissue){ t.disabled=true; guard(Forms.call('adminReissueLink',TOK,t.dataset.reissue,A.hours)).then(function(l){ return reload('New link created.'+(l.hasEmail?' The code was emailed to '+l.emailMasked+'.':' Now press Send code by SMS on it.')); }).catch(function(err){ Forms.toast(err.message); t.disabled=false; }); return; }
+    if(t.dataset.copytext){ copyText(t.dataset.copytext,'Reminder text copied'); return; }
+    if(t.dataset.texted||t.dataset.untexted){ guard(Forms.call('adminOutboxDone',TOK,t.dataset.texted||t.dataset.untexted,!!t.dataset.untexted)).then(function(){ return reload(t.dataset.texted?'Marked as texted.':'Reminder dismissed.'); }).catch(function(err){ Forms.toast(err.message); }); return; }
+    if(t.id==='bRefreshTpl'){ if(t.dataset.armed!=='1'){ t.dataset.armed='1'; t.textContent='Click again: cancel active links and refresh'; setTimeout(function(){ t.dataset.armed=''; t.textContent='Use the latest approved templates'; },5000); return; }
+      guard(Forms.call('adminRefreshTemplates',TOK,A.id)).then(function(r){ return reload(r.changed.length?'Templates refreshed: '+r.changed.join(', ')+'.':'Templates refreshed (same versions).'); }).catch(function(err){ Forms.toast(err.message); }); return; }
     if(t.id==='bSubmitReview'){ t.disabled=true; guard(Forms.call('adminSubmitForReview',TOK,A.id,'')).then(function(){ return reload('Submitted for approval.'); }).catch(function(err){ Forms.toast(err.message); t.disabled=false; }); return; }
     if(t.id==='bVault'){ if(t.dataset.armed!=='1'){ t.dataset.armed='1'; t.textContent='Click again to move to archive'; setTimeout(function(){ t.dataset.armed=''; t.textContent='Move to archive (loan closed)'; },4000); return; }
       guard(Forms.call('adminMoveToArchive',TOK,A.id,'')).then(function(r){ return reload('Moved to the archive.'+(r.retentionUntil?' Retention review date '+r.retentionUntil+'.':'')); }).catch(function(err){ Forms.toast(err.message); }); return; }
@@ -2458,7 +2604,7 @@ var Forms = (function(){
   var MON={ data:null, stage:'', q:'', only:'' };
   var STAGE_PILL={ 'Awaiting approval':'no', 'Approved, not shared':'info', 'Out for signature':'info', 'Partially signed':'no', 'Office signatures pending':'no', 'Ready to archive':'ok', 'Creating PDF copies':'info', 'Completed':'ok' };
   var DSTATE={ done:'complete', office:'office signatures pending', party:'waiting for a party', legal:'template not approved by counsel' };
-  function loadMonitor(){ $('monBody').innerHTML='<small>Loading…</small>'; guard(Forms.call('adminMonitor',TOK)).then(function(d){ MON.data=d; renderMonitor(); }).catch(function(e){ $('monBody').innerHTML='<small class="err">'+Forms.esc(e.message)+'</small>'; }); }
+  function loadMonitor(){ $('monBody').innerHTML='<small>Loading…</small>'; guard(Forms.call('adminOutbox',TOK)).then(function(o){ MON.outbox=o; }).catch(function(){ MON.outbox=[]; }); guard(Forms.call('adminMonitor',TOK)).then(function(d){ MON.data=d; renderMonitor(); }).catch(function(e){ $('monBody').innerHTML='<small class="err">'+Forms.esc(e.message)+'</small>'; }); }
   function monRows(){ var d=MON.data, q=MON.q.trim().toLowerCase();
     return d.rows.filter(function(r){ return (!MON.stage||r.stage===MON.stage) && (MON.only!=='ready'||r.ready) && (MON.only!=='wait'||r.waiting) && (!q||(r.loanId+' '+r.borrowerName+' '+r.branch+' '+r.id).toLowerCase().indexOf(q)>=0); }); }
   function monListHtml(){ var rows=monRows();
@@ -2477,6 +2623,7 @@ var Forms = (function(){
       '<div class="chips">'+chip('All',d.rows.length,'','stage')+d.stages.map(function(st){ return chip(st,d.summary[st]||0,st,'stage'); }).join('')+'</div>'+
       '<div class="bar"><input id="monQ" placeholder="Search loan number, borrower'+(d.allBranches?', branch':'')+'" value="'+Forms.esc(MON.q)+'">'+chip('Ready for release',d.ready,'ready','only')+chip('No activity '+d.staleDays+'+ days',d.waiting,'wait','only')+'</div>'+
       '<div class="legend"><span>Each document shows signatures collected / needed:</span><span class="dchip done">complete</span><span class="dchip office">office signatures pending</span><span class="dchip party">waiting for a party</span><span class="dchip legal">template not approved</span><span class="dchip party post">post-execution (does not block release)</span></div>'+
+      ((MON.outbox||[]).length?'<div class="remind"><b>'+MON.outbox.length+' reminder'+(MON.outbox.length===1?'':'s')+' to text</b><span>Signers without email who have not signed yet. Open the package to copy the text and mark it as texted.</span></div>':'')+
       '<div id="monList" style="display:flex;flex-direction:column;gap:8px">'+monListHtml()+'</div>'+
       '<small style="color:var(--muted)">As of '+Forms.esc(Forms.fmtManila(d.generatedAt))+(d.allBranches?' · all branches':' · your branch')+'. "Ready for release" means: approved, every loan document signed by all parties and the office, the executed copy archived, and every PDF copy created and verified. This screen changes nothing.</small></div>';
   }
@@ -2539,6 +2686,9 @@ var Forms = (function(){
     {h:'Default, fees, venue (PN §§3, 6, 10)'},{k:'cure.days',l:'Payment default: cure days after written notice'},{k:'cure.days2',l:'Other breach: cure days after written notice'},{k:'attorney.fee',l:'Attorney\'s fees % of amount due — management decision: 10'},{k:'venue',l:'Venue (proper court of …)'},
     {h:'Cash security deposit (CSDA)'},{k:'deposit.refundDays',l:'Refund within ___ business days (§4)'},{k:'deposit.noticeDays',l:'Notice before application, business days (§2) — 5'},{k:'refund.disputeDays',l:'Days to raise an accounting error after refund'},
     {h:'Collateral (MCSA §8, Release)'},{k:'ppsr.terminationDays',l:'Register PPSR termination within ___ working days'},
+    {h:'Reminders to signers (sent by the system every hour, 8 AM to 8 PM; never include the link or the code)'},
+    {k:'reminders.enabled',l:'Send reminders',type:'bool'},{k:'reminders.afterHours',l:'Hours after the link (and between reminders)'},{k:'reminders.max',l:'Most reminders per link (0 to 5)'},
+    {h:'Verification QR code'},{k:'verify.url',l:'Address the QR codes open (blank = this web app; set once, before documents are signed)',full:true},
     {h:'Installable app'},{k:'app.signBase',l:'Signer page URL of the installed app (blank = links open on this web app)',full:true},
     {h:'Data privacy (DS §G, Sign page)'},{k:'privacy.contact',l:'Where data subjects write (DS §G)',full:true},{k:'privacy.dpo',l:'Data Protection Officer (name / contact)'},{k:'retention.years',l:'Retention after full settlement (words)'},
     {h:'v2 delinquency fields (only packages pinned to DS v2 / PN v2 print these)'},
