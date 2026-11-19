@@ -206,71 +206,147 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
 </style>
 
 <style>
-/* Signer view: only the documents this link's signers must sign, with a checklist bar on top */
+/* Signer view (Phase 8): five steps — 1 Code, 2 Who you are, 3 Read, 4 Consent and sign, 5 Done.
+   Only the documents this link's signers must sign are shown. The documents' wording and layout are not changed here. */
 .bar{position:sticky;top:0;z-index:20;background:var(--royal-ink);color:#fff;padding:10px 16px;display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between}
 .bar b{font-size:15px;letter-spacing:.02em}
 .bar small{display:block;color:#c9d3ee;font-size:12px}
 .timer{font-variant-numeric:tabular-nums;background:#2a3f78;border-radius:99px;padding:4px 12px;font-size:13px;font-weight:600}
 .timer.low{background:#8a3412}
+.prog{position:sticky;top:52px;z-index:19;background:#fff;border-bottom:1px solid var(--line);padding:10px 16px 8px}
+.prog ol{list-style:none;margin:0 auto;padding:0;display:flex;gap:4px;max-width:900px}
+.prog li{flex:1;min-width:0;display:flex;flex-direction:column;gap:5px;font-size:11.5px;font-weight:600;color:var(--muted);text-align:center}
+.prog li::before{content:"";display:block;height:6px;border-radius:99px;background:var(--line)}
+.prog li.done::before,.prog li.cur::before{background:var(--royal)}
+.prog li.cur{color:var(--royal-ink);font-weight:700}
+.prog li span.st{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
 .wrap{max-width:900px;margin:0 auto;padding:16px max(16px,env(safe-area-inset-left)) 40px}
-.card{background:#fff;border:1px solid var(--line);border-radius:10px;padding:16px;margin-bottom:16px}
-.card h2{margin:0 0 6px;font-size:17px;color:var(--royal-ink)}
-.card p{margin:0 0 10px;color:var(--muted)}
+.card{background:#fff;border:1px solid var(--line);border-radius:12px;padding:16px;margin-bottom:16px}
+.card h2{margin:0 0 6px;font-size:19px;color:var(--royal-ink);text-wrap:balance}
+.card p{margin:0 0 10px;color:#39425a;line-height:1.5}
+.card .stepno{font-size:12.5px;color:var(--muted);font-weight:600;margin-bottom:4px;display:block}
 .steps{display:flex;flex-direction:column;gap:8px;margin:10px 0}
-.step{display:flex;justify-content:space-between;align-items:center;gap:10px;border:1px solid var(--line);border-radius:8px;padding:9px 11px}
+.step{display:flex;justify-content:space-between;align-items:center;gap:10px;border:1px solid var(--line);border-radius:10px;padding:10px 12px;flex-wrap:wrap}
 .step span{min-width:0}
-.consent{border:1px solid #f0c9b8;background:#fdf1ec;border-radius:8px;padding:10px 12px;margin:8px 0;font-size:13.5px;display:flex;gap:9px;align-items:flex-start}
-.consent input{margin-top:3px;width:18px;height:18px}
-.agree{display:flex;gap:9px;align-items:flex-start;margin:12px 0;font-size:13.5px}
-.agree input{margin-top:3px;width:18px;height:18px}
-.err{color:var(--warn);font-size:13px;margin-top:8px;white-space:pre-line}
-.big{padding:11px 18px;font-size:15px}
+.consent{border:1px solid #f0c9b8;background:#fdf1ec;border-radius:10px;padding:12px;margin:8px 0;font-size:14px;display:flex;gap:10px;align-items:flex-start;min-height:44px;line-height:1.45}
+.consent input,.agree input,.readtick input{margin-top:2px;width:22px;height:22px;flex:0 0 auto;accent-color:var(--royal)}
+.agree{display:flex;gap:10px;align-items:flex-start;margin:12px 0;font-size:14px;min-height:44px;line-height:1.45}
+.err{color:var(--warn);font-size:14px;margin-top:8px;white-space:pre-line}
+.big{min-height:48px;padding:0 20px;font-size:16px;font-weight:700}
+.btn{min-height:44px}
+.btn.sm{min-height:40px}
+.wide{width:100%}
 .state{text-align:center;padding:40px 16px}
 .state h2{color:var(--royal-ink)}
-.doclist{margin:6px 0 0;padding-left:18px;font-size:13px;color:var(--muted)}
-.otp{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:10px 0}
-.otp input{font-size:22px;letter-spacing:.35em;width:9.5em;text-align:center;padding:8px 10px;border:1px solid var(--line);border-radius:8px}
-.privacy{border:1px solid var(--line);background:#f7f8fb;border-radius:8px;padding:10px 12px;margin:8px 0;font-size:12.5px;color:var(--fg);max-height:150px;overflow:auto}
+.otp{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:10px 0}
+.otp input{font-size:24px;letter-spacing:.35em;width:9.5em;max-width:100%;text-align:center;min-height:52px;padding:0 10px;border:2px solid var(--royal);border-radius:10px;box-sizing:border-box}
+.privacy{border:1px solid var(--line);background:#f7f8fb;border-radius:10px;padding:10px 12px;margin:8px 0;font-size:13px;color:var(--fg);max-height:170px;overflow:auto;line-height:1.45}
+.kv2{display:grid;grid-template-columns:auto minmax(0,1fr);gap:6px 14px;font-size:14.5px;margin:6px 0}
+.kv2 span:nth-child(odd){color:var(--muted)}
+.kv2 b{word-break:break-word}
+.lbl{font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+.box{border:1px solid var(--line);border-radius:10px;padding:12px;margin:10px 0;display:flex;flex-direction:column;gap:4px}
+.doclist{list-style:none;margin:8px 0;padding:0;display:flex;flex-direction:column;gap:8px}
+.doclist li{border:1px solid var(--line);border-radius:10px;padding:10px 12px;display:flex;flex-direction:column;gap:6px}
+.doclist .top{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.doclist b{font-size:14.5px}
+.readtick{display:flex;gap:10px;align-items:center;min-height:44px;font-size:14px;cursor:pointer}
+.readtick.on{color:var(--ok);font-weight:700}
+.dock{position:sticky;bottom:0;z-index:18;background:#fff;border-top:1px solid var(--line);padding:10px 16px calc(10px + env(safe-area-inset-bottom,0px));display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap;margin:0 -16px}
+.dock small{color:var(--muted);font-size:13px}
+.ref{font-size:22px;font-weight:700;letter-spacing:.06em;color:var(--royal-ink);font-variant-numeric:tabular-nums}
+.qrrow{display:flex;gap:14px;align-items:center;flex-wrap:wrap}
+.qrrow img{width:132px;height:132px;image-rendering:pixelated;border:1px solid var(--line);border-radius:6px;background:#fff}
+.okmark{width:56px;height:56px;border-radius:50%;background:#e1f3e9;color:var(--ok);display:flex;align-items:center;justify-content:center;font-size:30px;font-weight:700;margin:0 auto 8px}
+.notme{background:#f9e3e3;color:var(--crit);border-radius:10px;padding:10px 12px;font-size:14px}
+.btn.dim{opacity:.55}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+@media (prefers-reduced-motion:no-preference){.card.enter{animation:stepIn .16s ease-out}@keyframes stepIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}}
+@media print{.prog,.dock{display:none!important}}
 </style>
 </head>
 <body>
 <div class="bar no-print">
-  <div><b>ERMANO LENDING CORPORATION</b><small>Loan documents for e-signature</small></div>
+  <div><b id="coName">ERMANO LENDING CORPORATION</b><small>Loan documents for e-signature</small></div>
   <span class="timer" id="timer" hidden></span>
 </div>
+<nav class="prog no-print" id="prog" aria-label="Signing steps" hidden>
+  <ol>
+    <li data-step="1">Code<span class="st"></span></li>
+    <li data-step="2">Who you are<span class="st"></span></li>
+    <li data-step="3">Read<span class="st"></span></li>
+    <li data-step="4">Sign<span class="st"></span></li>
+    <li data-step="5">Done<span class="st"></span></li>
+  </ol>
+</nav>
 
 <main class="wrap">
   <div class="card state no-print" id="loading"><h2>Loading…</h2></div>
   <div class="card state no-print" id="blocked" hidden><h2>Link unavailable</h2><p id="blockedMsg"></p></div>
 
-  <div class="card no-print" id="verify" hidden>
-    <h2>Verify your mobile number</h2>
+  <section class="card no-print" id="verify" hidden aria-labelledby="verifyH">
+    <span class="stepno">Step 1 of 5</span>
+    <h2 id="verifyH">Enter the 6-digit code we sent you</h2>
     <p id="verifyMsg"></p>
-    <div class="otp"><input id="otp" inputmode="numeric" autocomplete="one-time-code" maxlength="6" aria-label="6-digit verification code" placeholder="000000"><button class="btn royal big" id="verifyBtn" type="button">Open my documents</button></div>
+    <label for="otp" class="lbl">Code</label>
+    <div class="otp"><input id="otp" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="000000"><button class="btn royal big" id="verifyBtn" type="button">Continue</button></div>
     <div class="err" id="verifyErr" role="alert"></div>
-    <p style="font-size:12.5px">Type the code yourself. Do not give it to anyone, including our staff. Five wrong entries cancel this link. If no code arrived, ask your loan officer to send a new one.</p>
-  </div>
+    <p style="font-size:13.5px">Type the code yourself. Do not give it to anyone, including our staff. Five wrong entries cancel this link. If no code arrived, ask your loan officer to send a new one.</p>
+  </section>
 
-  <div class="card no-print" id="intro" hidden>
+  <section class="card no-print" id="who" hidden aria-labelledby="hello">
+    <span class="stepno">Step 2 of 5</span>
     <h2 id="hello"></h2>
-    <p>Please read every document below. When you are ready, complete each step, then submit. You can submit only once. The documents are dated on the day you submit.</p>
+    <p>Check that these details are yours before you read anything.</p>
+    <div class="box"><span class="lbl">Lender</span><b id="coName2"></b><span id="coAddr" style="color:var(--muted);font-size:13.5px"></span></div>
+    <div class="box"><span class="lbl">You are signing as</span><div id="whoList"></div></div>
+    <div class="box" id="loanBox"><span class="lbl">Loan</span><div class="kv2" id="loanKv"></div></div>
+    <div class="notme" id="notMeMsg" role="alert" hidden>Do not sign. Close this page and call ERMANO Lending using the number you know from your loan officer — not a number sent with this link.</div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:10px">
+      <button class="btn royal big" id="whoOk" type="button">Yes, this is me</button>
+      <button class="btn" id="notMe" type="button">This is not me</button>
+    </div>
+  </section>
+
+  <section class="card no-print" id="read" hidden aria-labelledby="readH">
+    <span class="stepno">Step 3 of 5</span>
+    <h2 id="readH">Read each document</h2>
+    <p>Every page is shown below, exactly as you will sign it. Open each document, read it, then tick it.</p>
     <ul class="doclist" id="docList"></ul>
-    <div class="steps" id="steps"></div>
+    <div class="err" id="readErr" role="alert"></div>
+  </section>
+
+  <section class="card no-print" id="intro" hidden aria-labelledby="signH">
+    <span class="stepno">Step 4 of 5</span>
+    <h2 id="signH">Agree and sign</h2>
+    <p>Complete each item, then submit. You can submit only once. The documents are dated on the day you submit.</p>
     <div id="consentBox"></div>
+    <div class="steps" id="steps"></div>
     <div class="privacy" id="privacy"></div>
     <label class="agree"><input type="checkbox" id="privacyAck"> <span>I have read the Data Privacy Notice above and consent to the processing described.</span></label>
     <label class="agree"><input type="checkbox" id="agree"> <span id="agreeText"></span></label>
-    <button class="btn royal big" id="submit" type="button">Submit signed documents</button>
+    <div style="display:flex;gap:10px;flex-wrap:wrap">
+      <button class="btn royal big" id="submit" type="button">Submit signed documents</button>
+      <button class="btn" id="backRead" type="button">Back to the documents</button>
+    </div>
     <div class="err" id="err" role="alert"></div>
-  </div>
+  </section>
 
-  <div class="card no-print" id="done" hidden>
-    <h2>Documents signed and submitted</h2>
-    <p id="doneMsg"></p>
+  <section class="card no-print" id="done" hidden aria-labelledby="doneH">
+    <span class="stepno">Step 5 of 5</span>
+    <div class="okmark" aria-hidden="true">✓</div>
+    <h2 id="doneH" style="text-align:center">Documents signed and submitted</h2>
+    <p id="doneMsg" style="text-align:center"></p>
+    <div class="box" id="refBox" hidden>
+      <span class="lbl">Reference number</span>
+      <div class="qrrow"><img id="refQr" alt="Verification QR code" hidden><span style="display:flex;flex-direction:column;gap:4px;min-width:0"><span class="ref" id="refNo"></span><span style="font-size:13.5px;color:#39425a">Scan this, or the code printed on any page, to check that a copy of these documents is genuine.</span></span></div>
+    </div>
+    <div class="box" id="copyBox"></div>
     <button class="btn" id="printCopy" type="button">Print / save a copy</button>
-  </div>
+  </section>
 
   <div class="pages" id="pages"></div>
+  <div class="dock no-print" id="readDock" hidden><small id="readCount" aria-live="polite"></small><span style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn" id="readThis" type="button" hidden>I have read this one</button><button class="btn royal big" id="readNext" type="button">Continue to signing</button></span></div>
 </main>
 
 <script>
@@ -1527,7 +1603,7 @@ var Forms = (function(){
 <script>
 (function(){
   var TOKEN = (new URLSearchParams(location.search).get('t')||'').replace(/[^a-f0-9]/gi,'').slice(0,64);
-  var st = { roles:[], submitted:false, expired:false, expiresAt:'', offset:0, busy:false, consent:{}, consentsNeeded:[], otp:'' };
+  var st = { roles:[], submitted:false, expired:false, expiresAt:'', offset:0, busy:false, consent:{}, consentsNeeded:[], otp:'', step:1, needsOtp:true, docs:[], read:{}, inView:'', copy:null, d:null };
   var $ = function(id){ return document.getElementById(id); };
   var base = function(k){ return String(k).split('@')[0]; }, docOf = function(k){ var i=String(k).indexOf('@'); return i<0?'':String(k).slice(i+1); };
   var LABEL = {
@@ -1536,36 +1612,90 @@ var Forms = (function(){
     grantor:{label:'Grantor / owner signature',hint:'Movable Collateral Security Agreement'}, grSpouse:{label:'Spouse of grantor — conformity',hint:'Movable Collateral Security Agreement'},
     surety:{label:'Surety / guarantor signature',hint:'Suretyship or Guaranty Agreement'}, suSpouse:{label:'Spouse of surety — conformity',hint:'Suretyship or Guaranty Agreement'}
   };
+  var STEP_CARDS = { 1:'verify', 2:'who', 3:'read', 4:'intro', 5:'done' };
+  var STEP_NAMES = ['Code','Who you are','Read','Sign','Done'];
   function nameOf(k){ var f=Forms.S.f, b=base(k), third=Forms.thirdPartyGrantor(); return { borrower:f.name, pnFig:f.name, spouse:f.spouseName, comaker:f.cmName, grantor:third?f.grName:f.name, grSpouse:third?f.grSpouseName:f.spouseName, surety:f.suName, suSpouse:f.suSpouseName }[b]||''; }
   function steps(){ return st.roles.map(function(r){ var b=base(r), l=LABEL[b]||{label:Forms.ROLE_LABELS[b]||b,hint:''}, d=docOf(r); var nm=nameOf(r); return {k:r, label:l.label+(nm&&b!=='pnFig'?' — '+nm:'')+(d?' ('+(Forms.DOC_TITLES[d]||d)+')':''), hint:d?(Forms.DOC_TITLES[d]||d):l.hint}; }); }
   function needsConsent(k){ return st.consentsNeeded.indexOf(base(k))>=0; }
-  Forms.canSign = function(k){ if(st.submitted||st.expired) return false; if(needsConsent(k) && !st.consent[base(k)]) return false; return st.roles.indexOf(k)>=0; };
+  // Signature boxes in the documents are live only on the signing step.
+  Forms.canSign = function(k){ if(st.submitted||st.expired||st.step!==4) return false; if(needsConsent(k) && !st.consent[base(k)]) return false; return st.roles.indexOf(k)>=0; };
   Forms.onSign = function(){ draw(); };
 
+  /* ---------- steps ---------- */
+  function go(n, focus){
+    st.step=n;
+    Object.keys(STEP_CARDS).forEach(function(k){ var el=$(STEP_CARDS[k]); el.hidden = +k!==n; if(+k===n){ el.classList.remove('enter'); void el.offsetWidth; el.classList.add('enter'); } });
+    $('prog').hidden=false;
+    $('prog').querySelectorAll('li').forEach(function(li){ var k=+li.dataset.step, done=k<n || (k===1 && !st.needsOtp) , cur=k===n;
+      li.className=(done?'done':'')+(cur?' cur':''); if(cur) li.setAttribute('aria-current','step'); else li.removeAttribute('aria-current');
+      li.querySelector('.st').textContent=cur?' (current step)':done?' (done)':''; });
+    $('readDock').hidden = n!==3;
+    // The documents are shown from the Read step on; the signature boxes become live on the Sign step.
+    if(n>=3) draw(); else $('pages').innerHTML='';
+    if(n===3) watchDocs();
+    document.title='Step '+n+' of 5 · '+STEP_NAMES[n-1]+' · ERMANO e-Sign';
+    if(focus!==false){ window.scrollTo(0,0); var h=$(STEP_CARDS[n]).querySelector('h2'); if(h){ h.setAttribute('tabindex','-1'); try{ h.focus({preventScroll:true}); }catch(e){} } }
+  }
+
+  /** The documents, grouped so each one can be found from the Read list. */
+  function renderDocs(){
+    var groups=[], at={};
+    Forms.pages().forEach(function(p){ if(at[p.code]===undefined){ at[p.code]=groups.length; groups.push({code:p.code, html:[]}); } groups[at[p.code]].html.push(p.html); });
+    $('pages').innerHTML=groups.map(function(g){ return '<div class="docgrp" id="doc-'+Forms.esc(g.code)+'" data-doc="'+Forms.esc(g.code)+'">'+g.html.join('')+'</div>'; }).join('');
+    Forms.fit($('pages'));
+    return groups;
+  }
   function draw(){
-    Forms.render($('pages'));
-    if(st.submitted){ $('intro').hidden=true; $('done').hidden=false; return; }
+    if(st.step>=3 || st.submitted) renderDocs();
+    renderRead();
     $('steps').innerHTML = steps().map(function(r){
       var done=!!Forms.S.sig[r.k], dis = needsConsent(r.k) && !st.consent[base(r.k)];
       return '<div class="step"><span><b>'+Forms.esc(r.label)+'</b><br><small style="color:var(--muted)">'+Forms.esc(r.hint)+'</small></span>'+
-        '<span style="display:flex;gap:6px;align-items:center"><span class="pill '+(done?'ok':'no')+'">'+(done?'Done':'To do')+'</span><button class="btn sm" type="button" data-go="'+r.k+'"'+(dis?' disabled':'')+'>'+(done?'Redo':(r.k==='pnFig'?'Write':'Sign'))+'</button></span></div>';
+        '<span style="display:flex;gap:8px;align-items:center"><span class="pill '+(done?'ok':'no')+'">'+(done?'Done':'To do')+'</span><button class="btn" type="button" data-go="'+r.k+'"'+(dis?' disabled':'')+'>'+(done?'Redo':(r.k==='pnFig'?'Write':'Sign'))+'</button></span></div>';
     }).join('');
+  }
+  function readCount(){ return st.docs.filter(function(c){ return st.read[c]; }).length; }
+  function renderRead(){
+    var n=st.docs.length, done=readCount();
+    $('docList').innerHTML=st.docs.map(function(c,i){ var t=Forms.DOC_TITLES[c]||c, on=!!st.read[c];
+      return '<li><div class="top"><span><small style="color:var(--muted)">Document '+(i+1)+' of '+n+'</small><br><b data-title>'+Forms.esc(t)+'</b></span><button class="btn sm" type="button" data-show="'+Forms.esc(c)+'">Show</button></div>'+
+        '<label class="readtick'+(on?' on':'')+'"><input type="checkbox" data-read="'+Forms.esc(c)+'"'+(on?' checked':'')+'> '+(on?'Read':'I have read this document')+'</label></li>'; }).join('');
+    $('readCount').textContent='Read '+done+' of '+n;
+    // Kept pressable so the signer is told why it does not continue yet.
+    $('readNext').classList.toggle('dim', done<n);
+    var cur=st.inView && !st.read[st.inView] ? st.inView : '';
+    $('readThis').hidden=!cur; if(cur) $('readThis').textContent='I have read the '+(Forms.DOC_TITLES[cur]||cur);
+  }
+  var observer=null;
+  function watchDocs(){
+    if(!('IntersectionObserver' in window)) return;
+    if(observer) observer.disconnect();
+    observer=new IntersectionObserver(function(es){ es.forEach(function(e){ if(e.isIntersecting) st.inView=e.target.dataset.doc; }); renderRead(); }, { rootMargin:'-40% 0px -40% 0px' });
+    $('pages').querySelectorAll('.docgrp').forEach(function(g){ observer.observe(g); });
   }
   function who(k){ var b=base(k); return {label:Forms.ROLE_LABELS[b]||b, name:nameOf(k)}; }
   document.addEventListener('click',function(e){
     var g=e.target.closest('[data-go]'); if(g){ Forms.openPad(g.dataset.go, who(g.dataset.go)); return; }
+    var sh=e.target.closest('[data-show]'); if(sh){ var el=$('doc-'+sh.dataset.show); if(el) el.scrollIntoView({ behavior:'auto', block:'start' }); return; }
     var s=e.target.closest('.sig.clickable'); if(s && Forms.canSign(s.dataset.sig)) Forms.openPad(s.dataset.sig, who(s.dataset.sig));
   });
-  document.addEventListener('keydown',function(e){ if((e.key==='Enter'||e.key===' ') && e.target.classList && e.target.classList.contains('clickable')){ e.preventDefault(); Forms.openPad(e.target.dataset.sig, who(e.target.dataset.sig)); } });
-  document.addEventListener('change',function(e){ var c=e.target.dataset.consent; if(c){ st.consent[c]=e.target.checked; if(!st.consent[c] && Forms.S.sig[c] && !Forms.S.sig[c].fileId) delete Forms.S.sig[c]; draw(); } });
+  document.addEventListener('keydown',function(e){ if((e.key==='Enter'||e.key===' ') && e.target.classList && e.target.classList.contains('clickable') && Forms.canSign(e.target.dataset.sig)){ e.preventDefault(); Forms.openPad(e.target.dataset.sig, who(e.target.dataset.sig)); } });
+  document.addEventListener('change',function(e){
+    var r=e.target.dataset.read; if(r){ st.read[r]=e.target.checked; $('readErr').textContent=''; renderRead(); return; }
+    var c=e.target.dataset.consent; if(c){ st.consent[c]=e.target.checked; if(!st.consent[c] && Forms.S.sig[c] && !Forms.S.sig[c].fileId) delete Forms.S.sig[c]; draw(); } });
   window.addEventListener('resize',function(){ Forms.fit($('pages')); });
+  $('readThis').addEventListener('click',function(){ if(st.inView){ st.read[st.inView]=true; renderRead(); } });
+  $('readNext').addEventListener('click',function(){ if(readCount()<st.docs.length){ $('readErr').textContent='Tick each document once you have read it.'; return; } go(4); });
+  $('backRead').addEventListener('click',function(){ go(3); });
+  $('whoOk').addEventListener('click',function(){ go(3); });
+  $('notMe').addEventListener('click',function(){ $('notMeMsg').hidden=false; $('whoOk').disabled=true; });
 
   function manilaToday(){ try{ var d=new Date(Date.now()+st.offset).toLocaleDateString('en-CA',{timeZone:'Asia/Manila'}); return /^\d{4}-\d{2}-\d{2}$/.test(d)?d:''; }catch(e){ return ''; } }
   function tick(){
     if(!st.expiresAt || st.submitted){ $('timer').hidden=true; return; }
     var left=new Date(st.expiresAt).getTime()-(Date.now()+st.offset), t=$('timer'); t.hidden=false;
-    if(left<=0){ st.expired=true; t.textContent='Link expired'; t.classList.add('low'); $('submit').disabled=true; $('verifyBtn').disabled=true; $('err').textContent='This link has expired. Please ask your loan officer for a new link.'; if(!$('intro').hidden) draw(); return; }
-    var today=manilaToday(); if(today && st.roles.indexOf('borrower')>=0 && Forms.S.f.name && today!==Forms.S.f.signDate){ Forms.S.f.signDate=today; draw(); }
+    if(left<=0){ st.expired=true; t.textContent='Link expired'; t.classList.add('low'); $('submit').disabled=true; $('verifyBtn').disabled=true; $('err').textContent='This link has expired. Please ask your loan officer for a new link.'; if(st.step>=3) draw(); return; }
+    var today=manilaToday(); if(today && st.roles.indexOf('borrower')>=0 && Forms.S.f.name && today!==Forms.S.f.signDate){ Forms.S.f.signDate=today; if(st.step>=3) draw(); }
     var h=Math.floor(left/3600000), m=Math.floor(left%3600000/60000), s=Math.floor(left%60000/1000);
     t.textContent='Expires in '+h+'h '+String(m).padStart(2,'0')+'m '+String(s).padStart(2,'0')+'s'; t.classList.toggle('low', left<3600000);
     setTimeout(tick,1000);
@@ -1590,38 +1720,90 @@ var Forms = (function(){
       if(st.roles.indexOf('borrower')>=0) Forms.S.f.signDate=r.signDate;
       Forms.S.meta.consents=Forms.S.meta.consents||{}; st.consentsNeeded.forEach(function(c){ Forms.S.meta.consents[c]={at:r.submittedAt}; });
       $('doneMsg').textContent='Submitted '+Forms.fmtManila(r.submittedAt)+'. ERMANO Lending has received your signed documents'+(r.status==='SIGNED'?'.':'; other parties may still need to sign.')+' You can close this page.';
-      $('timer').hidden=true; draw(); window.scrollTo(0,0);
+      $('timer').hidden=true; st.copy={ ready:false, reason:'pending' }; showDone();
     }).catch(function(e){ st.busy=false; $('submit').disabled=false; $('submit').textContent='Submit signed documents'; $('err').textContent=e.message; });
   });
   $('printCopy').addEventListener('click',function(){ window.print(); });
+
+  /* ---------- Done: reference number, QR, the signer's own copy ---------- */
+  function showDone(){
+    var v=Forms.S.verify;
+    if(v && v.ref){
+      $('refBox').hidden=false; $('refNo').textContent=String(v.ref).replace(/(.{5})(?=.)/g,'$1-');
+      var url=v.url?v.url+(v.url.indexOf('?')>=0?'&':'?')+'v='+v.ref:'', img=url&&Forms.QR?Forms.QR.dataUrl(url):'';
+      if(img){ $('refQr').src=img; $('refQr').hidden=false; }
+    }
+    var c=st.copy||{}, h='<span class="lbl">Your copy</span>';
+    if(c.ready){
+      h+='<span style="font-size:14px;line-height:1.45">The loan documents are finalized. Download the PDF copy of each document you signed'+(c.until?' (offered here until '+Forms.esc(Forms.fmtManila(c.until))+')':'')+'.</span>'+
+        c.docs.map(function(d){ return '<button class="btn" type="button" data-copy="'+Forms.esc(d.code)+'">Download '+Forms.esc(d.title||d.code)+(d.pages?' · '+d.pages+' page'+(d.pages>1?'s':''):'')+'</button>'; }).join('');
+    } else if(c.reason==='expired'){
+      h+='<span style="font-size:14px;line-height:1.45">Your copy is no longer offered on this page. Please ask ERMANO Lending for a copy.</span>';
+    } else if(c.reason==='cancelled'){
+      h+='<span style="font-size:14px;line-height:1.45">ERMANO Lending cancelled this loan package. Please contact your loan officer.</span>';
+    } else {
+      h+='<span style="font-size:14px;line-height:1.45">Your copy is ready once everyone has signed and ERMANO Lending finalizes the loan. Open this same link then to download it.</span><span class="pill info" style="align-self:flex-start">'+(c.reason==='pdf'?'Copies being prepared':'Waiting for the other signatures and the office')+'</span>';
+    }
+    $('copyBox').innerHTML=h+'<div class="err" id="copyErr" role="alert"></div>';
+    go(5);
+  }
+  $('copyBox').addEventListener('click',function(e){
+    var b=e.target.closest('[data-copy]'); if(!b) return;
+    b.disabled=true; var old=b.textContent; b.textContent='Preparing…'; $('copyErr').textContent='';
+    Forms.call('borrowerCopy', TOKEN, st.otp, b.dataset.copy).then(function(d){
+      var bin=atob(d.base64), arr=new Uint8Array(bin.length); for(var i=0;i<bin.length;i++) arr[i]=bin.charCodeAt(i);
+      var url=URL.createObjectURL(new Blob([arr],{type:d.mime})), a=document.createElement('a');
+      a.href=url; a.target='_blank'; a.rel='noopener'; a.download=d.name;
+      document.body.appendChild(a); a.click(); a.remove(); setTimeout(function(){ URL.revokeObjectURL(url); },60000);
+    }).catch(function(err){ $('copyErr').textContent=err.message; }).then(function(){ b.disabled=false; b.textContent=old; });
+  });
 
   function privacyText(d){
     var st_=d.settings||{};
     return '<b>Data Privacy Notice (R.A. No. 10173).</b> ERMANO Lending Corporation collects and processes your personal information, including identification details, contact information, your mobile number used for this verification and your signatures, to evaluate, document, administer and collect this loan; to comply with law and SEC, BSP, AMLC and Credit Information Corporation requirements; and to enforce its rights. Recipients may include the Credit Information Corporation, credit bureaus, authorized collection agents, counsel, courts and regulators. Information is retained for '+Forms.esc(st_.retentionYears||'five (5)')+' years after full settlement unless a longer period is required by law. You may access, correct or object to the processing of your data by writing to '+Forms.esc(d.privacyContact||st_.privacyContact||'ERMANO Lending Corporation')+'. Your electronic signature, the verification of your mobile number and the system’s audit record (date, time, device and document hash) identify you and evidence your consent (R.A. No. 8792 §8).';
   }
+  /** "UMID / 7788" or a type and last 4 -> "UMID •••• 7788". Only the last four digits are ever shown. */
+  function maskId(type, last4){ var t=String(type||'').replace(/[\/\-:]?\s*\d[\d\s\-]*$/,'').trim(), d=String(last4||'').replace(/\D/g,'').slice(-4); return (t||d)?(t?t+' ':'')+(d?'•••• '+d:''):''; }
+  function idOf(b){ var f=Forms.S.f, third=Forms.thirdPartyGrantor();
+    if(b==='borrower'||(b==='grantor'&&!third)) return maskId(f.idType, f.idLast4);
+    if(b==='grantor') return maskId(f.grId, String(f.grId||'').replace(/\D/g,''));
+    if(b==='surety') return maskId(f.suId, String(f.suId||'').replace(/\D/g,''));
+    return ''; }
+  function renderWho(d){
+    var f=d.f, names=[], seen={};
+    st.roles.forEach(function(r){ var n=nameOf(r); if(n && names.indexOf(n)<0) names.push(n); });
+    $('hello').textContent='Hello, '+(names.join(' and ')||'');
+    var co=d.company||{}; $('coName2').textContent=co.name||Forms.S.settings.companyName||'ERMANO LENDING CORPORATION'; $('coAddr').textContent=co.address||'';
+    $('whoList').innerHTML=st.roles.filter(function(r){ return base(r)!=='pnFig'; }).map(function(r){ var b=base(r); if(seen[b]) return ''; seen[b]=1; var id=idOf(b);
+      return '<div class="kv2"><span>Name</span><b>'+Forms.esc(nameOf(r)||'—')+'</b><span>Role</span><b>'+Forms.esc(Forms.ROLE_LABELS[b]||b)+'</b>'+(id?'<span>ID</span><b>'+Forms.esc(id)+'</b>':'')+'</div>'; }).join('<hr style="border:0;border-top:1px solid var(--line);margin:4px 0">');
+    var kv=''; if(f.loanId) kv+='<span>Loan no.</span><b>'+Forms.esc(f.loanId)+'</b>'; if(f.amount) kv+='<span>Principal</span><b>₱ '+Forms.esc(Forms.money(f.amount))+'</b>'; if(f.installments) kv+='<span>Installments</span><b>'+Forms.esc(f.installments)+'</b>';
+    $('loanKv').innerHTML=kv; $('loanBox').hidden=!kv;
+  }
   function opened(d){
+    st.d=d;
     Forms.S.f=d.f; Forms.S.checks=d.checks; Forms.S.sig=d.sig||{}; Forms.S.meta=d.meta||{}; Forms.S.docHash=d.docHash;
     Forms.S.legacy=d.templates&&d.templates.DS==='v1'; Forms.S.templates=d.templates||{}; Forms.S.templateStatus=d.templateStatus||{}; Forms.S.settings=d.settings||{}; Forms.S.docSet=d.docSet; Forms.S.verify=d.verify||null;
-    st.roles=d.roles; st.submitted=d.submitted; st.expiresAt=d.expiresAt; st.offset=new Date(d.serverNow).getTime()-Date.now(); st.consentsNeeded=d.consentsNeeded||[];
+    st.roles=d.roles; st.submitted=d.submitted; st.expiresAt=d.expiresAt; st.offset=new Date(d.serverNow).getTime()-Date.now(); st.consentsNeeded=d.consentsNeeded||[]; st.docs=d.docSet||[]; st.copy=d.copy||null;
     if(!d.submitted && st.roles.indexOf('borrower')>=0) Forms.S.f.signDate=d.serverToday;
-    $('loading').hidden=true; $('verify').hidden=true;
-    var f=d.f, names=[]; st.roles.forEach(function(r){ var n=nameOf(r); if(n && names.indexOf(n)<0) names.push(n); });
-    $('hello').textContent='Hello, '+(names.join(' and ')||'');
-    $('docList').innerHTML=d.docSet.map(function(c){ return '<li>'+Forms.esc(Forms.DOC_TITLES[c]||c)+'</li>'; }).join('');
+    if(d.company && d.company.name) $('coName').textContent=d.company.name;
+    $('loading').hidden=true;
+    var f=d.f;
+    renderWho(d);
     $('agreeText').textContent='I have read the documents listed above, I understand them, and I sign them voluntarily.';
     var cb='';
     if(st.consentsNeeded.indexOf('comaker')>=0) cb+='<label class="consent"><input type="checkbox" data-consent="comaker"> <span><b>Co-maker '+Forms.esc(f.cmName)+':</b> I expressly agree to be jointly and severally (solidarily) liable with the Borrower for the obligations stated in the Promissory Note, to the extent permitted by law. I received the completed Disclosure Statement before signing.</span></label>';
     if(st.consentsNeeded.indexOf('surety')>=0) cb+='<label class="consent"><input type="checkbox" data-consent="surety"> <span><b>Surety '+Forms.esc(f.suName)+':</b> I expressly bind myself solidarily with the Borrower under the Suretyship Agreement; I understand that the benefit of excussion does not apply and that the Lender may demand payment from me upon the Borrower’s default. I received the completed Disclosure Statement and Repayment Schedule before signing.</span></label>';
     $('consentBox').innerHTML=cb;
     $('privacy').innerHTML=privacyText(d);
-    if(d.submitted){ $('doneMsg').textContent='These documents were signed and submitted '+Forms.fmtManila(d.submittedAt)+'.'; }
-    else $('intro').hidden=false;
-    draw(); tick();
+    renderRead();
+    if(d.submitted){ $('doneMsg').textContent='These documents were signed and submitted '+Forms.fmtManila(d.submittedAt)+'.'; draw(); showDone(); }
+    else { draw(); go(2); }
+    tick();
   }
   function openDocs(){
     st.otp=$('otp').value.replace(/\D/g,'');
     $('verifyErr').textContent=''; $('verifyBtn').disabled=true; $('verifyBtn').textContent='Checking…';
-    Forms.call('borrowerOpen', TOKEN, st.otp).then(opened).catch(function(e){ $('verifyBtn').disabled=false; $('verifyBtn').textContent='Open my documents'; $('verifyErr').textContent=e.message; if(/cancelled/i.test(e.message)){ $('verify').hidden=true; $('blocked').hidden=false; $('blockedMsg').textContent=e.message; } });
+    Forms.call('borrowerOpen', TOKEN, st.otp).then(opened).catch(function(e){ $('verifyBtn').disabled=false; $('verifyBtn').textContent='Continue'; $('verifyErr').textContent=e.message; if(/cancelled/i.test(e.message)){ $('verify').hidden=true; $('prog').hidden=true; $('blocked').hidden=false; $('blockedMsg').textContent=e.message; } });
   }
   $('verifyBtn').addEventListener('click',openDocs);
   $('otp').addEventListener('keydown',function(e){ if(e.key==='Enter') openDocs(); });
@@ -1629,11 +1811,11 @@ var Forms = (function(){
   function friendly(e){ return e && e.message==='NO_SERVER' ? 'This signing link is incomplete. Please ask your ERMANO loan officer to send the link again.' : (e && e.message) || 'Something went wrong.'; }
   if(!TOKEN){ $('loading').hidden=true; $('blocked').hidden=false; $('blockedMsg').textContent='Open this page from the signing link ERMANO Lending sent to your phone.'; return; }
   Forms.call('borrowerPeek', TOKEN).then(function(d){
-    st.expiresAt=d.expiresAt; st.offset=new Date(d.serverNow).getTime()-Date.now(); st.roles=d.roles;
+    st.expiresAt=d.expiresAt; st.offset=new Date(d.serverNow).getTime()-Date.now(); st.roles=d.roles; st.needsOtp=!!d.needsOtp;
     $('loading').hidden=true;
     if(!d.needsOtp){ Forms.call('borrowerOpen', TOKEN, '').then(opened).catch(function(e){ $('blocked').hidden=false; $('blockedMsg').textContent=friendly(e); }); return; }
     $('verifyMsg').textContent=(d.channel==='office'?'You are signing on an ERMANO office device. ':'')+'Enter the 6-digit code ERMANO Lending sent '+(d.emailHint?'to your email '+d.emailHint:'by text to your mobile number'+(d.mobileHint?' ending '+d.mobileHint.replace('•••• ',''):''))+'. Signing as: '+d.roleLabels.filter(function(x){ return !/handwriting/.test(x); }).join(', ')+'.';
-    $('verify').hidden=false; $('otp').focus(); tick();
+    go(1, false); $('otp').focus(); tick();
   }).catch(function(e){ $('loading').hidden=true; $('blocked').hidden=false; $('blockedMsg').textContent=friendly(e); });
 })();
 </script>
