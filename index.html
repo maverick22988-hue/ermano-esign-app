@@ -13,6 +13,7 @@
 <meta name="robots" content="noindex">
 <title>ERMANO e-Sign</title>
 
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
 <style>
 /* ERMANO e-Sign v2 — shared styles: UI primitives, document pages (8.5 x 13 in long bond), signature boxes, signature pad. */
 :root{
@@ -364,63 +365,127 @@ details[open] summary::after{content:"–"}
 .otpbox{border:2px solid var(--royal);border-radius:8px;padding:8px 10px;margin:6px 0;font-size:13px}
 .otpbox b.code{font-size:22px;letter-spacing:.3em;display:block;margin:4px 0}
 
-/* ---------- Phase 8: left menu, dashboard, package workspace tabs ---------- */
-.shell{display:grid;grid-template-columns:236px minmax(0,1fr);min-height:100vh}
-.side{background:var(--royal-ink);color:#e8ecf6;display:flex;flex-direction:column;gap:2px;padding:14px 10px;position:sticky;top:0;height:100vh;box-sizing:border-box;overflow:auto;z-index:25}
-.side .brand{display:flex;align-items:center;gap:10px;padding:2px 8px 14px}
-.side .mark{width:34px;height:34px;border-radius:8px;background:var(--gold);color:var(--royal-ink);font-weight:700;display:flex;align-items:center;justify-content:center;flex:0 0 auto}
-.side .brand b{display:block;font-size:15px;color:#fff}
-.side .brand small{display:block;font-size:12px;color:#b9c4e0}
-.side .nav{display:flex;align-items:center;gap:10px;min-height:44px;padding:0 12px;border-radius:8px;border:0;background:transparent;color:#e8ecf6;font:inherit;font-size:14px;text-align:left;cursor:pointer;width:100%;box-sizing:border-box}
+/* ---------- Phase 8: screens built to the approved design "ERMANO e-Sign screens" ---------- */
+:root{--ui:Inter,system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;--warn-ink:#a3420f;--soft:#f5f7fb}
+.shell{display:flex;flex-wrap:wrap;align-items:stretch;min-height:100vh}
+.side{flex:1 1 232px;max-width:260px;background:var(--royal-ink);color:#e8ecf6;display:flex;flex-direction:column;gap:4px;padding:20px 12px;box-sizing:border-box;position:sticky;top:0;height:100vh;overflow:auto;z-index:25}
+.side .brand{display:flex;align-items:center;gap:10px;padding:4px 8px 18px}
+.side .mark{width:36px;height:36px;border-radius:8px;background:var(--gold);color:var(--royal-ink);font-weight:700;font-size:15px;display:flex;align-items:center;justify-content:center;flex:0 0 auto}
+.side .brand b{display:block;font-size:15px;color:#fff;letter-spacing:.02em}
+.side .brand small{display:block;font-size:12px;color:#aeb9d6}
+.side .nav{display:flex;align-items:center;gap:12px;min-height:44px;padding:0 12px;border-radius:8px;border:0;background:transparent;color:#e8ecf6;font:inherit;font-size:14px;text-align:left;cursor:pointer;width:100%;box-sizing:border-box}
 .side .nav:hover{background:#21397a}
 .side .nav.on{background:var(--royal);color:#fff;font-weight:600}
-.side .nav:focus-visible{outline:2px solid var(--gold);outline-offset:1px}
+.side .nav:focus-visible,.side .signout:focus-visible{outline:2px solid var(--gold);outline-offset:1px}
 .side .nav svg{width:18px;height:18px;flex:0 0 auto}
 .side .badge{margin-left:auto;background:var(--gold);color:var(--royal-ink);border-radius:99px;font-size:12px;font-weight:700;padding:1px 8px}
-.side .sep{height:1px;background:#2c4377;margin:8px 6px}
-.side .who{margin-top:auto;border-top:1px solid #2c4377;padding:10px 4px 0;display:flex;flex-direction:column;gap:4px}
-.side .who small{color:#c9d3ee;font-size:12px;padding:0 8px;line-height:1.4}
-.mainc{min-width:0;display:flex;flex-direction:column}
-@media (max-width:860px){.shell{grid-template-columns:minmax(0,1fr)}.side{position:sticky;height:auto;flex-direction:row;overflow-x:auto;padding:6px 8px;gap:4px}.side .nav{width:auto;white-space:nowrap;flex:0 0 auto}.side .brand,.side .sep{display:none}.side .who{margin:0;border:0;padding:0;flex-direction:row;align-items:center}.side .who small{display:none}}
-.topbar{position:sticky;top:0}
-@media (max-width:860px){.topbar{position:static}.panel{top:0}}
-.dash{padding:20px max(16px,env(safe-area-inset-left)) 32px;display:flex;flex-direction:column;gap:18px;max-width:1200px}
-.dash h1{margin:0;font-size:24px;color:var(--royal-ink)}
-.dash .sub{color:var(--muted);font-size:13.5px}
-.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.side .sep{height:1px;background:#2c4377;margin:10px 8px}
+.side .who{margin-top:auto;display:flex;flex-direction:column;gap:2px;padding:14px 12px 0;border-top:1px solid #2c4377;font-size:13px}
+.side .who b{font-weight:600;color:#e8ecf6}
+.side .who span{color:#aeb9d6}
+.side .signout{align-self:flex-start;min-height:44px;border:0;background:none;color:#f0d68f;font:inherit;font-size:13px;text-decoration:underline;cursor:pointer;padding:0}
+.mainc{flex:999 1 560px;min-width:0;display:flex;flex-direction:column}
+@media (max-width:860px){.side{position:sticky;height:auto;max-width:none;flex:1 1 100%;flex-direction:row;overflow-x:auto;padding:6px 8px;gap:4px}.side .nav{width:auto;white-space:nowrap;flex:0 0 auto}.side .brand,.side .sep,.side .who #opLabel{display:none}.side .who{margin:0;border:0;padding:0 8px;flex-direction:row;align-items:center}}
+.pagepad{padding:28px 32px 40px;box-sizing:border-box;display:flex;flex-direction:column;gap:22px}
+@media (max-width:700px){.pagepad{padding:18px 16px 32px}}
+.phead{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between}
+.phead h1{margin:0;font-size:26px;font-weight:700;color:var(--royal-ink)}
+.phead .sub,.psub{font-size:14px;color:var(--muted)}
+.ptools{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.search{display:flex;align-items:center;gap:8px;min-height:44px;padding:0 12px;background:#fff;border:1px solid var(--line);border-radius:8px;font-size:14px;color:var(--muted);box-sizing:border-box}
+.search input{border:0;outline:0;font:inherit;color:var(--fg);width:220px;max-width:100%;background:transparent;min-height:40px}
+.search:focus-within{border-color:var(--royal)}
+.btn.lg{display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:0 16px;border-radius:8px;font-size:14px;font-weight:600;box-sizing:border-box}
+.btn.lg.royal{padding:0 18px}
+.btn.lg.dangertext{color:var(--crit)}
+.btn.lg svg{width:16px;height:16px}
+.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
 @media (max-width:900px){.stats{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media (max-width:480px){.stats{grid-template-columns:minmax(0,1fr)}}
-.stat{background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px 16px;text-align:left;font:inherit;color:var(--fg);cursor:pointer;display:flex;flex-direction:column;gap:2px;min-height:44px}
+.stat{background:#fff;border:1px solid var(--line);border-radius:12px;padding:16px 18px;text-align:left;font:inherit;color:var(--fg);cursor:pointer;display:flex;flex-direction:column;gap:4px;min-height:44px}
 .stat:hover{border-color:var(--royal)}
-.stat:focus-visible{outline:2px solid var(--royal);outline-offset:2px}
-.stat span{font-size:13px;color:var(--muted);font-weight:600}
-.stat b{font-size:30px;color:var(--royal-ink);font-variant-numeric:tabular-nums}
-.stat small{font-size:12.5px;color:var(--muted)}
-.stat.warn b,.stat.warn small{color:var(--warn)}
+.stat:focus-visible,.need:focus-visible,.arow:focus-visible,.prow2:focus-visible{outline:2px solid var(--royal);outline-offset:2px}
+.stat span{font-size:13px;color:var(--muted);font-weight:500}
+.stat b{font-size:32px;font-weight:700;color:var(--royal-ink);font-variant-numeric:tabular-nums;line-height:1.2}
+.stat small{font-size:13px;color:var(--muted)}
+.stat.warn b,.stat.warn small{color:var(--warn-ink)}
 .stat.ok b{color:var(--ok)}
-.dcols{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px;align-items:start}
-@media (max-width:900px){.dcols{grid-template-columns:minmax(0,1fr)}}
-.dbox{background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px 16px;display:flex;flex-direction:column;gap:6px}
-.dbox h2{margin:0 0 4px;font-size:16px;color:var(--royal-ink)}
-.need{display:flex;gap:10px;align-items:center;min-height:48px;padding:6px 10px;border-radius:8px;border:1px solid var(--line);background:#f7f8fb;text-align:left;font:inherit;color:var(--fg);cursor:pointer;width:100%;box-sizing:border-box}
-.need:hover{border-color:var(--royal)}
-.need .tag{flex:0 0 auto;font-size:11.5px;font-weight:700;border-radius:6px;padding:2px 8px;background:#fff;border:1px solid var(--line);min-width:60px;text-align:center}
-.need .tag.text{color:#7a4300;border-color:#f0d8a8}.need .tag.approve{color:var(--warn)}.need .tag.office{color:var(--royal)}.need .tag.expiring,.need .tag.pdf{color:var(--crit)}
-.need b{display:block;font-size:13.5px}.need small{color:var(--muted);font-size:12.5px}
-.arow{display:grid;grid-template-columns:118px minmax(0,1fr);min-height:44px;align-items:center;gap:2px 10px;font-size:13px;padding:7px 0;border-top:1px solid var(--line);text-align:left;background:none;border-left:0;border-right:0;border-bottom:0;font:inherit;font-size:13px;color:var(--fg);cursor:pointer;width:100%}
-.arow:first-of-type{border-top:0}
-.arow small{color:var(--muted)}
-.wstabs{display:flex;flex-wrap:nowrap;overflow-x:auto;gap:0;border-bottom:1px solid var(--line);padding:0 6px;background:#fff;position:sticky;top:0;z-index:2}
-.wstabs button{min-height:44px;padding:0 7px;white-space:nowrap;flex:0 0 auto;border:0;border-bottom:3px solid transparent;background:transparent;font:inherit;font-size:13px;font-weight:600;color:var(--muted);cursor:pointer}
-.wstabs button.on{color:var(--royal-ink);border-bottom-color:var(--gold)}
+.dcols{display:flex;flex-wrap:wrap;gap:18px;align-items:flex-start}
+.dbox{flex:1 1 340px;min-width:0;background:#fff;border:1px solid var(--line);border-radius:12px;padding:18px;display:flex;flex-direction:column;gap:10px;box-sizing:border-box}
+.dbox.tight{gap:2px}
+.dbox h2,.card h2{margin:0;font-size:16px;font-weight:700;color:var(--royal-ink)}
+.dbox .hrow{display:flex;justify-content:space-between;align-items:baseline;gap:10px;margin-bottom:8px}
+.linkbtn{border:0;background:none;color:var(--royal);font:inherit;font-size:13px;text-decoration:underline;cursor:pointer;padding:0;min-height:44px}
+.need{display:flex;gap:12px;align-items:center;min-height:52px;padding:8px 10px;border-radius:8px;border:0;background:var(--soft);text-align:left;font:inherit;color:var(--fg);cursor:pointer;width:100%;box-sizing:border-box}
+.need.text{background:#fdf1dc}
+.need:hover{box-shadow:inset 0 0 0 1px var(--royal)}
+.need .tag{flex:0 0 auto;font-size:12px;font-weight:700;border-radius:6px;padding:2px 8px;background:#fff;border:1px solid var(--line)}
+.need .tag.text{color:#8a4b00;border-color:#f0d8a8}.need .tag.approve{color:var(--warn-ink);border-color:#f0c9b8}.need .tag.office{color:var(--royal);border-color:#c9d3ea}.need .tag.expiring,.need .tag.pdf,.need .tag.notme{color:var(--crit);border-color:#efc2bf}
+.need b{display:block;font-size:14px}.need small{color:var(--muted);font-size:13px}
+.arow{display:grid;grid-template-columns:64px minmax(0,1fr);gap:2px 12px;min-height:44px;align-items:center;font:inherit;font-size:13.5px;padding:8px 0;border:0;border-top:1px solid var(--bg);text-align:left;background:none;color:var(--fg);cursor:pointer;width:100%}
+.arow small{color:var(--muted);font-size:13.5px}
+/* packages list */
+.pcard{background:#fff;border:1px solid var(--line);border-radius:12px;padding:6px 18px}
+.pcard .list{padding:0;gap:0}
+.pcard .item{border:0;border-top:1px solid var(--bg);border-radius:0;min-height:56px;padding:10px 0;background:none}
+.pcard .item:first-child{border-top:0}
+.pcard .item.cur{background:none}
+.pcard .item.cur b::after{content:" · open";color:var(--muted);font-weight:400}
+.pcard .item b{font-size:14px}.pcard .item small{font-size:13px}
+/* package workspace */
+.pkghead{padding:22px 32px 0;display:flex;flex-direction:column;gap:16px}
+@media (max-width:700px){.pkghead{padding:16px 16px 0}}
+.back{align-self:flex-start;border:0;background:none;color:var(--royal);font:inherit;font-size:13px;cursor:pointer;padding:0;min-height:44px}
+.pkgrow{display:flex;flex-wrap:wrap;gap:14px;align-items:flex-start;justify-content:space-between}
+.pkgrow h1{margin:0;font-size:24px;font-weight:700;color:var(--royal-ink);overflow-wrap:anywhere}
+.pkgttl{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.pkgacts{display:flex;gap:8px;flex-wrap:wrap}
+.pill.d{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;padding:3px 10px}
+.pill.d::before{content:"";width:8px;height:8px;border-radius:50%;background:currentColor}
+.wstabs{display:flex;flex-wrap:wrap;gap:2px;border-bottom:1px solid var(--line)}
+.wstabs button{min-height:44px;padding:0 16px;border:0;border-bottom:3px solid transparent;background:transparent;font:inherit;font-size:14px;font-weight:500;color:var(--muted);cursor:pointer}
+.wstabs button.on{color:var(--royal-ink);font-weight:700;border-bottom-color:var(--gold)}
 .wstabs button:focus-visible{outline:2px solid var(--royal);outline-offset:-2px}
-.panel[data-ws="terms"] details[data-ws]:not([data-ws="terms"]),.panel[data-ws="parties"] details[data-ws]:not([data-ws="parties"]),.panel[data-ws="docs"] details[data-ws]:not([data-ws="docs"]),
-.panel[data-ws="sign"] details[data-ws]:not([data-ws="sign"]),.panel[data-ws="act"] details[data-ws]:not([data-ws="act"]),.panel[data-ws="ver"] details[data-ws]:not([data-ws="ver"]){display:none}
-.wslist{padding:0 14px 14px;display:flex;flex-direction:column;gap:4px;font-size:12.5px}
-.wslist .r{border-top:1px solid var(--line);padding:5px 0}
+.wrap{display:block;padding:16px 32px 40px}
+@media (max-width:700px){.wrap{padding:16px 16px 32px}}
+.panel{background:none;border:0;border-radius:0;position:static;max-height:none;overflow:visible}
+.panel details{background:#fff;border:1px solid var(--line);border-radius:12px;margin-bottom:14px}
+.panel details:last-child{border-bottom:1px solid var(--line)}
+.panel summary{padding:16px 18px;font-size:16px;font-weight:700}
+.panel .sec{padding:0 18px 18px;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px}
+.panel .share,.panel .list,.panel .wslist{padding:0 18px 18px}
+.panel .fld label{font-size:13px;text-transform:none;letter-spacing:0;margin-bottom:6px}
+.panel .sec>.fld>input,.panel .sec>.fld>select,.panel .share .fld input,.panel .share .fld select{min-height:44px;border-radius:8px;padding:0 12px;background:#fff;box-sizing:border-box}
+.panel .sec>.fld>textarea{border-radius:8px;padding:10px 12px;background:#fff}
+.panel[data-ws="terms"] [data-ws]:not([data-ws="terms"]),.panel[data-ws="parties"] [data-ws]:not([data-ws="parties"]),.panel[data-ws="docs"] [data-ws]:not([data-ws="docs"]),
+.panel[data-ws="sign"] [data-ws]:not([data-ws="sign"]),.panel[data-ws="act"] [data-ws]:not([data-ws="act"]),.panel[data-ws="ver"] [data-ws]:not([data-ws="ver"]){display:none}
+.panel[data-ws]:not([data-ws="docs"]):not([data-ws="all"])~.preview{display:none}
+.preview{margin-top:4px}
+.signcols{display:flex;flex-wrap:wrap;gap:18px;align-items:flex-start}
+.signmain{flex:3 1 520px;min-width:0}
+.card{background:#fff;border:1px solid var(--line);border-radius:12px;padding:18px;display:flex;flex-direction:column;gap:12px;box-sizing:border-box;margin-bottom:14px}
+#relBox{flex:1 1 260px;min-width:0;gap:10px}
+.whohead{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between}
+.whohead label{display:flex;gap:8px;align-items:center;font-size:13.5px;color:var(--muted)}
+.whohead select{min-height:44px;border:1px solid var(--line);border-radius:8px;padding:0 10px;font:inherit;color:var(--fg);background:#fff;max-width:100%}
+.pbar{height:10px;background:var(--bg);border-radius:99px;overflow:hidden}
+.pbar div{height:100%;background:var(--ok)}
+.whotbl{width:100%;border-collapse:collapse}
+.whotbl td,.whotbl th{padding:10px 12px;text-align:left;border-top:1px solid var(--bg);font-size:13.5px;vertical-align:middle}
+.whotbl th{font-size:12px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.04em;border-top:0}
+.whotbl td small{color:var(--muted);font-size:12.5px;display:block}
+.whotbl .btn{min-height:40px;border-radius:8px;padding:0 14px;font-weight:600}
+.relrow{display:flex;gap:10px;font-size:13.5px;align-items:baseline}
+.relrow b{flex:0 0 auto;font-weight:700}
+.relrow.done b{color:var(--ok)}.relrow.open b{color:var(--warn-ink)}
+.relnote{margin-top:6px;padding:10px 12px;border-radius:8px;background:#fdf1dc;font-size:13px;color:#6b3d00}
+.relnote.ok{background:#e1f3e9;color:#17603c}
+.wslist{display:flex;flex-direction:column;gap:4px;font-size:13.5px}
+.wslist .r{border-top:1px solid var(--bg);padding:8px 0}
 .wslist .r:first-child{border-top:0}
 .wslist small{color:var(--muted)}
-@media print{.shell{display:block!important}.mainc{display:block!important}#wsView{display:block!important}}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+@media print{.shell,.mainc,#wsView,#pkgView{display:block!important}.preview{display:block!important;margin:0}.wrap{padding:0}}
 </style>
 </head>
 <body>
@@ -465,51 +530,83 @@ details[open] summary::after{content:"–"}
 <nav class="side no-print" aria-label="Main">
   <div class="brand"><span class="mark" aria-hidden="true">E</span><span><b>ERMANO e-Sign</b><small id="sideBranch"></small></span></div>
   <button class="nav" type="button" id="navDash"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg>Dashboard</button>
-  <button class="nav" type="button" id="navPkg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6"/><path d="M8 14h8M8 17h5"/></svg>Package</button>
-  <button class="nav" type="button" id="bCenter"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18"/><path d="M8 14h8"/></svg>Documents</button>
+  <button class="nav" type="button" id="navPkg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6"/></svg>Packages</button>
   <button class="nav" type="button" id="bMonitor"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 12h4l3-8 4 16 3-8h4"/></svg>Monitor<span class="badge" id="monBadge" hidden></span></button>
-  <button class="nav" type="button" id="bConfig"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 4h16v4H4z"/><path d="M4 12h10"/><path d="M4 16h7"/><path d="M16 15l2 2 4-4"/></svg>Templates</button>
+  <button class="nav" type="button" id="navVault"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18"/><path d="M8 14h8"/></svg>Vault</button>
+  <button class="nav" type="button" id="bConfig"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 4h16v4H4z"/><path d="M4 12h10"/><path d="M4 16h7"/><path d="M17 14l2 2 3-4"/></svg>Templates</button>
   <div class="sep"></div>
+  <button class="nav" type="button" id="bUsers" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.8-3.6 3.4-5.5 6.5-5.5s5.7 1.9 6.5 5.5"/><path d="M16 4.5a3.5 3.5 0 0 1 0 7"/><path d="M18 14.6c2 .7 3.2 2.5 3.6 5.4"/></svg>Users</button>
   <button class="nav" type="button" id="navSettings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1"/></svg>Settings</button>
-  <button class="nav" type="button" id="bUsers" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.8-3.6 3.4-5.5 6.5-5.5s5.7 1.9 6.5 5.5"/><path d="M16 4.5a3.5 3.5 0 0 1 0 7"/></svg>Users</button>
-  <button class="nav" type="button" id="navAudit"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>Audit log</button>
-  <div class="who"><small id="opLabel"></small><button class="nav" type="button" id="bLogout"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M15 4h4a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1h-4"/><path d="M10 16l-4-4 4-4"/><path d="M6 12h10"/></svg>Sign out</button></div>
+  <button class="nav" type="button" id="navAudit"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 8v4l3 2"/><circle cx="12" cy="12" r="9"/></svg>Audit log</button>
+  <div class="who"><div id="opLabel"></div><button class="signout" type="button" id="bLogout">Sign out</button></div>
 </nav>
 <div class="mainc">
 <div class="envbar no-print" id="envBar" hidden></div>
-<section class="dash no-print" id="dashView" aria-labelledby="dashTitle" hidden><h1 id="dashTitle">Dashboard</h1><div id="dashBody"><small>Loading…</small></div></section>
-<div id="wsView">
-<header class="topbar no-print">
-  <div><b>Package</b><small id="pkgLabel">New package</small></div>
-  <div class="actions">
-    <button class="btn ghost" id="bNew" type="button">New package</button>
-    <button class="btn ghost" id="bDemo" type="button">Load demo</button>
-    <button class="btn ghost" id="bSave" type="button">Save</button>
-    <button class="btn ghost" id="bAudit" type="button">Package audit</button>
-    <button class="btn ghost" id="bArchive" type="button">Finalize &amp; archive</button>
-    <button class="btn primary" id="bPrint" type="button">Print / Save as PDF</button>
+<section class="pagepad no-print" id="dashView" aria-labelledby="dashTitle" hidden>
+  <div class="phead">
+    <div><h1 id="dashTitle">Dashboard</h1><span class="sub" id="dashDate"></span></div>
+    <div class="ptools">
+      <form id="dashSearchForm" role="search"><label class="search"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg><input type="search" id="dashSearch" placeholder="Loan no., borrower, co-maker…" aria-label="Search packages"></label></form>
+      <button class="btn lg royal" type="button" id="bDashNew"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>New package</button>
+    </div>
   </div>
+  <div id="dashBody" style="display:flex;flex-direction:column;gap:22px"><small>Loading…</small></div>
+</section>
+<div id="wsView">
+<section class="pagepad no-print" id="listView" aria-labelledby="listTitle" hidden>
+  <div class="phead">
+    <div><h1 id="listTitle">Packages</h1><span class="sub">Most recently updated first</span></div>
+    <div class="ptools">
+      <button class="btn lg" type="button" id="bCenter"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>Search and filter</button>
+      <button class="btn lg" type="button" id="bRefresh">Refresh</button>
+      <button class="btn lg" type="button" id="bDemo">Load demo</button>
+      <button class="btn lg royal" type="button" id="bNew"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>New package</button>
+    </div>
+  </div>
+  <div class="pcard"><div class="list" id="pkgList"><small style="color:var(--muted)">Loading…</small></div></div>
+</section>
+<div id="pkgView">
+<header class="pkghead no-print">
+  <button class="back" type="button" id="bBack">← Packages</button>
+  <div class="pkgrow">
+    <div style="display:flex;flex-direction:column;gap:6px;min-width:0">
+      <div class="pkgttl"><h1 id="pkgTitle">New package</h1><span id="pkgPill"></span></div>
+      <span class="psub"><span id="pkgSub"></span><span id="pkgLabel">New package</span></span>
+    </div>
+    <div class="pkgacts">
+      <button class="btn lg" id="bPrint" type="button">Print set</button>
+      <button class="btn lg" id="bGoAmend" type="button" hidden>Amend</button>
+      <button class="btn lg dangertext" id="bGoCancel" type="button" hidden>Cancel package</button>
+      <button class="btn lg" id="bSave" type="button">Save</button>
+      <button class="btn lg" id="bArchive" type="button">Finalize &amp; archive</button>
+      <button class="btn lg royal" id="bNewLink" type="button" hidden>New signing link</button>
+    </div>
+  </div>
+  <div id="lockBanner"></div>
+  <div class="wstabs" role="tablist" aria-label="Package sections" id="wsTabs"><button type="button" role="tab" data-wstab="terms">Terms</button><button type="button" role="tab" data-wstab="parties">Parties</button><button type="button" role="tab" data-wstab="docs">Documents</button><button type="button" role="tab" data-wstab="sign">Signing progress</button><button type="button" role="tab" data-wstab="act">Activity</button><button type="button" role="tab" data-wstab="ver">Versions</button></div>
 </header>
 
 <main class="wrap">
   <aside class="panel no-print" id="wsPanel" data-ws="terms">
-    <details id="dPkgs">
-      <summary>Packages <button class="btn sm" id="bRefresh" type="button">Refresh</button></summary>
-      <div class="list" id="pkgList"><small style="color:var(--muted)">Loading…</small></div>
-    </details>
-
-    <div id="lockBanner" style="padding-top:12px"></div>
-    <div class="wstabs" role="tablist" aria-label="Package sections" id="wsTabs"><button type="button" role="tab" data-wstab="terms">Terms</button><button type="button" role="tab" data-wstab="parties">Parties</button><button type="button" role="tab" data-wstab="docs">Documents</button><button type="button" role="tab" data-wstab="sign">Signing progress</button><button type="button" role="tab" data-wstab="act">Activity</button><button type="button" role="tab" data-wstab="ver">Versions</button></div>
-
     <details open data-ws="docs">
       <summary>Documents &amp; status</summary>
       <div class="list" id="checklist"></div>
     </details>
 
-    <details open data-ws="sign">
-      <summary>Share for signing</summary>
-      <div class="share" id="share"></div>
-    </details>
+    <div class="signcols" data-ws="sign" id="signArea">
+      <div class="signmain">
+        <section class="card" id="whoBox" aria-label="Who has signed"></section>
+        <details open>
+          <summary>Share for signing</summary>
+          <div class="share" id="share"></div>
+        </details>
+        <details open>
+          <summary>Signatures</summary>
+          <div class="list" id="signers"></div>
+        </details>
+      </div>
+      <aside class="card" id="relBox" aria-label="Before release"></aside>
+    </div>
 
     <div id="fs">
     <details open data-ws="terms">
@@ -747,11 +844,6 @@ details[open] summary::after{content:"–"}
     </details>
     </div>
 
-    <details open data-ws="sign">
-      <summary>Signatures</summary>
-      <div class="list" id="signers"></div>
-    </details>
-
     <details open data-ws="act">
       <summary>Activity on this package</summary>
       <div class="wslist" id="wsAct"><small>Open a saved package to see its activity.</small></div>
@@ -770,6 +862,7 @@ details[open] summary::after{content:"–"}
 
   <section class="preview"><div class="pages" id="pages"></div></section>
 </main>
+</div>
 </div>
 </div>
 </div>
@@ -2139,7 +2232,7 @@ var Forms = (function(){
   function loadConfig(){ return guard(Forms.call('adminGetConfig',TOK)).then(function(c){ A.cfg=c; A.operator=c.operator||A.operator; applyRoleUi(); if(!A.id){ Forms.S.settings=c.snapshot; Forms.S.templateStatus=tstatusFromCfg(); Forms.S.templates=versionsFromCfg(); } return c; }); }
   function applyRoleUi(){
     var c=A.cfg, u=c.user||{};
-    $('opLabel').textContent=(u.name||A.operator)+' · '+(u.roles||[]).map(function(r){ return (c.roleNames||{})[r]||r; }).join(', ')+(u.branch?' · '+u.branch:'');
+    $('opLabel').innerHTML='<b>'+Forms.esc(u.name||A.operator)+'</b><br><span>'+Forms.esc((u.roles||[]).map(function(r){ return (c.roleNames||{})[r]||r; }).join(', ')+(u.branch?' · '+u.branch:''))+'</span>';
     $('envBar').hidden = !c.env || c.env==='PRODUCTION'; $('envBar').textContent = c.env+' — test copy. Use made-up test data only; never real borrower information.';
     ['bNew','bDemo','bSave'].forEach(function(id){ $(id).hidden=!CAN('prepare'); });
     $('bUsers').hidden=!CAN('users'); $('navSettings').hidden=!CAN('settings');
@@ -2173,7 +2266,7 @@ var Forms = (function(){
   var leaveArmed=0;
   function confirmLeave(){ if(Date.now()-leaveArmed<5000) return true; leaveArmed=Date.now(); Forms.toast('You have unsaved changes. Click again to discard them.'); return false; }
   $('pkgList').addEventListener('click',function(e){ if(e.target.id==='bListMore'){ $('bCenter').click(); return; } var b=e.target.closest('[data-pkg]'); if(b) openPkg(b.dataset.pkg); });
-  $('bRefresh').addEventListener('click',function(e){ e.preventDefault(); loadList(); if(A.id) openPkg(A.id); });
+  $('bRefresh').addEventListener('click',function(){ loadList(); });
   function newPkg(){
     if(A.dirty && !confirmLeave()) return;
     A.server=null; A.id=''; A.status='DRAFT'; A.links=[]; A.collateral=[]; A.deposit=null; A.dirty=false; A.cmConsent=false;
@@ -2181,7 +2274,7 @@ var Forms = (function(){
     Forms.S.templates=versionsFromCfg(); Forms.S.templateStatus=tstatusFromCfg(); Forms.S.settings=A.cfg?A.cfg.snapshot:{};
     loadFields(); renderEditors(); renderAll(); loadList(); wsTab('terms');
   }
-  $('bNew').onclick=function(){ showView('ws'); newPkg(); };
+  $('bNew').onclick=function(){ if(A.dirty && !confirmLeave()) return; showView('ws'); newPkg(); };
   /* Fill a new, unsaved package with the DEMO loan so the full document set can be seen (and signed in the office) before any real data is entered. */
   function loadDemo(){
     if(A.dirty && !confirmLeave()) return Promise.resolve();
@@ -2314,7 +2407,7 @@ var Forms = (function(){
     var pending=pendingKeys().filter(function(r){ return r!=='pnFig'; });
     var lifePending=pending.length && docOf(pending[0]);
     if(A.id) h+=lifecycleBoxHtml();
-    if(A.id && !cancelled()) h+=remindersHtml()+progressHtml();
+    if(A.id && !cancelled()) h+=remindersHtml();
     if(cancelled()){ h+='<div class="banner cancel" style="margin:0">This package was cancelled. It is kept for the record.</div>'; }
     else if(archived()){ h+='<div class="banner lock" style="margin:0">Finalized and archived. Executed copy SHA-256 '+Forms.esc((A.server.archive||{}).sha256||'').slice(0,16)+'…</div>'+pdfBoxHtml(); }
     else if(!pending.length && A.status==='SIGNED'){ h+='<div class="banner lock" style="margin:0">All parties have signed. Add the office signatures, Save, then Finalize &amp; archive. Post-execution documents can be enabled below and shared from here.</div>'; }
@@ -2346,10 +2439,11 @@ var Forms = (function(){
       }
     }
     el.innerHTML=h;
+    renderWho(); renderRelease(); renderHead();
   }
-  $('share').addEventListener('change',function(e){ var t=e.target;
+  $('signArea').addEventListener('change',function(e){ var t=e.target;
     if(t.id==='ordMode'){ guard(Forms.call('adminSetSigningOrder',TOK,A.id,t.value)).then(function(r){ return reload('Signing order saved.'+(r.waitingLinks?' '+r.waitingLinks+' active link(s) will open only when it is that signer\'s turn.':'')); }).catch(function(err){ Forms.toast(err.message); renderShare(); }); return; } if(t.name==='hrs') A.hours=Number(t.value); if(t.name==='chan'){ A.channel=t.value; renderShare(); } if(t.dataset.role){ A.roles[t.dataset.role]=t.checked; renderShare(); } });
-  $('share').addEventListener('input',function(e){ var t=e.target, m={shareMobile:'mobile',shareEmail:'email',shareIdType:'idType',shareIdLast4:'idLast4'}; if(m[t.id]) A[m[t.id]]=t.value;
+  $('signArea').addEventListener('input',function(e){ var t=e.target, m={shareMobile:'mobile',shareEmail:'email',shareIdType:'idType',shareIdLast4:'idLast4'}; if(m[t.id]) A[m[t.id]]=t.value;
     var w={wetDate:'date',wetIdType:'idType',wetIdLast4:'idLast4',wetNote:'note'}; if(w[t.id]) A.wet[w[t.id]]=t.value; });
   function copyText(t,okMsg){
     var done=function(){ Forms.toast(okMsg); };
@@ -2359,7 +2453,7 @@ var Forms = (function(){
   function reload(msg){ return guard(Forms.call('adminGetPackage',TOK,A.id)).then(function(p){ applyServer(p); loadFields(); renderEditors(); renderAll(); loadList(); if(msg) Forms.toast(msg); }); }
   function tickedRoles(){ var roles=[]; $('share').querySelectorAll('[data-role]').forEach(function(cb){ if(cb.checked) roles.push(cb.dataset.role); }); return roles; }
   function readFile(file){ return new Promise(function(ok,no){ var r=new FileReader(); r.onload=function(){ ok(r.result); }; r.onerror=function(){ no(new Error('Could not read the file.')); }; r.readAsDataURL(file); }); }
-  $('share').addEventListener('click',function(e){
+  $('signArea').addEventListener('click',function(e){
     var t=e.target;
     if(t.dataset.docget){ openDoc(t.dataset.docget,t); return; }
     if(t.dataset.reissue){ t.disabled=true; guard(Forms.call('adminReissueLink',TOK,t.dataset.reissue,A.hours)).then(function(l){ return reload('New link created.'+(l.hasEmail?' The code was emailed to '+l.emailMasked+'.':' Now press Send code by SMS on it.')); }).catch(function(err){ Forms.toast(err.message); t.disabled=false; }); return; }
@@ -2564,7 +2658,7 @@ var Forms = (function(){
     document.querySelectorAll('#fs [data-f]').forEach(function(el){ var k=el.dataset.f; var lifeD=Object.keys(LIFE).filter(function(d){ return LIFE[d].test(k); })[0];
       el.disabled = ar || !CAN('prepare') || k==='approvalRef' || k==='approvedBy' || (lifeD ? (A.status!=='SIGNED' || lifeLocked(lifeD)) : (lk && OFFICE_KEYS.indexOf(k)<0)); });
     document.querySelectorAll('#checksEd input,#chargesEd input,#assetsEd input,#assetsEd select,#assetsEd button').forEach(function(el){ el.disabled=lk||ar; });
-    $('bRegen').disabled=lk||ar; $('bAddAsset').disabled=lk||ar; $('bSave').disabled=ar; $('bArchive').hidden=!(A.status==='SIGNED'&&!ar&&A.id&&CAN('archive')); $('bAudit').hidden=!A.id;
+    $('bRegen').disabled=lk||ar; $('bAddAsset').disabled=lk||ar; $('bSave').disabled=ar; $('bArchive').hidden=!(A.status==='SIGNED'&&!ar&&A.id&&CAN('archive'));
     $('dCollateral').hidden=!f.secCollateral; $('dDeposit').hidden=!f.secDeposit; $('dSurety').hidden=!f.secSurety; $('dPDC').hidden=!(f.incPDC||Forms.S.legacy); $('dLife').hidden=!(isV3() && A.status==='SIGNED');
     ['f_purposeOther'].forEach(function(id){ $(id).parentElement.hidden = f.purposeClass!=='specific'; }); $('f_spouseName').parentElement.hidden = f.civilStatus!=='Married'; $('f_grSpouseName').parentElement.hidden = f.grCivilStatus!=='Married' || !!f.borrowerIsGrantor; $('f_suSpouseName').parentElement.hidden = f.suCivilStatus!=='Married';
     document.querySelectorAll('.lifegrp').forEach(function(g){ g.hidden = !f['inc'+g.dataset.life]; });
@@ -2575,7 +2669,7 @@ var Forms = (function(){
     var extra=(sv.amendment?'<div class="banner info">'+Forms.esc((A.cfg&&A.cfg.amendKinds||{})[sv.amendment.kind]||sv.amendment.kind)+' of package '+Forms.esc(sv.amendment.of)+': '+Forms.esc(sv.amendment.reason)+'. The original stays as it is and becomes Superseded only when this package is Completed.</div>':'')+
       (sv.supersededBy?'<div class="banner info">Superseded by package '+Forms.esc(sv.supersededBy)+'. The documents and signatures of this package are unchanged and remain in the vault.</div>':'');
     $('lockBanner').innerHTML = extra + (cancelled() ? '<div class="banner cancel">Cancelled '+Forms.esc(Forms.fmtManila(sv.cancelled.at))+' by '+Forms.esc(sv.cancelled.by)+': '+Forms.esc(sv.cancelled.reason)+'. Nothing was deleted; the package can no longer be changed.</div>' : ar ? '<div class="banner lock">Finalized and archived '+Forms.esc(Forms.fmtManila(A.server.archive.at))+'. Executed copy SHA-256 '+Forms.esc(A.server.archive.sha256)+'. Nothing can be changed.</div>' : lk ? '<div class="banner lock">'+(A.status==='SIGNED'?'All parties signed':'A party has signed')+'. Loan terms are locked; office details, post-execution documents and office signatures can still be added.</div>' : (liveLinks().length&&A.dirty ? '<div class="banner warn">Saving changed terms cancels the active signing links.</div>' : ''));
-    $('pkgLabel').textContent = (A.id ? A.id : (Forms.S.meta&&Forms.S.meta.demo?'DEMO loan':'New package'))+(A.dirty?' · unsaved':'');
+    renderHead();
     renderCalc(); renderSigners(); renderSignDate(); renderChecklist(); renderRecords(); if(!skipShare) renderShare();
     Forms.S.docSet=null; Forms.render($('pages'));
   }
@@ -2601,7 +2695,6 @@ var Forms = (function(){
     guard(Forms.call('adminArchive',TOK,A.id,executedHtml())).then(function(r){ Forms.toast('Archived. SHA-256 '+r.sha256.slice(0,16)+'…'+(r.pdfQueued?' · '+r.pdfQueued+' PDF copies are being created':'')); return guard(Forms.call('adminGetPackage',TOK,A.id)); }).then(function(p){ applyServer(p); loadFields(); renderEditors(); renderAll(); loadList(); })
       .catch(function(e){ Forms.toast(e.message); }).finally(function(){ b.disabled=false; b.dataset.armed=''; b.textContent='Finalize & archive'; });
   };
-  $('bAudit').onclick=function(){ wsTab('act'); };
 
   /* ---------- Settings & Templates overlay ---------- */
   /* ---------- Document Center (packages) and Vault (by borrower) ---------- */
@@ -2763,7 +2856,7 @@ var Forms = (function(){
   $('tabMe').addEventListener('click',function(e){ if(e.target.id!=='bMePw') return; if($('meNew').value!==$('meNew2').value){ Forms.toast('The two new passwords do not match.'); return; }
     guard(Forms.call('adminChangePassword',TOK,$('meOld').value,$('meNew').value)).then(function(d){ TOK=d.token; try{sessionStorage.setItem('esign_adm',TOK);}catch(x){} renderMe(); Forms.toast('Password changed.'); }).catch(function(err){ Forms.toast(err.message); }); });
   var SET_FIELDS=[
-    {h:'Company'},{k:'company.name',l:'Company name'},{k:'company.address',l:'Company address'},{k:'payment.channels',l:'Payment place / channels (printed on the Disclosure)',full:true},
+    {h:'Company'},{k:'company.name',l:'Company name'},{k:'company.address',l:'Company address'},{k:'company.phone',l:'Office phone shown to signers (blank = "call your loan officer")'},{k:'payment.channels',l:'Payment place / channels (printed on the Disclosure)',full:true},
     {h:'Delinquency charge (DS §D, PN §2) — counsel to set the rate; ≤ 5 % per month for covered small loans'},
     {k:'delinquency.grace',l:'Grace period (calendar days) — management decision: 5'},{k:'delinquency.rate',l:'Delinquency charge % per month (blank = NONE)'},{k:'delinquency.cap',l:'Aggregate cap, % of original principal (blank = none stated)'},
     {h:'Default, fees, venue (PN §§3, 6, 10)'},{k:'cure.days',l:'Payment default: cure days after written notice'},{k:'cure.days2',l:'Other breach: cure days after written notice'},{k:'attorney.fee',l:'Attorney\'s fees % of amount due — management decision: 10'},{k:'venue',l:'Venue (proper court of …)'},
@@ -2805,12 +2898,15 @@ var Forms = (function(){
 
   /* ---------- Phase 8: views (dashboard | package workspace), workspace tabs, dashboard ---------- */
   var VIEW='ws';
-  function showView(v){ VIEW=v; $('dashView').hidden=v!=='dash'; $('wsView').hidden=v!=='ws'; $('navDash').classList.toggle('on',v==='dash'); $('navPkg').classList.toggle('on',v==='ws');
-    $('navDash').setAttribute('aria-current',v==='dash'?'page':'false'); $('navPkg').setAttribute('aria-current',v==='ws'?'page':'false'); if(v==='ws') setTimeout(function(){ Forms.fit($('pages')); },0); }
+  /** dash = dashboard · list = the Packages list · ws = one package's workspace. */
+  function showView(v){ VIEW=v; $('dashView').hidden=v!=='dash'; $('wsView').hidden=v==='dash'; $('listView').hidden=v!=='list'; $('pkgView').hidden=v!=='ws';
+    $('navDash').classList.toggle('on',v==='dash'); $('navPkg').classList.toggle('on',v!=='dash');
+    $('navDash').setAttribute('aria-current',v==='dash'?'page':'false'); $('navPkg').setAttribute('aria-current',v!=='dash'?'page':'false');
+    if(v==='ws') setTimeout(function(){ Forms.fit($('pages')); },0); window.scrollTo(0,0); }
   var WS_TABS=['terms','parties','docs','sign','act','ver'];
   function wsTab(t){ if(WS_TABS.indexOf(t)<0) t='terms'; $('wsPanel').dataset.ws=t;
     $('wsTabs').querySelectorAll('[data-wstab]').forEach(function(b){ var on=b.dataset.wstab===t; b.classList.toggle('on',on); b.setAttribute('aria-selected',on?'true':'false'); });
-    if(t==='act') loadActivity(); if(t==='ver') renderVersions(); }
+    if(t==='act') loadActivity(); if(t==='ver') renderVersions(); if(t==='docs') setTimeout(function(){ Forms.fit($('pages')); },0); }
   /** The tab a package opens on: the terms while it is a draft; afterwards Signing progress, which holds the status, PDF copies and the package actions. */
   function defaultTab(){ var st=(A.server&&A.server.lifecycle)||'Draft'; return (!A.id||st==='Draft'||st==='Pending Review')?'terms':'sign'; }
   $('wsTabs').addEventListener('click',function(e){ var b=e.target.closest('[data-wstab]'); if(b) wsTab(b.dataset.wstab); });
@@ -2838,53 +2934,117 @@ var Forms = (function(){
 
   var DASH=null;
   var STAT_DEFS=[
-    { k:'thisMonth', l:'Packages this month', s:function(d){ return 'created since the 1st'; }, go:function(){ openCenter({ sort:'created' }); } },
-    { k:'pendingSignatures', l:'Waiting for signatures', s:function(){ return 'out for signature or partly signed'; }, go:function(){ openCenter({ status:['Pending Signature','Partially Signed'] }); } },
-    { k:'pendingApprovals', l:'Waiting for approval', warn:true, s:function(){ return 'submitted for approval'; }, go:function(){ openCenter({ status:['Pending Review'] }); } },
-    { k:'expiring24h', l:'Links expiring in 24 hours', warn:true, s:function(){ return 'remind or send a new link'; }, go:function(){ $('bMonitor').click(); } },
-    { k:'executedThisWeek', l:'Finalized this week', ok:true, s:function(d){ return 'since Monday '+(d.weekStart||''); }, go:function(d){ openCenter({ status:['Fully Signed','Completed','Archived'], from:d.weekStart||'' }); } },
-    { k:'completed', l:'Completed', ok:true, s:function(){ return 'all PDF copies verified'; }, go:function(){ openCenter({ status:['Completed','Archived'] }); } }
+    { k:'thisMonth', l:'Packages this month', s:function(d){ var c=d.counts, df=c.thisMonth-(c.lastMonth||0); return c.lastMonth===undefined?'created since the 1st':df===0?'Same as '+d.lastMonthName:Math.abs(df)+(df>0?' more than ':' fewer than ')+d.lastMonthName; }, go:function(){ openCenter({ sort:'created' }); } },
+    { k:'pendingSignatures', l:'Waiting for signatures', s:function(d){ var n=d.counts.partiallySigned; return n===undefined?'out for signature':n+' partially signed'; }, go:function(){ openCenter({ status:['Pending Signature','Partially Signed'] }); } },
+    { k:'pendingApprovals', l:'Waiting for approval', warn:true, s:function(d){ return d.counts.pendingApprovals?'Needs an approver':'None waiting'; }, go:function(){ openCenter({ status:['Pending Review'] }); } },
+    { k:'expiring24h', l:'Links expiring in 24 hours', warn:true, s:function(d){ return d.counts.expiring24h?'Remind or send a new link':'None expiring'; }, go:function(){ $('bMonitor').click(); } },
+    { k:'executedThisWeek', l:'Finalized this week', ok:true, s:function(){ return 'PDF copies verified'; }, go:function(d){ openCenter({ status:['Fully Signed','Completed','Archived'], from:d.weekStart||'' }); } },
+    { k:'completed', l:'Completed (all time)', ok:true, s:function(){ return 'Ready for release'; }, go:function(){ openCenter({ status:['Completed','Archived'] }); } }
   ];
-  var NEED_TAG={ text:'Text', expiring:'Expiring', pdf:'PDF', approve:'Approve', office:'Office' };
-  function openCenter(q){ DC.q=Object.assign({ text:'', status:[], branch:'', from:'', to:'', sort:'updated', page:1 }, q||{}); DC.open=''; DC.card=null; $('dcView').hidden=false; $('dcPk').innerHTML='<small>Loading…</small>'; loadCenter(); }
+  var NEED_TAG={ text:'Text', expiring:'Expiring', pdf:'PDF', approve:'Approve', office:'Office', notme:'Check' };
+  function openCenter(q){ DC.q=Object.assign({ text:'', status:[], branch:'', from:'', to:'', sort:'updated', page:1 }, q||{}); DC.open=''; DC.card=null; $('dcView').hidden=false; $('dcView').querySelector('[data-dctab="pk"]').click(); $('dcPk').innerHTML='<small>Loading…</small>'; loadCenter(); }
   function loadDash(){
-    $('dashBody').innerHTML = DASH ? $('dashBody').innerHTML : '<small>Loading…</small>';
+    $('dashDate').textContent=new Date().toLocaleDateString('en-PH',{ timeZone:'Asia/Manila', weekday:'long', year:'numeric', month:'long', day:'numeric' });
+    $('bDashNew').hidden=!CAN('prepare');
     return guard(Forms.call('adminDashboard',TOK)).then(function(d){ DASH=d; renderDash(); }).catch(function(e){
-      // An app newer than its server (the server not yet updated to Phase 8): carry on in the package workspace.
-      if(/unknown function|adminDashboard/i.test(e.message||'')){ $('dashBody').innerHTML='<div class="banner warn" style="margin:0">The dashboard needs the Phase 8 server update. Everything else works as before.</div>'; if(VIEW==='dash' && !DASH) showView('ws'); return; }
+      // An app newer than its server (the server not yet updated to Phase 8): carry on in the Packages list.
+      if(/unknown function|adminDashboard/i.test(e.message||'')){ $('dashBody').innerHTML='<div class="banner warn" style="margin:0">The dashboard needs the Phase 8 server update. Everything else works as before.</div>'; if(VIEW==='dash' && !DASH) showView('list'); return; }
       $('dashBody').innerHTML='<div class="banner crit" style="margin:0">'+Forms.esc(e.message)+'</div>'; });
   }
+  /** Activity time: the hour today, the day otherwise (Manila). */
+  function shortWhen(ts){ var d=new Date(ts), o={ timeZone:'Asia/Manila' }; return d.toLocaleDateString('en-CA',o)===new Date().toLocaleDateString('en-CA',o) ? d.toLocaleTimeString('en-US',{ timeZone:'Asia/Manila', hour:'numeric', minute:'2-digit' }) : d.toLocaleDateString('en-US',{ timeZone:'Asia/Manila', month:'short', day:'numeric' }); }
   function renderDash(){
-    var d=DASH, c=d.counts, u=(A.cfg&&A.cfg.user)||{};
+    var d=DASH, c=d.counts;
     var texts=d.attention.filter(function(x){ return x.kind==='text'; }).length; $('monBadge').hidden=!texts; $('monBadge').textContent=texts+' to text';
-    var h='<div class="sub">'+Forms.esc(new Date(d.generatedAt).toLocaleDateString('en-PH',{ timeZone:'Asia/Manila', weekday:'long', year:'numeric', month:'long', day:'numeric' }))+(u.name?' · '+Forms.esc(u.name):'')+' · <button class="btn sm" type="button" id="bDashRefresh">Refresh</button>'+(CAN('prepare')?' <button class="btn sm royal" type="button" id="bDashNew">New package</button>':'')+'</div>';
-    h+='<div class="stats">'+STAT_DEFS.map(function(s,i){ var n=c[s.k]||0; return '<button type="button" class="stat'+(s.warn&&n?' warn':'')+(s.ok&&n?' ok':'')+'" data-stat="'+i+'"><span>'+Forms.esc(s.l)+'</span><b>'+n+'</b><small>'+Forms.esc(s.s(d))+'</small></button>'; }).join('')+'</div>';
-    h+='<div class="dcols"><section class="dbox" aria-labelledby="needT"><h2 id="needT">Needs attention</h2>'+(d.attention.length?d.attention.map(function(x){ return '<button type="button" class="need" data-needpkg="'+Forms.esc(x.packageId)+'" data-needkind="'+x.kind+'"><span class="tag '+x.kind+'">'+NEED_TAG[x.kind]+'</span><span><b>'+Forms.esc(x.title)+'</b><small>'+Forms.esc(x.sub)+'</small></span></button>'; }).join('')+(d.attentionMore?'<small>'+d.attentionMore+' more in the Monitor.</small>':''):'<small>Nothing is waiting. </small>')+'</section>';
-    h+='<section class="dbox" aria-labelledby="actT"><h2 id="actT">Recent activity</h2>'+(d.activity.length?d.activity.map(function(a){ return '<button type="button" class="arow"'+(a.packageId?' data-actpkg="'+Forms.esc(a.packageId)+'"':'')+'><small>'+Forms.esc(Forms.fmtManila(a.ts))+'</small><span><b>'+Forms.esc(a.actor)+'</b> '+Forms.esc(a.words)+(a.loan?' · '+Forms.esc(a.loan):'')+'</span></button>'; }).join(''):'<small>No activity yet.</small>')+'</section></div>';
+    var h='<section class="stats" aria-label="Counts">'+STAT_DEFS.map(function(s,i){ var n=c[s.k]||0; return '<button type="button" class="stat'+(s.warn&&n?' warn':'')+(s.ok?' ok':'')+'" data-stat="'+i+'"><span>'+Forms.esc(s.l)+'</span><b>'+n+'</b><small>'+Forms.esc(s.s(d))+'</small></button>'; }).join('')+'</section>';
+    h+='<div class="dcols"><section class="dbox" aria-labelledby="needT"><h2 id="needT">Needs you today</h2>'+(d.attention.length?d.attention.map(function(x){ return '<button type="button" class="need '+x.kind+'" data-needpkg="'+Forms.esc(x.packageId)+'" data-needkind="'+x.kind+'"><span class="tag '+x.kind+'">'+NEED_TAG[x.kind]+'</span><span><b>'+Forms.esc(x.title)+'</b><small>'+Forms.esc(x.sub)+'</small></span></button>'; }).join('')+(d.attentionMore?'<small style="color:var(--muted)">'+d.attentionMore+' more in the Monitor.</small>':''):'<small style="color:var(--muted)">Nothing is waiting for you.</small>')+'</section>';
+    h+='<section class="dbox tight" aria-labelledby="actT"><div class="hrow"><h2 id="actT">Recent activity</h2><button type="button" class="linkbtn" id="bDashAudit">Open audit log</button></div>'+(d.activity.length?d.activity.map(function(a){ return '<button type="button" class="arow"'+(a.packageId?' data-actpkg="'+Forms.esc(a.packageId)+'"':'')+' title="'+Forms.esc(Forms.fmtManila(a.ts))+'"><small>'+Forms.esc(shortWhen(a.ts))+'</small><span><b>'+Forms.esc(String(a.actor||'').replace(/ \[[^\]]*\]$/,''))+'</b> '+Forms.esc(a.words)+(a.loan?' · '+Forms.esc(a.loan):'')+'</span></button>'; }).join(''):'<small style="color:var(--muted)">No activity yet.</small>')+'</section></div>';
     $('dashBody').innerHTML=h;
   }
   $('dashBody').addEventListener('click',function(e){
     var t=e.target.closest('button'); if(!t) return;
-    if(t.id==='bDashRefresh'){ loadDash(); return; }
-    if(t.id==='bDashNew'){ $('bNew').click(); return; }
+    if(t.id==='bDashAudit'){ $('navAudit').click(); return; }
     if(t.dataset.stat){ STAT_DEFS[+t.dataset.stat].go(DASH); return; }
     if(t.dataset.needpkg){ openPkg(t.dataset.needpkg, 'sign'); return; }
     if(t.dataset.actpkg){ openPkg(t.dataset.actpkg); return; }
   });
+  $('bDashNew').onclick=function(){ $('bNew').click(); };
+  $('dashSearchForm').addEventListener('submit',function(e){ e.preventDefault(); openCenter({ text:$('dashSearch').value.trim() }); });
   $('navDash').onclick=function(){ if(VIEW!=='dash'){ showView('dash'); } loadDash(); };
-  $('navPkg').onclick=function(){ showView('ws'); };
+  $('navPkg').onclick=function(){ showView('list'); loadList(); };
+  $('bBack').onclick=function(){ showView('list'); loadList(); };
+  $('navVault').onclick=function(){ $('dcView').hidden=false; $('dcView').querySelector('[data-dctab="vault"]').click(); };
   $('navSettings').onclick=function(){ $('cfgView').hidden=false; loadConfig().then(function(){ renderCfg(); $('cfgView').querySelector('[data-tab="set"]').click(); }).catch(function(e){ Forms.toast(e.message); }); };
   $('navAudit').onclick=function(){ $('cfgView').hidden=false; $('cfgView').querySelector('[data-tab="aud"]').click(); $('tabAud').innerHTML='<small>Loading…</small>';
     guard(Forms.call('adminDashboard',TOK)).then(function(d){ $('tabAud').innerHTML='<div class="banner info" style="margin:0 0 8px">The last '+d.activity.length+' actions on the packages you can see. Open a package and its Activity tab for its whole history; the Audit sheet is the full record.</div><table class="audit">'+d.activity.map(function(a){ return '<tr><td style="white-space:nowrap">'+Forms.esc(Forms.fmtManila(a.ts))+'</td><td>'+Forms.esc(a.actor)+'</td><td><b>'+Forms.esc(a.words)+'</b></td><td>'+Forms.esc(a.loan)+'</td></tr>'; }).join('')+'</table>'; }).catch(function(e){ $('tabAud').innerHTML='<small class="err">'+Forms.esc(e.message)+'</small>'; }); };
 
+  /* ---------- package header, "Who has signed", "Before release" ---------- */
+  function renderHead(){
+    var f=Forms.S.f, sv=A.server||{}, st=cancelled()?'Cancelled':(sv.lifecycle||'Draft');
+    $('pkgTitle').textContent = (A.id||f.loanId||f.name) ? (f.loanId||'(no loan no.)')+' · '+(f.name||'(no borrower yet)') : 'New package';
+    $('pkgPill').innerHTML = '<span class="pill d '+(LC_PILL[st]||'mute')+'">'+Forms.esc(st)+'</span>'+(A.dirty?' <span class="pill d no">Unsaved changes</span>':'');
+    var bits=[]; if(f.loanType) bits.push(f.loanType==='Other'&&f.loanTypeOther?f.loanTypeOther:f.loanType+' loan'); if(f.amount) bits.push('₱'+Forms.money(f.amount));
+    if(f.installments) bits.push(f.installments+' '+(f.frequency||'')+' installment'+(String(f.installments)==='1'?'':'s')); if(sv.branch) bits.push(sv.branch);
+    if(sv.approval) bits.push('approved by '+sv.approval.name+', '+Forms.fmtManila(sv.approval.at));
+    $('pkgSub').textContent = bits.length ? bits.join(' · ')+' · ' : '';
+    $('pkgLabel').textContent = (A.id ? A.id : (Forms.S.meta&&Forms.S.meta.demo?'DEMO loan':'New package'))+(A.dirty?' · unsaved':'');
+    $('bSave').classList.toggle('royal', !!A.dirty);
+    // Header shortcuts appear only when the action itself is offered on the Signing progress tab.
+    $('bGoAmend').hidden=!$('amKind'); $('bGoCancel').hidden=!$('cxReason');
+    $('bNewLink').hidden=!(A.id && CAN('prepare') && !archived() && !cancelled() && pendingKeys().filter(function(r){ return r!=='pnFig'; }).length);
+  }
+  function goSign(focusId){ wsTab('sign'); setTimeout(function(){ var el=$(focusId); if(el){ el.scrollIntoView({ block:'center' }); try{ el.focus({ preventScroll:true }); }catch(e){} } },0); }
+  $('bGoAmend').onclick=function(){ goSign('amKind'); };
+  $('bGoCancel').onclick=function(){ goSign('cxReason'); };
+  $('bNewLink').onclick=function(){ goSign($('shareMobile')?'shareMobile':$('apprRef')?'apprRef':'share'); if(!$('bShare') && !$('bWet')) Forms.toast($('apprRef')||!(A.server&&A.server.approval)?'Approve the package for signing first.':'Choose who signs, then create the link.'); };
+  function methodOf(r){
+    if(r.state==='signed') return r.how==='on paper'?'Wet ink, scan saved':r.how==='in the office'?'In the office':r.how==='in the office with code'?'In the office, with code':'Remote, with code';
+    var l=r.token?A.links.filter(function(x){ return x.token===r.token; })[0]:null;
+    return l ? (l.channel==='office'?'In the office, ':'Remote, ')+(l.hasEmail?'emailed code':'code by text') : '—';
+  }
+  function renderWho(){
+    var sv=A.server||{}, rows=sv.progress||[], el=$('whoBox');
+    if(!A.id){ el.innerHTML='<h2>Who has signed</h2><span class="psub">Save the package to start. Signing begins after an approver approves it.</span>'; return; }
+    var modes=sv.orderModes||{}, mode=sv.signOrder||'any', canEdit=CAN('prepare') && !locked() && !archived();
+    // The company line: the office signatures on the loan documents (company, witnesses, custodian).
+    var office=[], sig=Forms.S.sig||{}; Forms.docSet().forEach(function(code){ if(LIFE[code]) return; docSigners(code).forEach(function(k){ if(PARTY.indexOf(base(k))<0 && office.indexOf(k)<0) office.push(k); }); });
+    var offDone=office.filter(function(k){ return sig[k]; }).length, partiesLeft=rows.filter(function(r){ return !r.doc && r.state!=='signed'; }).length;
+    var loanRows=rows.filter(function(r){ return !r.doc; }), done=loanRows.filter(function(r){ return r.state==='signed'; }).length+(office.length&&offDone===office.length?1:0), total=loanRows.length+(office.length?1:0);
+    var h='<div class="whohead"><h2>Who has signed</h2><label for="ordMode">Signing order '+(canEdit?'<select id="ordMode">'+Object.keys(modes).map(function(k){ return '<option value="'+k+'"'+(k===mode?' selected':'')+'>'+Forms.esc(modes[k])+'</option>'; }).join('')+'</select>':'<b style="color:var(--fg)">'+Forms.esc(modes[mode]||mode)+'</b>')+'</label></div>';
+    h+='<div class="pbar" role="progressbar" aria-valuemin="0" aria-valuenow="'+done+'" aria-valuemax="'+total+'" aria-label="'+done+' of '+total+' parties signed"><div style="width:'+(total?Math.round(done/total*100):0)+'%"></div></div><span class="psub" style="font-size:13px" id="whoCount">'+done+' of '+total+' parties signed</span>';
+    h+='<div style="overflow-x:auto"><table class="whotbl"><thead><tr><th>Party</th><th>Status</th><th>Method</th><th>Last change</th><th><span class="sr">Action</span></th></tr></thead><tbody>';
+    rows.forEach(function(r){ var ps=PSTATE[r.state]||['mute',r.state];
+      var note = r.waitFor&&r.waitFor.length ? 'waits for '+r.waitFor.join(', ') : (r.state==='sent'||r.state==='opened'||r.state==='verified') ? 'expires '+Forms.fmtManila(r.expiresAt)+(r.reminders?' · '+r.reminders+' reminder'+(r.reminders>1?'s':''):'') : '';
+      var acts='';
+      if(CAN('prepare') && !archived() && r.token && (r.state==='expired'||r.state==='cancelled'||r.state==='sent'||r.state==='opened')) acts+='<button class="btn" type="button" data-reissue="'+Forms.esc(r.token)+'">New link</button>';
+      h+='<tr><td><b>'+Forms.esc(r.name||'—')+'</b><small>'+Forms.esc(r.label)+(r.doc?' ('+Forms.esc(r.doc)+')':'')+'</small></td><td><span class="pill d '+ps[0]+'">'+ps[1]+'</span></td><td>'+Forms.esc(methodOf(r))+(note?'<small>'+Forms.esc(note)+'</small>':'')+'</td><td>'+(r.at?Forms.esc(Forms.fmtManila(r.at)):'—')+'</td><td>'+acts+'</td></tr>';
+    });
+    if(office.length) h+='<tr><td><b>'+Forms.esc((Forms.S.settings&&Forms.S.settings.companyName)||'ERMANO Lending Corporation')+'</b><small>Company'+(office.length>1?' and '+(office.length-1)+' other office signature'+(office.length>2?'s':''):'')+'</small></td><td><span class="pill d '+(offDone===office.length?'ok':'mute')+'">'+(offDone===office.length?'Signed':partiesLeft?'Waiting for parties':offDone+' of '+office.length+' signed')+'</span></td><td>In the office</td><td>—</td><td></td></tr>';
+    h+='</tbody></table></div>';
+    if(canEdit && sv.templates && Object.keys(sv.templates).length && !Object.keys(Forms.S.sig||{}).length && !Forms.S.legacy) h+='<div style="border-top:1px solid var(--bg);padding-top:10px"><button class="btn sm" type="button" id="bRefreshTpl">Use the latest approved templates</button> <small style="color:var(--muted)">Only before anyone signs. Active links are cancelled.</small></div>';
+    el.innerHTML=h;
+  }
+  var REL_ITEMS=[ ['Templates approved by counsel',/^Template not yet approved/], ['Approved for signing',/approved for signing|Approval was withdrawn|Not yet approved/i], ['All parties signed',/^Still to sign/], ['Office signatures',/^Office signatures missing/], ['Finalized, archived and PDF copies',/Executed copy not yet|PDF cop/] ];
+  function renderRelease(){
+    var sv=A.server||{}, rel=sv.release, el=$('relBox'), h='<h2>Before release</h2>';
+    if(cancelled()) h+='<div class="relnote">This package was cancelled. It does not release a loan.</div>';
+    else if(!A.id || !rel) h+='<span class="psub" style="font-size:13.5px">'+(A.id?'Open the package again to see what is left.':'Save the package to see what is left before the loan can be released.')+'</span>';
+    else {
+      REL_ITEMS.forEach(function(it){ var bl=rel.blockers.filter(function(b){ return it[1].test(b); })[0]; h+='<div class="relrow '+(bl?'open':'done')+'"><b>'+(bl?'✗ Open':'✓ Done')+'</b><span>'+Forms.esc(bl||it[0])+'</span></div>'; });
+      rel.blockers.filter(function(b){ return !REL_ITEMS.some(function(it){ return it[1].test(b); }); }).forEach(function(b){ h+='<div class="relrow open"><b>✗ Open</b><span>'+Forms.esc(b)+'</span></div>'; });
+      h+=rel.ready?'<div class="relnote ok" id="relNote">Ready for release. Every document is complete and its PDF copy is verified.</div>':'<div class="relnote" id="relNote">Not ready for release.'+(rel.next?' Next: '+Forms.esc(rel.next)+'.':'')+'</div>';
+    }
+    el.innerHTML=h;
+  }
+
   function start(){
-    $('loginView').hidden=true; $('appView').hidden=false; $('dPkgs').open=true;
-    var hash=(location.hash||'').slice(1); if(hash==='new'){ setTimeout(function(){ try{ $('bNew').click(); }catch(e){} },300); } if(hash==='packages'){ setTimeout(function(){ try{ $('dPkgs').open=true; $('dPkgs').scrollIntoView(); }catch(e){} },300); } $('bArchive').hidden=true; $('bAudit').hidden=true;
+    $('loginView').hidden=true; $('appView').hidden=false;
+    var hash=(location.hash||'').slice(1); if(hash==='new'){ setTimeout(function(){ try{ $('bNew').click(); }catch(e){} },300); } $('bArchive').hidden=true;
     loadConfig().then(function(){ newPkg(); return guard(Forms.call('adminListPackages',TOK)); })
       .then(function(list){
         // First run (no packages yet): the DEMO loan in the workspace. Otherwise the dashboard, unless the address asked for a package view.
         if(!list.length && CAN('prepare')){ showView('ws'); return loadDemo(); }
-        if(hash==='new'||hash==='packages') showView('ws'); else { showView('dash'); return loadDash(); }
+        if(hash==='new') showView('ws'); else if(hash==='packages') showView('list'); else { showView('dash'); return loadDash(); }
       })
       .catch(function(e){ Forms.toast(e.message); if(!A.cfg) newPkg(); });
   }
