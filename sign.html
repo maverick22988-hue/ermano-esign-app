@@ -1778,8 +1778,11 @@ var Forms = (function(){
     // One id per submission: if the connection drops and the signer presses again, the server recognises it and answers once.
     st.submitId = st.submitId || ('S'+Date.now().toString(36)+Math.random().toString(36).slice(2,10));
     var send = function(tries){ return Forms.call('borrowerSubmit', TOKEN, { otp:st.otp, sig:sig, consents:st.consent, agree:true, privacy:true, ua:navigator.userAgent, submitId:st.submitId })
-      .catch(function(e){ if(tries>0 && /network|failed to fetch|timed? ?out|NetworkError|Load failed/i.test(e.message||'')) return new Promise(function(ok){ setTimeout(ok,2500); }).then(function(){ return send(tries-1); }); throw e; }); };
-    send(2).then(function(r){
+      .catch(function(e){
+        // A dropped connection or a busy server: wait and send the same submission again (same id, so it can never sign twice).
+        if(tries>0 && /network|failed to fetch|timed? ?out|NetworkError|Load failed|system is busy/i.test(e.message||'')){ $('submit').textContent='Still sending… please wait'; return new Promise(function(ok){ setTimeout(ok,2500+Math.floor(Math.random()*3000)); }).then(function(){ return send(tries-1); }); }
+        throw e; }); };
+    send(4).then(function(r){
       st.submitted=true; st.roles.forEach(function(k){ Forms.S.sig[k].at=r.submittedAt; Forms.S.sig[k].by='link'; });
       if(st.roles.indexOf('borrower')>=0) Forms.S.f.signDate=r.signDate;
       Forms.S.meta.consents=Forms.S.meta.consents||{}; st.consentsNeeded.forEach(function(c){ Forms.S.meta.consents[c]={at:r.submittedAt}; });
@@ -1881,7 +1884,8 @@ var Forms = (function(){
     if(st.expired) return;
     st.otp=$('otp').value.replace(/\D/g,'');
     $('verifyErr').textContent=''; $('verifyBtn').disabled=true; $('verifyBtn').textContent='Checking…';
-    Forms.call('borrowerOpen', TOKEN, st.otp).then(function(d){ $('verifyBtn').disabled=false; $('verifyBtn').textContent='Continue'; opened(d); }).catch(function(e){ $('verifyBtn').disabled=false; $('verifyBtn').textContent='Continue'; $('verifyErr').textContent=e.message; if(/cancelled/i.test(e.message)) block(e.message); });
+    var tryOpen=function(tries){ return Forms.call('borrowerOpen', TOKEN, st.otp).catch(function(e){ if(tries>0 && /system is busy/i.test(e.message||'')) return new Promise(function(ok){ setTimeout(ok,1500+Math.floor(Math.random()*2500)); }).then(function(){ return tryOpen(tries-1); }); throw e; }); };
+    tryOpen(3).then(function(d){ $('verifyBtn').disabled=false; $('verifyBtn').textContent='Continue'; opened(d); }).catch(function(e){ $('verifyBtn').disabled=false; $('verifyBtn').textContent='Continue'; $('verifyErr').textContent=e.message; if(/cancelled/i.test(e.message)) block(e.message); });
   }
   function block(msg){ ['verify','who','read','intro','done','prog','foot','stepRow','loading'].forEach(function(id){ $(id).hidden=true; }); $('blocked').hidden=false; $('blockedMsg').textContent=msg; }
   $('verifyBtn').addEventListener('click',openDocs);

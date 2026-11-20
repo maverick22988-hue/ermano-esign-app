@@ -886,11 +886,12 @@ details[open] summary::after{content:"–"}
 <div class="overlay no-print" id="cfgView" hidden>
   <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="cfgTitle">
     <h2 id="cfgTitle">Settings &amp; Templates <button class="btn sm" id="bCfgClose" type="button">Close</button></h2>
-    <div class="tabs"><button type="button" class="on" data-tab="tpl">Templates &amp; legal review</button><button type="button" data-tab="set">Settings</button><button type="button" data-tab="aud">Audit log</button><button type="button" data-tab="api">ELMS connection</button><button type="button" data-tab="usr">Users</button><button type="button" data-tab="me">My account</button></div>
+    <div class="tabs"><button type="button" class="on" data-tab="tpl">Templates &amp; legal review</button><button type="button" data-tab="set">Settings</button><button type="button" data-tab="aud">Audit log</button><button type="button" data-tab="api">ELMS connection</button><button type="button" data-tab="ops">System health</button><button type="button" data-tab="usr">Users</button><button type="button" data-tab="me">My account</button></div>
     <div id="tabTpl"></div>
     <div id="tabSet" hidden></div>
     <div id="tabAud" hidden></div>
     <div id="tabApi" hidden></div>
+    <div id="tabOps" hidden></div>
     <div id="tabUsr" hidden></div>
     <div id="tabMe" hidden></div>
   </div>
@@ -2239,7 +2240,7 @@ var Forms = (function(){
     $('bUsers').hidden=!CAN('users'); $('navSettings').hidden=!CAN('settings');
     $('sideBranch').textContent=u.branch?u.branch+' branch':'All branches';
     $('cfgView').querySelector('[data-tab="usr"]').hidden=!CAN('users');
-    $('cfgView').querySelector('[data-tab="set"]').hidden=!CAN('settings'); $('cfgView').querySelector('[data-tab="api"]').hidden=!CAN('settings');
+    $('cfgView').querySelector('[data-tab="set"]').hidden=!CAN('settings'); $('cfgView').querySelector('[data-tab="api"]').hidden=!CAN('settings'); $('cfgView').querySelector('[data-tab="ops"]').hidden=!CAN('settings');
   }
   function versionsFromCfg(){ var v={}; (A.cfg?A.cfg.templates:[]).forEach(function(t){ if(t.current!==false) v[t.id]=t.version; }); return v; }
   function tstatusFromCfg(){ var s={}; (A.cfg?A.cfg.templates:[]).forEach(function(t){ if(t.current!==false) s[t.id]={version:t.version,legalStatus:t.legalStatus,reviewedBy:t.reviewedBy,reviewedAt:t.reviewedAt,title:t.title}; }); return s; }
@@ -2816,8 +2817,8 @@ var Forms = (function(){
 
   $('bConfig').onclick=function(){ $('cfgView').hidden=false; loadConfig().then(renderCfg).catch(function(e){ Forms.toast(e.message); }); };
   $('bCfgClose').onclick=function(){ $('cfgView').hidden=true; if(!A.id){ Forms.S.settings=A.cfg.snapshot; Forms.S.templateStatus=tstatusFromCfg(); } else if(A.server && !A.server.pinned){ Forms.S.settings=A.cfg.snapshot; Forms.S.templateStatus=tstatusFromCfg(); } renderAll(); };
-  $('cfgView').querySelector('.tabs').addEventListener('click',function(e){ var b=e.target.closest('[data-tab]'); if(!b) return; $('cfgView').querySelectorAll('.tabs button').forEach(function(x){ x.classList.toggle('on',x===b); }); $('tabTpl').hidden=b.dataset.tab!=='tpl'; $('tabSet').hidden=b.dataset.tab!=='set'; $('tabAud').hidden=b.dataset.tab!=='aud'; $('tabUsr').hidden=b.dataset.tab!=='usr'; $('tabMe').hidden=b.dataset.tab!=='me'; $('tabApi').hidden=b.dataset.tab!=='api';
-    if(b.dataset.tab==='usr') loadUsers(); if(b.dataset.tab==='me') renderMe(); if(b.dataset.tab==='api') loadApi(); if(b.dataset.tab==='set'){ if(!$('smsBox') && A.cfg) renderCfg(); loadSms(); } if(b.dataset.tab==='aud' && !AUD.loaded) loadAudit(); });
+  $('cfgView').querySelector('.tabs').addEventListener('click',function(e){ var b=e.target.closest('[data-tab]'); if(!b) return; $('cfgView').querySelectorAll('.tabs button').forEach(function(x){ x.classList.toggle('on',x===b); }); $('tabTpl').hidden=b.dataset.tab!=='tpl'; $('tabSet').hidden=b.dataset.tab!=='set'; $('tabAud').hidden=b.dataset.tab!=='aud'; $('tabUsr').hidden=b.dataset.tab!=='usr'; $('tabMe').hidden=b.dataset.tab!=='me'; $('tabApi').hidden=b.dataset.tab!=='api'; $('tabOps').hidden=b.dataset.tab!=='ops';
+    if(b.dataset.tab==='usr') loadUsers(); if(b.dataset.tab==='me') renderMe(); if(b.dataset.tab==='api') loadApi(); if(b.dataset.tab==='ops') loadOps(); if(b.dataset.tab==='set'){ if(!$('smsBox') && A.cfg) renderCfg(); loadSms(); } if(b.dataset.tab==='aud' && !AUD.loaded) loadAudit(); });
   $('bUsers').onclick=function(){ $('cfgView').hidden=false; loadConfig().then(function(){ renderCfg(); $('cfgView').querySelector('[data-tab="usr"]').click(); }).catch(function(e){ Forms.toast(e.message); }); };
   var NEW_TEMP=null;
   function loadUsers(){ $('tabUsr').innerHTML='<small>Loading…</small>'; guard(Forms.call('adminListUsers',TOK)).then(renderUsers).catch(function(e){ $('tabUsr').innerHTML='<small class="err">'+Forms.esc(e.message)+'</small>'; }); }
@@ -2865,6 +2866,7 @@ var Forms = (function(){
     {h:'Collateral (MCSA §8, Release)'},{k:'ppsr.terminationDays',l:'Register PPSR termination within ___ working days'},
     {h:'Reminders to signers (sent by the system every hour, 8 AM to 8 PM; never include the link or the code)'},
     {k:'reminders.enabled',l:'Send reminders',type:'bool'},{k:'reminders.afterHours',l:'Hours after the link (and between reminders)'},{k:'reminders.max',l:'Most reminders per link (0 to 5)'},
+    {h:'System health alerts'},{k:'ops.alertEmail',l:'Email that is told when the daily check fails (blank = no email)',full:true},
     {h:'Signer\'s own copy (step 5 of the signer page)'},{k:'signer.copyDays',l:'Days the signer can download their PDF copy after finalizing (0 = not offered)'},
     {h:'SMS gateway (optional). Off: codes go by email, and staff text the code for signers without email. On: the server texts codes and reminders itself.'},
     {k:'sms.provider',l:'Provider',type:'sel',opts:[{v:'',t:'Off'},{v:'semaphore',t:'Semaphore (Philippines)'},{v:'generic',t:'Other gateway (HTTPS, JSON)'}]},{k:'sms.sender',l:'Sender name registered with the provider (up to 11 letters)'},{k:'sms.url',l:'Gateway address, only for "Other gateway" (https://…)',full:true},
@@ -3131,6 +3133,34 @@ var Forms = (function(){
         $('audExpMsg').textContent=r.rows+' records exported.';
       }).catch(function(err){ $('audExpMsg').textContent=err.message; }).then(function(){ t.disabled=false; });
     }
+  });
+
+  /* ---------- Phase 10: System health (check, backup, restore drill, audit record) ---------- */
+  var OPS_PILL={ ok:['ok','OK'], warn:['no','Check'], fail:['crit','Fix'], info:['mute','Info'] };
+  function loadOps(){
+    $('tabOps').innerHTML='<small>Checking…</small>';
+    guard(Forms.call('adminHealth',TOK)).then(function(h){ OPSD=h; renderOps(); }).catch(function(e){ $('tabOps').innerHTML='<div class="banner '+(/unknown function|adminHealth/i.test(e.message||'')?'warn':'crit')+'" style="margin:0">'+(/unknown function|adminHealth/i.test(e.message||'')?'System health needs the Phase 10 server update.':Forms.esc(e.message))+'</div>'; });
+  }
+  var OPSD=null;
+  function renderOps(extra){
+    var h=OPSD, head={ ok:['ok','Everything checked is in order.'], warn:['warn','Working, with '+h.items.filter(function(i){ return i.state==='warn'; }).length+' thing(s) to look at.'], fail:['crit',h.items.filter(function(i){ return i.state==='fail'; }).length+' thing(s) need fixing.'] }[h.state];
+    var x='<div class="banner '+head[0]+'" style="margin:0 0 10px"><b>'+head[1]+'</b> ERMANO e-Sign '+Forms.esc(h.version)+' · '+Forms.esc(h.env)+' · checked '+Forms.esc(Forms.fmtManila(h.checkedAt))+(h.alertEmail?' · failures are emailed to '+Forms.esc(h.alertEmail):' · no alert email set (Settings)')+'</div>';
+    x+='<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px"><button class="btn royal" type="button" id="bOpsCheck">Check again</button><button class="btn" type="button" id="bOpsBackup">Back up now</button><button class="btn" type="button" id="bOpsDrill">Run restore drill</button><button class="btn" type="button" id="bOpsAudit">Check the whole audit record</button></div><div id="opsMsg" role="status">'+(extra||'')+'</div>';
+    x+='<table class="audit"><tr><th>What</th><th>State</th><th>Detail</th></tr>'+h.items.map(function(i){ var p=OPS_PILL[i.state]||OPS_PILL.info; return '<tr><td style="white-space:nowrap"><b>'+Forms.esc(i.label)+'</b></td><td><span class="pill '+p[0]+'">'+p[1]+'</span></td><td style="overflow-wrap:anywhere">'+Forms.esc(i.detail)+'</td></tr>'; }).join('')+'</table>';
+    x+='<small style="display:block;margin-top:8px">The restore drill only reads a backup copy and checks it; it never changes the live data. Restoring for real is a manual step for the owner — see docs/RUNBOOK.md. A passing check means these items are in order; it is not a statement that the system is completely secure.</small>';
+    $('tabOps').innerHTML=x;
+  }
+  $('tabOps').addEventListener('click',function(e){
+    var t=e.target.closest('button'); if(!t) return;
+    var busy=function(msg){ t.disabled=true; $('opsMsg').innerHTML='<small>'+msg+'</small>'; };
+    var after=function(html){ return guard(Forms.call('adminHealth',TOK)).then(function(h){ OPSD=h; renderOps(html); }); };
+    var fail=function(err){ t.disabled=false; $('opsMsg').innerHTML='<div class="banner crit" style="margin:0 0 10px">'+Forms.esc(err.message)+'</div>'; };
+    if(t.id==='bOpsCheck'){ loadOps(); return; }
+    if(t.id==='bOpsBackup'){ busy('Copying the data…'); guard(Forms.call('adminBackupNow',TOK)).then(function(b){ return after('<div class="banner ok" style="margin:0 0 10px">Backup made: '+Forms.esc(b.name)+' ('+b.kept+' kept).</div>'); }).catch(fail); return; }
+    if(t.id==='bOpsDrill'){ busy('Opening the newest backup and checking it. This can take a minute…'); guard(Forms.call('adminRestoreDrill',TOK,'')).then(function(d){
+        return after('<div class="banner '+(d.ok?'ok':'crit')+'" style="margin:0 0 10px"><b>Restore drill '+(d.ok?'passed':'FAILED')+'</b> on "'+Forms.esc(d.backup.name)+'" (made '+Forms.esc(Forms.fmtManila(d.backup.at))+', '+Math.round(d.tookMs/100)/10+' s).<ul style="margin:6px 0 0;padding-left:18px">'+d.checks.map(function(c){ return '<li>'+(c.ok?'✓ ':'✗ ')+Forms.esc(c.name)+' — '+Forms.esc(c.detail)+'</li>'; }).join('')+'</ul></div>'); }).catch(fail); return; }
+    if(t.id==='bOpsAudit'){ busy('Checking every audit record…'); guard(Forms.call('adminVerifyAudit',TOK,true)).then(function(r){
+        return after('<div class="banner '+(r.ok?'ok':'crit')+'" style="margin:0 0 10px">'+(r.ok?'<b>Audit record intact.</b> '+r.covered+' chained record(s) checked'+(r.legacy?'; '+r.legacy+' older record(s) from before the chain are not covered':'')+(r.state==='partial'?' (stopped at the time limit after '+r.checked+'; run it again later)':'')+'.':'<b>Audit record problem.</b> '+Forms.esc(r.reason)+' Do not edit the sheet; see docs/RUNBOOK.md, "Audit record problem".')+'</div>'); }).catch(fail); return; }
   });
   function start(){
     $('loginView').hidden=true; $('appView').hidden=false;
